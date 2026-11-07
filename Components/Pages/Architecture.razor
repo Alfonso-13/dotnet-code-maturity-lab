@@ -1,0 +1,20 @@
+@page "/arquitectura"
+
+<PageTitle>Arquitectura | .NET Code Maturity Lab</PageTitle>
+
+<header class="page-header"><span class="eyebrow">Diseño de solución</span><h1>Comprende el sistema antes de elegir herramientas.</h1><p class="lead">Visualiza responsabilidades, límites y dependencias. Cada componente debe responder a una necesidad, no a una tendencia.</p></header>
+
+<section class="architecture-board page-section">
+    <div class="architecture-toolbar"><span>Flujo de una orden</span><div><button class="mini-button active">Lógico</button><button class="mini-button">Infraestructura</button></div></div>
+    <div class="architecture-flow">
+        <article><span class="architecture-icon">HTTP</span><small>Entrada</small><strong>API</strong><p>Contrato y transporte</p></article><i>→</i>
+        <article><span class="architecture-icon">APP</span><small>Aplicación</small><strong>Caso de uso</strong><p>Orquesta el flujo</p></article><i>→</i>
+        <article class="highlight"><span class="architecture-icon">DOM</span><small>Dominio</small><strong>Orden</strong><p>Reglas de negocio</p></article><i>→</i>
+        <article><span class="architecture-icon">DB</span><small>Infraestructura</small><strong>Persistencia</strong><p>Detalle técnico</p></article>
+    </div>
+    <div class="architecture-legend"><span><i class="dot red"></i> Dependencia directa</span><span><i class="dot dark"></i> Límite de responsabilidad</span><span><i class="dot blue"></i> Adaptador externo</span></div>
+</section>
+
+<section class="definition-grid page-section">
+    <article><span>01</span><h3>Objetivo</h3><p>¿Qué resultado de negocio debe producir la solución?</p></article><article><span>02</span><h3>Reglas</h3><p>¿Qué condiciones deben cumplirse siempre?</p></article><article><span>03</span><h3>Calidad</h3><p>¿Qué disponibilidad, seguridad y rendimiento requiere?</p></article><article><span>04</span><h3>Restricciones</h3><p>¿Qué límites de tiempo, costo y tecnología existen?</p></article>
+</section>

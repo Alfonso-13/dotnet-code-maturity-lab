@@ -1,0 +1,54 @@
+﻿@page "/"
+
+<PageTitle>Inicio | .NET Code Maturity Lab</PageTitle>
+
+<section class="hero page-section">
+    <div class="hero-copy">
+        <span class="eyebrow">Laboratorio interactivo · .NET 10</span>
+        <h1>Del código que funciona a una solución preparada para producción.</h1>
+        <p class="lead">Explora cómo madura una API de órdenes a través de código, pruebas, arquitectura e infraestructura. Aprende qué cambia, por qué cambia y qué decisión tomar según el contexto.</p>
+        <div class="button-row">
+            <a class="button button-primary" href="ruta">Comenzar recorrido <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="laboratorio">Ver el laboratorio</a>
+        </div>
+        <div class="hero-meta">
+            <span><strong>3</strong> niveles</span><span><strong>1</strong> caso práctico</span><span><strong>0</strong> registro requerido</span>
+        </div>
+    </div>
+    <div class="hero-visual" aria-label="Progresión de madurez: Junior, Middle y Senior">
+        <div class="terminal-bar"><span></span><span></span><span></span><small>order-processing.cs</small></div>
+        <div class="maturity-code">
+            <span class="line-number">01</span><code><b>public</b> Task&lt;Result&gt; Process(Order order)</code>
+            <span class="line-number">02</span><code>{</code>
+            <span class="line-number">03</span><code>  <em>// La solución evoluciona contigo</em></code>
+            <span class="line-number">04</span><code>  <mark>Validate(order);</mark></code>
+            <span class="line-number">05</span><code>  <mark>await Persist(order);</mark></code>
+            <span class="line-number">06</span><code>}</code>
+        </div>
+        <div class="level-stack">
+            <div><span>01</span><strong>Junior</strong><small>Funciona correctamente</small></div>
+            <div><span>02</span><strong>Middle</strong><small>Es mantenible y comprobable</small></div>
+            <div><span>03</span><strong>Senior</strong><small>Resiste condiciones reales</small></div>
+        </div>
+    </div>
+</section>
+
+<section class="page-section section-heading">
+    <div><span class="eyebrow">Una forma distinta de aprender</span><h2>No memorices patrones. Observa qué problema resuelven.</h2></div>
+    <p>Cada concepto parte de una situación visible y termina con una decisión que puedes defender en una entrevista o aplicar en un proyecto real.</p>
+</section>
+
+<section class="feature-grid page-section">
+    <article class="feature-card accent-red"><span class="card-number">01</span><h3>Compara</h3><p>Revisa el antes y después del código con riesgos, cambios y consecuencias señalados.</p><span class="text-link">Código y refactorización →</span></article>
+    <article class="feature-card accent-dark"><span class="card-number">02</span><h3>Experimenta</h3><p>Ejecuta pruebas, provoca fallos y visualiza el recorrido de una petición por el sistema.</p><span class="text-link">Pruebas y comportamiento →</span></article>
+    <article class="feature-card accent-blue"><span class="card-number">03</span><h3>Decide</h3><p>Evalúa trade-offs de diseño, infraestructura, costo, seguridad y escalabilidad.</p><span class="text-link">Arquitectura y Azure →</span></article>
+</section>
+
+<section class="path-preview page-section">
+    <div class="section-heading compact"><div><span class="eyebrow">Ruta de aprendizaje</span><h2>Una misma API, tres perspectivas.</h2></div><a class="text-link" href="ruta">Ver ruta completa →</a></div>
+    <div class="path-line">
+        <article><span class="level-dot">J</span><small>Nivel 01</small><h3>Junior</h3><p>C#, REST, validación, HTTP, LINQ, pruebas unitarias y AAA.</p></article>
+        <article><span class="level-dot">M</span><small>Nivel 02</small><h3>Middle</h3><p>SOLID, DI, Strategy, integración, errores y refactorización.</p></article>
+        <article><span class="level-dot">S</span><small>Nivel 03</small><h3>Senior</h3><p>Idempotencia, concurrencia, resiliencia, seguridad y observabilidad.</p></article>
+    </div>
+</section>

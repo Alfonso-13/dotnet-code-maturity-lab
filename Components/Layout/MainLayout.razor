@@ -1,0 +1,49 @@
+﻿@inherits LayoutComponentBase
+
+<a class="skip-link" href="#main-content">Saltar al contenido</a>
+
+<div id="site-intro" class="site-intro" aria-hidden="true">
+    <div class="intro-accent"></div>
+    <div class="intro-content">
+        <div class="intro-mark">
+            <span class="intro-tile intro-tile-red">&lt;</span>
+            <span class="intro-tile intro-tile-dark">&gt;</span>
+        </div>
+        <div class="intro-wordmark">
+            <strong><span>Red</span> &amp; Black</strong>
+            <small>Codeworkers</small>
+        </div>
+        <div class="intro-product">
+            <span></span>
+            <p>.NET Code Maturity Lab</p>
+        </div>
+    </div>
+</div>
+
+<div class="app-shell">
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="Ir al inicio">
+            <img src="images/red-black-codeworkers-logo.png" alt="Red & Black Codeworkers" />
+            <span class="brand-product">
+                <strong>.NET Code Maturity</strong>
+                <small>Interactive lab</small>
+            </span>
+        </a>
+        <div class="topbar-actions">
+            <span class="public-badge"><span aria-hidden="true">●</span> Laboratorio abierto</span>
+            <a class="github-link" href="https://github.com/Alfonso-13/dotnet-code-maturity-lab" target="_blank" rel="noreferrer">Ver en GitHub <span aria-hidden="true">↗</span></a>
+        </div>
+    </header>
+    <aside class="sidebar" aria-label="Navegación principal"><NavMenu /></aside>
+    <main id="main-content" class="main-content" tabindex="-1">@Body</main>
+    <footer class="app-footer">
+        <span>Un proyecto educativo de <strong>Red & Black Codeworkers</strong></span>
+        <span>Construido con .NET 10 y Blazor</span>
+    </footer>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    Ocurrió un error inesperado.
+    <a href="." class="reload">Recargar</a>
+    <span class="dismiss">🗙</span>
+</div>

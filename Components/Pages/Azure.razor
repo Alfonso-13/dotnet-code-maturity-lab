@@ -1,0 +1,16 @@
+@page "/azure"
+
+<PageTitle>Azure y escala | .NET Code Maturity Lab</PageTitle>
+
+<header class="page-header"><span class="eyebrow">Infraestructura y nube</span><h1>Escalar es gestionar recursos, límites y costo.</h1><p class="lead">Una vista inicial del simulador que permitirá observar qué sucede cuando cambia la demanda de la API.</p></header>
+
+<section class="cloud-board page-section">
+    <div class="traffic-panel"><span class="eyebrow">Escenario simulado</span><h2>Tráfico moderado</h2><div class="metric"><strong>120</strong><span>solicitudes / min</span></div><div class="metric-row"><span>CPU <b>42%</b></span><span>Latencia <b>180 ms</b></span><span>Errores <b>0.2%</b></span></div><div class="fake-slider"><span></span></div><small>El simulador interactivo se incorporará en una siguiente etapa.</small></div>
+    <div class="cloud-diagram"><div class="cloud-node client">Clientes <small>120 req/min</small></div><i>↓</i><div class="cloud-node azure">Azure App Service <small>2 instancias</small><div class="instances"><b>API</b><b>API</b></div></div><i>↓</i><div class="cloud-node database">Azure SQL <small>40% DTU</small></div></div>
+</section>
+
+<section class="scale-grid page-section">
+    <article><span class="scale-icon">↥</span><h3>Vertical</h3><p>Más CPU, memoria o capacidad para una instancia.</p><small>Simple, pero con un límite físico y económico.</small></article>
+    <article><span class="scale-icon">↔</span><h3>Horizontal</h3><p>Más instancias atendiendo solicitudes en paralelo.</p><small>Exige controlar el estado y las dependencias compartidas.</small></article>
+    <article><span class="scale-icon">⌁</span><h3>Dinámico</h3><p>La capacidad cambia según tráfico, métricas o programación.</p><small>Equilibra rendimiento, disponibilidad y costo.</small></article>
+</section>

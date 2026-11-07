@@ -1,0 +1,33 @@
+@page "/laboratorio"
+
+<PageTitle>Laboratorio | .NET Code Maturity Lab</PageTitle>
+
+<header class="lab-header"><div><span class="eyebrow">Ejercicio modelo · Middle</span><h1>Separar responsabilidades con SOLID</h1><p>Un servicio procesa la orden, calcula descuentos, persiste datos y envía notificaciones.</p></div><span class="status-chip active">Vista de demostración</span></header>
+<nav class="lab-tabs" aria-label="Secciones del ejercicio"><span class="active">Código</span><span>Pruebas</span><span>Flujo visual</span><span>Decisión</span><span>Entrevista</span></nav>
+
+<section class="comparison-grid page-section">
+    <article class="code-window problem"><header><div><span class="code-status">Antes</span><strong>OrderService.cs</strong></div><span class="risk-label">3 riesgos</span></header><pre><code><span class="code-keyword">public class</span> OrderService
+{
+  <span class="code-keyword">public async</span> Task Process(Order order)
+  {
+    Validate(order);
+    CalculateDiscount(order);
+<span class="code-risk">    await _database.Save(order);</span>
+<span class="code-risk">    await _email.Send(order);</span>
+  }
+}</code></pre><footer><span>Responsabilidades mezcladas</span><span>Alto acoplamiento</span></footer></article>
+    <article class="code-window solution"><header><div><span class="code-status">Después</span><strong>OrderProcessor.cs</strong></div><span class="success-label">Responsabilidad clara</span></header><pre><code><span class="code-keyword">public class</span> OrderProcessor(
+  IOrderValidator validator,
+  IOrderRepository repository,
+  INotifier notifier)
+{
+  <span class="code-keyword">public async</span> Task Process(Order order)
+  {
+    <span class="code-good">validator.Validate(order);</span>
+    <span class="code-good">await repository.Save(order);</span>
+    <span class="code-good">await notifier.Notify(order);</span>
+  }
+}</code></pre><footer><span>Dependencias explícitas</span><span>Comportamiento comprobable</span></footer></article>
+</section>
+
+<section class="insight-grid page-section"><article><span class="eyebrow">Principio aplicado</span><h2>S · Responsabilidad única</h2><p>Cada componente tiene una razón concreta para cambiar. Separar no significa crear una clase por cada línea, sino reconocer responsabilidades que evolucionan de manera independiente.</p></article><article class="test-preview"><span class="eyebrow">Prueba estructurada con AAA</span><div><b>Arrange</b><span>Preparar la orden y dependencias</span></div><div><b>Act</b><span>Procesar una única conducta</span></div><div><b>Assert</b><span>Verificar el resultado observable</span></div></article></section>
