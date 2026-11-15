@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 230" role="img" aria-labelledby="title desc">
+  <title id="title">Flujo visual para tomar decisiones</title>
+  <desc id="desc">Una decisión de arquitectura se divide en opciones con diferentes riesgos, costos y resultados.</desc>
+  <rect width="640" height="230" rx="18" fill="#f3f5f6"/>
+  <g fill="none" stroke="#748089" stroke-width="3"><path d="M170 115h80M390 72h45M390 158h45M320 115v43M320 115V72"/><path d="m240 106 10 9-10 9M425 63l10 9-10 9M425 149l10 9-10 9"/></g>
+  <rect x="38" y="70" width="132" height="90" rx="12" fill="#0d141a"/><circle cx="73" cy="101" r="15" fill="#e53935"/><path d="M67 101h12m-6-6 6 6-6 6" stroke="#fff" stroke-width="2" fill="none"/><text x="96" y="99" fill="#fff" font-family="Arial" font-size="13" font-weight="700">Contexto</text><text x="96" y="119" fill="#aeb7bd" font-family="Arial" font-size="11">riesgo y escala</text><text x="57" y="144" fill="#aeb7bd" font-family="Arial" font-size="10">¿QUÉ NECESITA CAMBIAR?</text>
+  <rect x="250" y="70" width="140" height="90" rx="12" fill="#fff" stroke="#cfd5d9"/><path d="M279 95h82M279 116h60M279 137h72" stroke="#1d2931" stroke-width="5" stroke-linecap="round"/><circle cx="366" cy="95" r="6" fill="#e53935"/>
+  <g font-family="Arial,sans-serif"><rect x="435" y="33" width="169" height="77" rx="11" fill="#fff" stroke="#d5dade"/><circle cx="458" cy="57" r="11" fill="#198754"/><path d="m453 57 4 4 7-8" fill="none" stroke="#fff" stroke-width="2"/><text x="478" y="60" fill="#18242c" font-size="12" font-weight="700">Solución simple</text><text x="455" y="88" fill="#65717a" font-size="10">menor costo · menor riesgo</text>
+  <rect x="435" y="120" width="169" height="77" rx="11" fill="#0d141a"/><circle cx="458" cy="144" r="11" fill="#e53935"/><path d="M452 144h12m-6-6v12" stroke="#fff" stroke-width="2"/><text x="478" y="147" fill="#fff" font-size="12" font-weight="700">Diseño escalable</text><text x="455" y="175" fill="#9ca8af" font-size="10">más capacidad · más operación</text></g>
+</svg>

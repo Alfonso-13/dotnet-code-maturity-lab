@@ -1,0 +1,86 @@
+@inject IJSRuntime JS
+
+<article class="csharp-code-card code-protagonist @CssClass">
+    <header>
+        <div>
+            <span class="code-language">C#</span>
+            <strong>@FileName</strong>
+            @if (!string.IsNullOrWhiteSpace(Label))
+            {
+                <span class="code-window-label">@Label</span>
+            }
+        </div>
+        <button type="button" class="code-copy-icon" @onclick="CopyCode" aria-label="@(Copied ? $"Código copiado de {FileName}" : $"Copiar código de {FileName}")" title="@(Copied ? "Código copiado" : "Copiar código")">
+            @if (Copied)
+            {
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+                <span class="visually-hidden" role="status">Código copiado</span>
+            }
+            else
+            {
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="1"/><path d="M16 8V5H5v11h3"/></svg>
+            }
+        </button>
+    </header>
+    <pre><code>@((MarkupString)Highlight(PlainCode))</code></pre>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public string FileName { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string PlainCode { get; set; } = string.Empty;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool Copied { get; set; }
+
+    protected override void OnParametersSet() => Copied = false;
+
+    private async Task CopyCode()
+    {
+        await JS.InvokeVoidAsync("labProgress.copyCode", PlainCode);
+        Copied = true;
+    }
+
+    private static string Highlight(string code)
+    {
+        var keywords = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "if", "else", "return", "foreach", "in", "switch", "case", "default", "for", "while", "null",
+            "public", "private", "protected", "internal", "sealed", "class", "new", "void", "static", "readonly", "var",
+            "interface", "record", "struct", "enum", "init", "get", "set", "with", "async", "await", "try", "catch",
+            "throw", "out", "is", "true", "false", "using", "namespace", "override"
+        };
+        var types = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "string", "int", "decimal", "bool", "Guid", "Task", "ValueTask", "CancellationToken", "Func", "List", "Dictionary",
+            "HashSet", "LinkedList", "LinkedListNode", "OrderItem", "Order", "OrderStatus", "Money", "Coordinates",
+            "INotifier", "IOrderNotifier", "EmailNotifier", "CreateOrderRequest", "ReplaceOrderRequest", "UpdateOrderRequest",
+            "CreateOrderResult", "OrderResponse", "HttpResponseMessage", "DbContext", "DbContextOptions", "DbSet",
+            "OrderDbContext", "ModelBuilder", "IOrderStore", "SqliteOrderStore", "IDbContextFactory", "WebApplicationBuilder", "WebApplication",
+            "IConfiguration", "ILogger", "InvalidOperationException", "SystemClock", "AppMetadata"
+        };
+        var pattern = new System.Text.RegularExpressions.Regex("//[^\\r\\n]*|\"(?:\\\\.|[^\"\\\\])*\"|\\b\\d+(?:\\.\\d+)?m?\\b|\\b[A-Za-z_]\\w*\\b");
+        var result = new System.Text.StringBuilder();
+        var cursor = 0;
+
+        foreach (System.Text.RegularExpressions.Match match in pattern.Matches(code))
+        {
+            result.Append(System.Net.WebUtility.HtmlEncode(code[cursor..match.Index]));
+            var token = match.Value;
+            var cssClass = token.StartsWith("//", StringComparison.Ordinal) ? "cs-comment"
+                : token.StartsWith('"') ? "cs-string"
+                : char.IsDigit(token[0]) ? "cs-number"
+                : keywords.Contains(token) ? "cs-keyword"
+                : types.Contains(token) ? "cs-type"
+                : null;
+
+            if (cssClass is null) result.Append(System.Net.WebUtility.HtmlEncode(token));
+            else result.Append("<span class=\"").Append(cssClass).Append("\">").Append(System.Net.WebUtility.HtmlEncode(token)).Append("</span>");
+            cursor = match.Index + match.Length;
+        }
+
+        result.Append(System.Net.WebUtility.HtmlEncode(code[cursor..]));
+        return result.ToString();
+    }
+}

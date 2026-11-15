@@ -1,33 +1,100 @@
 @page "/laboratorio"
+@page "/laboratorio/{Level}"
+@using DotnetCodeMaturityLab.Components.Learning
+@using DotnetCodeMaturityLab.Components.Orders
 
-<PageTitle>Laboratorio | .NET Code Maturity Lab</PageTitle>
+<PageTitle>Laboratorios | .NET Code Maturity Lab</PageTitle>
 
-<header class="lab-header"><div><span class="eyebrow">Ejercicio modelo · Middle</span><h1>Separar responsabilidades con SOLID</h1><p>Un servicio procesa la orden, calcula descuentos, persiste datos y envía notificaciones.</p></div><span class="status-chip active">Vista de demostración</span></header>
-<nav class="lab-tabs" aria-label="Secciones del ejercicio"><span class="active">Código</span><span>Pruebas</span><span>Flujo visual</span><span>Decisión</span><span>Entrevista</span></nav>
-
-<section class="comparison-grid page-section">
-    <article class="code-window problem"><header><div><span class="code-status">Antes</span><strong>OrderService.cs</strong></div><span class="risk-label">3 riesgos</span></header><pre><code><span class="code-keyword">public class</span> OrderService
+@if (string.IsNullOrWhiteSpace(Level))
 {
-  <span class="code-keyword">public async</span> Task Process(Order order)
-  {
-    Validate(order);
-    CalculateDiscount(order);
-<span class="code-risk">    await _database.Save(order);</span>
-<span class="code-risk">    await _email.Send(order);</span>
-  }
-}</code></pre><footer><span>Responsabilidades mezcladas</span><span>Alto acoplamiento</span></footer></article>
-    <article class="code-window solution"><header><div><span class="code-status">Después</span><strong>OrderProcessor.cs</strong></div><span class="success-label">Responsabilidad clara</span></header><pre><code><span class="code-keyword">public class</span> OrderProcessor(
-  IOrderValidator validator,
-  IOrderRepository repository,
-  INotifier notifier)
+    <header class="page-header lab-catalog-header"><span class="eyebrow">Práctica por nivel</span><h1>Tres laboratorios. Una API que madura.</h1><p class="lead">Cada ejercicio reúne lo aprendido en su nivel. Aquí no estudias temas aislados: tomas decisiones y observas el resultado.</p></header>
+    <section class="lab-level-grid page-section">
+        <article class="lab-level-card available"><div class="lab-level-icon">⌨</div><small>Junior · disponible</small><h2>Crear una orden</h2><p>Modela, valida, persiste y comprueba el contrato HTTP de una orden.</p><ul><li>C#, POO y colecciones</li><li>REST, persistencia y ASP.NET Core</li><li>Pruebas y evidencia observable</li></ul><a class="button button-primary" href="laboratorio/junior">Abrir laboratorio →</a></article>
+        <article class="lab-level-card"><div class="lab-level-icon">⌘</div><small>Middle · próximamente</small><h2>Refactorizar el flujo</h2><p>Separa responsabilidades y vuelve la solución mantenible y comprobable.</p><ul><li>SOLID y DI</li><li>Strategy</li><li>Pruebas de integración</li></ul><a class="button button-secondary" href="en-preparacion/laboratorio-middle">Próximamente →</a></article>
+        <article class="lab-level-card dark"><div class="lab-level-icon">⚙</div><small>Senior · próximamente</small><h2>Operar bajo presión</h2><p>Protege la creación de órdenes ante reintentos, concurrencia y fallos externos.</p><ul><li>Idempotencia</li><li>Resiliencia</li><li>Observabilidad</li></ul><a class="button button-secondary dark" href="en-preparacion/laboratorio-senior">Próximamente →</a></article>
+    </section>
+}
+else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
 {
-  <span class="code-keyword">public async</span> Task Process(Order order)
-  {
-    <span class="code-good">validator.Validate(order);</span>
-    <span class="code-good">await repository.Save(order);</span>
-    <span class="code-good">await notifier.Notify(order);</span>
-  }
-}</code></pre><footer><span>Dependencias explícitas</span><span>Comportamiento comprobable</span></footer></article>
-</section>
+    <div class="level-lab-page">
+        <header class="level-lab-header">
+            <div>
+                <a class="course-back" href="laboratorio">← Laboratorios</a>
+                <span class="eyebrow">Laboratorio Junior · integrador</span>
+                <h1>Crea una orden que proteja su contrato.</h1>
+                <p>Partes de una solicitud, aplicas reglas de dominio, conservas la orden en SQLite mediante EF Core y observas una respuesta HTTP verificable.</p>
+            </div>
+            <aside class="lab-mission">
+                <small>Misión</small>
+                <strong>Obtén un 201 y provoca un 400 controlado.</strong>
+                <span>Completa ambos caminos para registrar la evidencia en este navegador.</span>
+            </aside>
+        </header>
 
-<section class="insight-grid page-section"><article><span class="eyebrow">Principio aplicado</span><h2>S · Responsabilidad única</h2><p>Cada componente tiene una razón concreta para cambiar. Separar no significa crear una clase por cada línea, sino reconocer responsabilidades que evolucionan de manera independiente.</p></article><article class="test-preview"><span class="eyebrow">Prueba estructurada con AAA</span><div><b>Arrange</b><span>Preparar la orden y dependencias</span></div><div><b>Act</b><span>Procesar una única conducta</span></div><div><b>Assert</b><span>Verificar el resultado observable</span></div></article></section>
+        <section class="lab-brief" aria-label="Objetivos del laboratorio">
+            <article><span>01</span><div><strong>Protege el dominio</strong><p>El servidor genera Id y subtotal; el cliente solo decide producto, cantidad y precio.</p></div></article>
+            <article><span>02</span><div><strong>Persiste con intención</strong><p>DTO, servicio y un repositorio EF Core colaboran sin mezclar HTTP, reglas y SQLite.</p></div></article>
+            <article><span>03</span><div><strong>Comprueba el resultado</strong><p>Una orden válida se conserva; una inválida devuelve errores sin persistirse.</p></div></article>
+        </section>
+
+        <section class="lab-code-section" aria-labelledby="lab-code-title">
+            <header><span class="eyebrow">Antes y después</span><h2 id="lab-code-title">Del endpoint frágil a un flujo comprobable.</h2></header>
+            <div class="code-compare-grid lesson-dual-code final-code-review">
+                <CSharpCodeWindow FileName="OrderEndpoint.Before.cs" Label="Código deficiente" CssClass="bad-practice review-code" PlainCode="@BeforeCode" />
+                <CSharpCodeWindow FileName="OrderEndpoint.After.cs" Label="Código correcto" CssClass="good-practice review-code" PlainCode="@AfterCode" />
+            </div>
+        </section>
+
+        <CreateOrderPlayground />
+
+        <section class="lab-takeaway">
+            <div><span class="eyebrow">Qué debe defender un Junior</span><h2>No basta con devolver JSON: explica quién controla cada dato y cómo compruebas la regla.</h2></div>
+            <p>Un entrevistador puede pedirte justificar el DTO, el código 201, la validación previa, el cálculo del subtotal, la abstracción de persistencia y la diferencia entre una prueba de servicio y una prueba del endpoint.</p>
+        </section>
+    </div>
+}
+else
+{
+    <section class="empty-state"><span class="eyebrow">Laboratorio @Level</span><h1>Este ejercicio está en preparación.</h1><p>Primero terminaremos la experiencia Junior; después evolucionaremos la misma API.</p><a class="button button-primary" href="laboratorio">Volver a laboratorios</a></section>
+}
+
+@code {
+    [Parameter] public string? Level { get; set; }
+
+    private const string BeforeCode = """
+        app.MapPost("/createOrder", (Order order) =>
+        {
+            // El cliente puede enviar Id y Subtotal manipulados.
+            database.Orders.Add(order);
+            database.SaveChanges();
+
+            // Siempre responde 200, incluso si los datos son inválidos.
+            return Results.Ok(order);
+        });
+        """;
+
+    private const string AfterCode = """
+        app.MapPost("/api/orders", async (
+            CreateOrderRequest request,
+            CreateOrderService service,
+            CancellationToken cancellationToken) =>
+        {
+            // El servicio valida, genera Id y calcula Subtotal.
+            CreateOrderResult result = await service.CreateAsync(
+                request,
+                cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                return Results.ValidationProblem(result.Errors);
+            }
+
+            CreateOrderResponse response =
+                CreateOrderResponse.FromOrder(result.Order!);
+
+            return Results.Created(
+                $"/api/orders/{response.Id}",
+                response);
+        });
+        """;
+}

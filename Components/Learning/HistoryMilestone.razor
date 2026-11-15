@@ -1,0 +1,21 @@
+@using DotnetCodeMaturityLab.Components.Pages
+
+<article class="history-event @Branch @(Item.Current ? "current" : null)">
+    <div class="history-event-heading">
+        <span class="history-branch-tag">@(Branch == "framework" ? "Framework" : Branch == "core" ? "Core" : ".NET")</span>
+        <span class="history-version-mark">@Item.Version</span>
+        @if (Item.Current)
+        {
+            <em>Actual</em>
+        }
+    </div>
+    <dl>
+        <div><dt>Qué cambió</dt><dd>@Item.Changed</dd></div>
+        <div><dt>Qué buscó resolver</dt><dd>@Item.Purpose</dd></div>
+    </dl>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public DotNetHistory.HistoryItem Item { get; set; } = default!;
+    [Parameter, EditorRequired] public string Branch { get; set; } = string.Empty;
+}

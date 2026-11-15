@@ -1,0 +1,62 @@
+@page "/ecosistema-dotnet"
+
+<PageTitle>Ecosistema .NET | .NET Code Maturity Lab</PageTitle>
+
+<header class="history-hero ecosystem-hero">
+    <div>
+        <span class="eyebrow">Ecosistema .NET</span>
+        <h1>Elige la herramienta según lo que necesitas construir.</h1>
+        <p>La versión define la base y el soporte. El modelo de aplicación define cómo construyes la interfaz, expones servicios o accedes a los datos.</p>
+        <div class="button-row"><a class="button button-secondary" href="historia-dotnet">← Ver de dónde viene .NET</a></div>
+    </div>
+</header>
+
+<section class="history-takeaway reveal-section" aria-labelledby="takeaway-title">
+    <span class="eyebrow">La idea que debes conservar</span>
+    <h2 id="takeaway-title">El número de versión importa menos que la intención del cambio.</h2>
+    <p class="history-takeaway-intro">Hoy no son tres alternativas equivalentes. Cada rama representa una decisión diferente sobre compatibilidad, soporte y evolución.</p>
+    <div class="history-current-grid">
+        <article class="framework">
+            <header><span class="history-logo-frame"><img src="images/dotnet-framework-logo.png" alt="Microsoft .NET Framework" /></span><span><small>Compatibilidad Windows</small><strong>.NET Framework</strong></span></header>
+            <p class="history-verdict">Consérvalo cuando una aplicación existente depende profundamente del ecosistema clásico de Windows.</p>
+            <section class="history-pros"><h3>Ventajas actuales</h3><ul><li>Gran compatibilidad con aplicaciones empresariales existentes.</li><li>Mantiene tecnologías y bibliotecas exclusivas de Framework.</li></ul></section>
+            <section class="history-cons"><h3>Limitaciones actuales</h3><ul><li>Está ligado a Windows y se encuentra en mantenimiento.</li><li>Framework 4 se actualiza en toda la máquina y no funciona lado a lado.</li></ul></section>
+            <footer><span>Úsalo para preservar</span><strong>No como primera opción para una API nueva</strong></footer>
+        </article>
+        <article class="core">
+            <header><span class="history-logo-frame"><img src="images/dotnet-core-logo.png" alt=".NET Core" /></span><span><small>Rama histórica</small><strong>.NET Core 1–3.1</strong></span></header>
+            <p class="history-verdict">Fue el puente que convirtió .NET en una plataforma abierta, rápida, modular y multiplataforma.</p>
+            <section class="history-pros"><h3>Ventajas que heredamos</h3><ul><li>Introdujo despliegues independientes y ejecución multiplataforma.</li><li>Sentó la base de ASP.NET Core y del .NET actual.</li></ul></section>
+            <section class="history-cons"><h3>Limitaciones actuales</h3><ul><li>Todas las versiones 1.0–3.1 están fuera de soporte.</li><li>No reciben correcciones de seguridad: deben migrarse.</li></ul></section>
+            <footer><span>Estúdialo para comprender</span><strong>No lo elijas para producción nueva</strong></footer>
+        </article>
+        <article class="modern">
+            <header><span class="history-logo-frame"><img src="images/dotnet-modern-logo.png" alt=".NET" /></span><span><small>Plataforma principal</small><strong>.NET moderno</strong></span></header>
+            <p class="history-verdict">Es el camino recomendado para APIs, nube, servicios, escritorio moderno y aplicaciones multiplataforma.</p>
+            <section class="history-pros"><h3>Ventajas actuales</h3><ul><li>Multiplataforma, alto rendimiento y versiones lado a lado.</li><li>Evolución activa con opciones LTS y STS.</li></ul></section>
+            <section class="history-cons"><h3>Consideraciones</h3><ul><li>Exige mantener parches y planear actualizaciones periódicas.</li><li>Migrar desde Framework puede requerir sustituir tecnologías exclusivas.</li></ul></section>
+            <footer><span>Elige una versión soportada</span><strong>.NET 10 LTS o .NET 11 STS</strong></footer>
+        </article>
+    </div>
+    <p class="history-source-note">Las versiones fuera de soporte se muestran por su importancia histórica, no como recomendación para proyectos nuevos.</p>
+</section>
+
+<section class="dotnet-family reveal-section" aria-labelledby="dotnet-family-title">
+    <header class="dotnet-family-heading">
+        <div><span class="eyebrow">¿Cuál usar?</span><h2 id="dotnet-family-title">Primero elige qué vas a construir.</h2></div>
+        <p>.NET es la plataforma. ASP.NET Core, Blazor, Razor Pages y .NET MAUI son modelos o frameworks especializados que resuelven experiencias distintas.</p>
+    </header>
+    <div class="dotnet-family-map">
+        <article class="family-card web-api"><span class="family-symbol" aria-hidden="true">API</span><small>Backend y servicios HTTP</small><h3>ASP.NET Core Web API</h3><p>Para APIs REST, backends de aplicaciones y servicios consumidos por web o móvil.</p><strong>Minimal APIs o Controllers</strong></article>
+        <article class="family-card blazor"><span class="family-symbol" aria-hidden="true">B</span><small>Web interactiva con C#</small><h3>Blazor</h3><p>Para interfaces web por componentes que pueden renderizarse en servidor o ejecutarse con WebAssembly.</p><strong>Este laboratorio usa Blazor</strong></article>
+        <article class="family-card razor"><span class="family-symbol" aria-hidden="true">R</span><small>Web orientada a páginas</small><h3>Razor Pages</h3><p>Para formularios, portales y sitios renderizados en servidor organizados alrededor de cada página.</p><strong>Menos interacción tipo SPA</strong></article>
+        <article class="family-card mvc"><span class="family-symbol" aria-hidden="true">MVC</span><small>Web con responsabilidades separadas</small><h3>ASP.NET Core MVC</h3><p>Para aplicaciones con controladores y vistas, especialmente soluciones empresariales o migraciones MVC.</p><strong>Model · View · Controller</strong></article>
+        <article class="family-card maui"><span class="family-symbol" aria-hidden="true">M</span><small>Móvil y escritorio nativo</small><h3>.NET MAUI</h3><p>Para Android, iOS, macOS y Windows compartiendo C#, XAML y buena parte del código.</p><strong>MAUI, no “MUI”</strong></article>
+        <article class="family-card windows"><span class="family-symbol" aria-hidden="true">W</span><small>Escritorio exclusivo de Windows</small><h3>WPF o Windows Forms</h3><p>Para aplicaciones de escritorio Windows, sistemas internos y modernización gradual de software existente.</p><strong>Úsalo cuando Windows sea el destino</strong></article>
+    </div>
+    <aside class="dotnet-family-note">
+        <div><span>Razor</span><p>Es la sintaxis que mezcla HTML y C#. La usan Razor Pages, vistas MVC y componentes Blazor; no es otra plataforma independiente.</p></div>
+        <div><span>EF Core</span><p>Es acceso a datos mediante objetos .NET. Puede acompañar una API, Blazor, Razor Pages, MVC o una aplicación de escritorio.</p></div>
+        <div><span>SignalR y gRPC</span><p>Son opciones de comunicación: tiempo real para clientes conectados y contratos eficientes entre servicios.</p></div>
+    </aside>
+</section>
