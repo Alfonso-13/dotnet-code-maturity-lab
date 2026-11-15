@@ -1,54 +1,58 @@
-﻿@page "/"
+@page "/"
 
 <PageTitle>Inicio | .NET Code Maturity Lab</PageTitle>
 
-<section class="hero page-section">
+<section class="hero page-section reveal-section">
     <div class="hero-copy">
         <span class="eyebrow">Laboratorio interactivo · .NET 10</span>
-        <h1>Del código que funciona a una solución preparada para producción.</h1>
-        <p class="lead">Explora cómo madura una API de órdenes a través de código, pruebas, arquitectura e infraestructura. Aprende qué cambia, por qué cambia y qué decisión tomar según el contexto.</p>
+        <h1>Aprende .NET con código visual y decisiones reales.</h1>
+        <p class="lead">Domina .NET con comparaciones visuales, ejemplos ejecutables y decisiones reales. Avanza desde los fundamentos de C# hasta arquitectura, operación y escalabilidad.</p>
         <div class="button-row">
-            <a class="button button-primary" href="ruta">Comenzar recorrido <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="laboratorio">Ver el laboratorio</a>
+            <a class="button button-primary" href="ruta">Empezar a aprender <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="laboratorio">Practicar en laboratorios</a>
         </div>
         <div class="hero-meta">
-            <span><strong>3</strong> niveles</span><span><strong>1</strong> caso práctico</span><span><strong>0</strong> registro requerido</span>
+            <span><strong>3</strong> niveles de madurez</span><span><strong>1</strong> API que evoluciona</span><span><strong>0</strong> registro requerido</span>
         </div>
     </div>
-    <div class="hero-visual" aria-label="Progresión de madurez: Junior, Middle y Senior">
+    <div class="hero-visual" aria-label="Código de una API de órdenes que evoluciona de Junior a Senior">
         <div class="terminal-bar"><span></span><span></span><span></span><small>order-processing.cs</small></div>
-        <div class="maturity-code">
-            <span class="line-number">01</span><code><b>public</b> Task&lt;Result&gt; Process(Order order)</code>
+        <div class="maturity-code" aria-label="Ejemplo de código C# correctamente indentado">
+            <span class="line-number">01</span><code><b>public async</b> Task&lt;Result&gt; Process(Order order)</code>
             <span class="line-number">02</span><code>{</code>
-            <span class="line-number">03</span><code>  <em>// La solución evoluciona contigo</em></code>
-            <span class="line-number">04</span><code>  <mark>Validate(order);</mark></code>
-            <span class="line-number">05</span><code>  <mark>await Persist(order);</mark></code>
+            <span class="line-number">03</span><code class="code-indent-1"><mark>Validate(order);</mark></code>
+            <span class="line-number">04</span><code class="code-indent-1"><b>var</b> saved = <b>await</b> PersistAsync(order);</code>
+            <span class="line-number">05</span><code class="code-indent-1"><b>return</b> Result.Success(saved);</code>
             <span class="line-number">06</span><code>}</code>
         </div>
         <div class="level-stack">
-            <div><span>01</span><strong>Junior</strong><small>Funciona correctamente</small></div>
-            <div><span>02</span><strong>Middle</strong><small>Es mantenible y comprobable</small></div>
-            <div><span>03</span><strong>Senior</strong><small>Resiste condiciones reales</small></div>
+            <div><span class="stack-icon" aria-hidden="true">✓</span><strong>Junior</strong><small>Resuelve correctamente</small></div>
+            <div><span class="stack-icon" aria-hidden="true">◇</span><strong>Middle</strong><small>Diseña para el cambio</small></div>
+            <div><span class="stack-icon" aria-hidden="true">◆</span><strong>Senior</strong><small>Opera en producción</small></div>
         </div>
     </div>
 </section>
 
-<section class="page-section section-heading">
-    <div><span class="eyebrow">Una forma distinta de aprender</span><h2>No memorices patrones. Observa qué problema resuelven.</h2></div>
-    <p>Cada concepto parte de una situación visible y termina con una decisión que puedes defender en una entrevista o aplicar en un proyecto real.</p>
+<section class="page-section section-heading reveal-section">
+    <div><span class="eyebrow">Aprende observando y haciendo</span><h2>Ve el problema. Compara opciones. Comprueba la decisión.</h2></div>
+    <p>Los conceptos se explican con código, recorridos visuales y ejercicios breves para que entiendas cuándo aplicar cada práctica y cómo defenderla en una entrevista.</p>
 </section>
 
-<section class="feature-grid page-section">
-    <article class="feature-card accent-red"><span class="card-number">01</span><h3>Compara</h3><p>Revisa el antes y después del código con riesgos, cambios y consecuencias señalados.</p><span class="text-link">Código y refactorización →</span></article>
-    <article class="feature-card accent-dark"><span class="card-number">02</span><h3>Experimenta</h3><p>Ejecuta pruebas, provoca fallos y visualiza el recorrido de una petición por el sistema.</p><span class="text-link">Pruebas y comportamiento →</span></article>
-    <article class="feature-card accent-blue"><span class="card-number">03</span><h3>Decide</h3><p>Evalúa trade-offs de diseño, infraestructura, costo, seguridad y escalabilidad.</p><span class="text-link">Arquitectura y Azure →</span></article>
+<section class="feature-grid page-section reveal-section" aria-label="Cómo se aprende en el laboratorio">
+    <article class="feature-card feature-compare"><div class="feature-illustration"><img src="images/learning-compare.svg" alt="Código antes y después con riesgos y responsabilidades señaladas" /></div><h3>Compara</h3><p>Contrasta código frágil contra una solución más clara. Identifica acoplamiento, responsabilidades mezcladas y decisiones que dificultan el cambio.</p><span class="text-link">Antes, después y por qué →</span></article>
+    <article class="feature-card feature-experiment"><div class="feature-illustration"><img src="images/learning-experiment.svg" alt="Panel de pruebas conectado con una petición a la API" /></div><h3>Experimenta</h3><p>Cambia datos, ejecuta pruebas y provoca errores controlados. Observa qué ocurre en el servicio, la API y la respuesta HTTP.</p><span class="text-link">Pruebas y comportamiento →</span></article>
+    <article class="feature-card feature-decide"><div class="feature-illustration"><img src="images/learning-decide.svg" alt="Flujo de decisiones con alternativas simples y escalables" /></div><h3>Decide</h3><p>Relaciona cada alternativa con su costo, riesgo y contexto. Aprende cuándo una solución sencilla basta y cuándo necesitas escalar el diseño.</p><span class="text-link">Contexto y trade-offs →</span></article>
 </section>
 
-<section class="path-preview page-section">
-    <div class="section-heading compact"><div><span class="eyebrow">Ruta de aprendizaje</span><h2>Una misma API, tres perspectivas.</h2></div><a class="text-link" href="ruta">Ver ruta completa →</a></div>
-    <div class="path-line">
-        <article><span class="level-dot">J</span><small>Nivel 01</small><h3>Junior</h3><p>C#, REST, validación, HTTP, LINQ, pruebas unitarias y AAA.</p></article>
-        <article><span class="level-dot">M</span><small>Nivel 02</small><h3>Middle</h3><p>SOLID, DI, Strategy, integración, errores y refactorización.</p></article>
-        <article><span class="level-dot">S</span><small>Nivel 03</small><h3>Senior</h3><p>Idempotencia, concurrencia, resiliencia, seguridad y observabilidad.</p></article>
+<section class="path-preview page-section reveal-section">
+    <div class="section-heading compact"><div><span class="eyebrow">Ruta de aprendizaje</span><h2>Aprende .NET visualmente, desde los fundamentos hasta producción.</h2></div><a class="text-link" href="ruta">Explorar la ruta →</a></div>
+    <div class="path-scroll" aria-label="Ruta de Junior a Senior">
+        <div class="path-line">
+            <div class="maturity-rail rail-junior-middle" aria-hidden="true"><span></span></div>
+            <div class="maturity-rail rail-middle-senior" aria-hidden="true"><span></span></div>
+            <article class="path-junior"><div class="level-person level-badge" role="img" aria-label="Insignia Red and Black Codeworkers Junior"></div><span class="level-stage">Comienza aquí</span><h3>Junior</h3><p>Construye una base sólida con C#, POO, colecciones, LINQ, asincronía, validación, REST y pruebas unitarias con AAA.</p><strong>Haz que funcione correctamente.</strong></article>
+            <article class="path-middle"><div class="level-person level-badge" role="img" aria-label="Insignia Red and Black Codeworkers Mid"></div><span class="level-stage">Diseña mejor</span><h3>Middle</h3><p>Refactoriza con SOLID, inyección de dependencias y Strategy. Separa responsabilidades y comprueba colaboraciones reales.</p><strong>Haz que sea mantenible.</strong></article>
+            <article class="path-senior"><div class="level-person level-badge" role="img" aria-label="Insignia Red and Black Codeworkers Senior"></div><span class="level-stage">Opera con confianza</span><h3>Senior</h3><p>Protege la solución con idempotencia, concurrencia, resiliencia, observabilidad, seguridad y estrategias de escala en Azure.</p><strong>Haz que resista producción.</strong></article>
+        </div>
     </div>
 </section>

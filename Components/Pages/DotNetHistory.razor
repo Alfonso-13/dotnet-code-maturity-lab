@@ -1,0 +1,113 @@
+@page "/historia-dotnet"
+@using DotnetCodeMaturityLab.Components.Learning
+
+<PageTitle>Historia de .NET | .NET Code Maturity Lab</PageTitle>
+
+<header class="history-hero">
+    <div>
+        <span class="eyebrow">Historia de .NET</span>
+        <h1>Una plataforma que cambió para llegar a más lugares.</h1>
+        <p>.NET no reemplazó una versión con otra siguiendo una sola línea. Se abrió en ramas: una permaneció ligada a Windows, otra hizo la plataforma multiplataforma y ambas ideas convergieron en el .NET moderno.</p>
+        <div class="button-row"><a class="button button-secondary" href="ecosistema-dotnet">¿Qué tecnología usar hoy? <span aria-hidden="true">→</span></a></div>
+    </div>
+</header>
+
+<section class="history-map" aria-labelledby="history-map-title">
+    <header class="history-map-heading">
+        <div>
+            <span class="eyebrow">Mapa de evolución</span>
+            <h2 id="history-map-title">Del CLR original a una plataforma unificada</h2>
+        </div>
+        <div class="history-map-context">
+            <aside class="history-now" aria-label="Punto actual de la cronología">
+                <span>Punto actual · noviembre 2026</span>
+                <strong>.NET 11</strong>
+                <small>Plataforma unificada, abierta y multiplataforma.</small>
+            </aside>
+            <div class="history-legend" aria-label="Leyenda">
+                <span><i class="framework"></i> Windows</span>
+                <span><i class="core"></i> Multiplataforma</span>
+                <span><i class="modern"></i> Unificado</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="history-track-headings" aria-label="Ramas de la cronología">
+        <span class="history-year-heading">Año</span>
+        <div class="framework"><span class="history-logo-frame"><img class="history-platform-logo" src="images/dotnet-framework-logo.png" alt="Microsoft .NET Framework" /></span><span><small>Rama Windows</small><strong>.NET Framework</strong></span></div>
+        <div class="core"><span class="history-logo-frame"><img class="history-platform-logo" src="images/dotnet-core-logo.png" alt=".NET Core" /></span><span><small>Rama abierta</small><strong>.NET Core</strong></span></div>
+        <div class="modern"><span class="history-logo-frame"><img class="history-platform-logo" src="images/dotnet-modern-logo.png" alt=".NET" /></span><span><small>Convergencia</small><strong>.NET moderno</strong></span></div>
+    </div>
+
+    <div class="history-chronology">
+        <span class="history-progress-line" aria-hidden="true"></span>
+        @foreach (var row in HistoryRows)
+        {
+            <section class="history-year-row" aria-label="Versiones publicadas en @row.Year">
+                <time datetime="@row.Year"><span>@row.Year</span></time>
+                @if (row.Framework is not null) { <span class="history-row-link framework" aria-hidden="true"></span> }
+                @if (row.Core is not null) { <span class="history-row-link core" aria-hidden="true"></span> }
+                @if (row.Modern is not null) { <span class="history-row-link modern" aria-hidden="true"></span> }
+                <div class="history-track-cell framework">
+                    @if (row.Framework is not null)
+                    {
+                        <HistoryMilestone Item="row.Framework" Branch="framework" />
+                    }
+                </div>
+                <div class="history-track-cell core">
+                    @if (row.Core is not null)
+                    {
+                        <HistoryMilestone Item="row.Core" Branch="core" />
+                    }
+                </div>
+                <div class="history-track-cell modern">
+                    @if (row.Modern is not null)
+                    {
+                        <HistoryMilestone Item="row.Modern" Branch="modern" />
+                    }
+                </div>
+            </section>
+        }
+    </div>
+
+    <footer class="history-branch-summary">
+        <article class="framework"><strong>Framework continúa</strong><span>para aplicaciones Windows existentes.</span></article>
+        <article class="core"><strong>Core converge</strong><span>sus ideas pasan a la plataforma principal desde .NET 5.</span></article>
+        <article class="modern"><strong>.NET 11 es actual</strong><span>.NET 10 LTS es la base de este laboratorio.</span></article>
+    </footer>
+</section>
+
+<aside class="history-next-step">
+    <div><span class="eyebrow">Del pasado a la decisión</span><strong>Ahora elige qué parte de .NET necesita tu proyecto.</strong></div>
+    <a class="button button-primary" href="ecosistema-dotnet">Explorar el ecosistema .NET <span aria-hidden="true">→</span></a>
+</aside>
+
+@code {
+    private static IReadOnlyList<HistoryRow> HistoryRows { get; } =
+    [
+        new("2002", new("1.0", "CLR, bibliotecas base y código administrado.", "Dar a varios lenguajes una base común, segura y consistente."), null, null),
+        new("2003", new("1.1", "Ejecución lado a lado, IPv6 y mejoras para ASP.NET.", "Hacer convivir aplicaciones y ampliar el alcance de la web."), null, null),
+        new("2005", new("2.0", "Genéricos, 64 bits, ClickOnce y un CLR más escalable.", "Crear aplicaciones más seguras, reutilizables y fáciles de distribuir."), null, null),
+        new("2006", new("3.0", "WPF, WCF y Workflow sobre el CLR 2.0.", "Cubrir interfaces, comunicación y procesos empresariales."), null, null),
+        new("2007", new("3.5", "LINQ, árboles de expresión, AJAX y nuevas colecciones.", "Consultar y transformar datos con una sintaxis común."), null, null),
+        new("2010", new("4.0", "Nueva generación CLR 4 y mejor ejecución en paralelo.", "Aprovechar equipos multinúcleo y aislar mejor las versiones."), null, null),
+        new("2012", new("4.5", "Async/await y mejoras del runtime y la web.", "Simplificar entrada y salida sin bloquear la aplicación."), null, null),
+        new("2013", new("4.5.1", "Mejoras de rendimiento, depuración y aplicaciones ASP.NET.", "Pulir la experiencia sin romper aplicaciones existentes."), null, null),
+        new("2014", new("4.5.2", "Mejoras de confiabilidad y compatibilidad.", "Estabilizar las aplicaciones empresariales en Windows."), null, null),
+        new("2015", new("4.6 · 4.6.1", "Nuevo compilador, criptografía y mejoras de rendimiento.", "Modernizar la plataforma conservando compatibilidad."), null, null),
+        new("2016", new("4.6.2", "Seguridad, alta resolución y confiabilidad.", "Adaptar aplicaciones Windows a equipos modernos."), new("Core 1.0 · 1.1", "Runtime, CLI y ASP.NET Core abiertos y multiplataforma.", "Desplegar servicios sin depender de Windows."), null),
+        new("2017", new("4.7 · 4.7.1", "Accesibilidad, criptografía y mejoras de WPF.", "Mantener vigente la experiencia de escritorio."), new("Core 2.0", ".NET Standard 2.0 amplió la superficie de APIs.", "Reutilizar bibliotecas entre implementaciones."), null),
+        new("2018", new("4.7.2", "Mejoras de ASP.NET, WPF y alta resolución.", "Reducir fricción en aplicaciones empresariales."), new("Core 2.1 · 2.2", "LTS, rendimiento, herramientas y ASP.NET Core.", "Hacer viable la plataforma para servicios y contenedores."), null),
+        new("2019", new("4.8", "Estabilidad, accesibilidad y mejoras de Windows.", "Conservar la inversión empresarial existente."), new("Core 3.0 · 3.1 LTS", "WinForms y WPF llegaron a Core; mejoró el despliegue autónomo.", "Ampliar aplicaciones y preparar la unificación."), null),
+        new("2020", null, null, new(".NET 5", "El nombre Core desapareció y comenzó la plataforma unificada.", "Evitar familias paralelas y ofrecer un camino común.")),
+        new("2021", null, null, new(".NET 6 LTS", "Minimal APIs, Hot Reload y una experiencia más simple.", "Reducir ceremonia y acelerar el desarrollo web y cloud.")),
+        new("2022", new("4.8.1", "Soporte nativo para Arm64 y más accesibilidad.", "Mantener vigente el ecosistema Windows."), null, new(".NET 7", "Más rendimiento, Native AOT y matemáticas genéricas.", "Producir servicios rápidos y ejecutables compactos.")),
+        new("2023", null, null, new(".NET 8 LTS", "Native AOT maduró y Blazor amplió su renderizado.", "Mejorar arranque, consumo y desarrollo web integral.")),
+        new("2024", null, null, new(".NET 9", "Foco en cloud-native, rendimiento y bloques para IA.", "Facilitar servicios observables y cargas inteligentes.")),
+        new("2025", null, null, new(".NET 10 LTS", "Mejoras de JIT, Native AOT, APIs y diagnósticos.", "Consolidar una base rápida con soporte prolongado.")),
+        new("2026", null, null, new(".NET 11 STS", "Runtime async, hardware moderno, rendimiento y seguridad.", "Reducir la sobrecarga async y preparar cargas futuras.", true))
+    ];
+
+    public sealed record HistoryItem(string Version, string Changed, string Purpose, bool Current = false);
+    private sealed record HistoryRow(string Year, HistoryItem? Framework, HistoryItem? Core, HistoryItem? Modern);
+}

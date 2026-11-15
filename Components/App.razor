@@ -6,7 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <meta name="description" content="Laboratorio visual para explorar la madurez de código, arquitectura e infraestructura en .NET." />
+    <meta name="application-name" content=".NET Code Maturity Lab" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content=".NET Code Maturity Lab" />
+    <meta property="og:description" content="Aprende .NET visualmente con código, pruebas y decisiones reales." />
+    <meta property="og:image" content="/images/dotnet-code-maturity-lab-icon.png" />
     <meta name="theme-color" content="#e53935" />
+    <link rel="icon" type="image/png" href="images/dotnet-code-maturity-lab-icon.png" />
+    <link rel="apple-touch-icon" href="images/dotnet-code-maturity-lab-icon.png" />
+    <script>
+        try {
+            if (window.sessionStorage.getItem("dotnet-code-maturity-intro-seen") === "true") {
+                document.documentElement.classList.add("intro-seen");
+            }
+        } catch { }
+    </script>
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["DotnetCodeMaturityLab.styles.css"]" />
@@ -15,10 +29,52 @@
 </head>
 
 <body>
+    <div id="site-intro" class="site-intro" aria-hidden="true" data-permanent>
+        <div class="intro-accent"></div>
+        <div class="intro-content">
+            <span class="intro-kicker">Red &amp; Black Codeworkers presenta</span>
+            <div class="intro-mark">
+                <span class="intro-tile intro-tile-red">&lt;</span>
+                <span class="intro-tile intro-tile-dark">&gt;</span>
+            </div>
+            <div class="intro-wordmark">
+                <strong><span>Red</span> &amp; Black</strong>
+                <small>Codeworkers</small>
+            </div>
+            <div class="intro-product">
+                <span></span>
+                <p>.NET Code Maturity Lab</p>
+                <span></span>
+            </div>
+            <div class="intro-loading">
+                <i></i>
+                <small>Preparando el laboratorio</small>
+            </div>
+        </div>
+    </div>
     <Routes />
     <ReconnectModal />
     <script src="@Assets["intro.js"]"></script>
+    <script src="@Assets["lab-progress.js"]"></script>
+    <script src="@Assets["section-reveal.js"]"></script>
+    <script src="@Assets["history-timeline.js"]"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        const registerEnhancedLoad = () => {
+            if (!window.Blazor) {
+                window.setTimeout(registerEnhancedLoad, 50);
+                return;
+            }
+
+            window.Blazor.addEventListener("enhancedload", () => {
+                window.dotnetIntro?.hideIfSeen();
+                window.sectionReveal?.scan();
+                window.dotnetHistoryTimeline?.scan();
+            });
+        };
+
+        registerEnhancedLoad();
+    </script>
 </body>
 
 </html>

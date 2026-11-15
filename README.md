@@ -4,13 +4,17 @@ Laboratorio visual e interactivo de Red & Black Codeworkers que muestra cómo un
 
 El proyecto utiliza un único caso práctico —una API de procesamiento de órdenes— para comparar tres niveles:
 
-- **Junior:** C#, POO, validación, LINQ, REST, HTTP y pruebas unitarias con AAA.
+- **Junior:** C#, POO, validación, colecciones, LINQ, asincronía, pruebas AAA, REST, EF Core y fundamentos de ASP.NET Core.
 - **Middle:** SOLID, inyección de dependencias, patrones justificados, refactorización y pruebas de integración.
 - **Senior:** idempotencia, concurrencia, resiliencia, observabilidad, seguridad y escalabilidad en Azure.
 
 ## Estado
 
-El repositorio contiene el cascarón visual inicial. Las páginas y ejemplos actuales sirven para validar navegación, identidad y composición; todavía no representan el contenido definitivo de los ejercicios.
+El nivel Junior contiene doce módulos guiados antes de aplicar los conceptos en la API. Cada módulo reúne concepto, comparación visual, código y pistas dentro de una misma pantalla.
+
+La ruta de madurez separa el aprendizaje Junior, Middle y Senior. Cada nivel muestra su avance guardado únicamente en `localStorage`; los laboratorios son ejercicios independientes asociados a cada nivel y no requieren una cuenta.
+
+La ruta comienza en `/aprender/junior`. La práctica independiente está en `/laboratorio/junior` e incluye endpoints reales `GET /api/orders`, `GET /api/orders/{id}` y `POST /api/orders`, validación, persistencia local con EF Core y SQLite, demostración interactiva, pruebas unitarias con AAA y pruebas de integración HTTP.
 
 ## Ejecutar localmente
 
@@ -32,4 +36,12 @@ También puedes ejecutarla directamente con la CLI:
 dotnet run
 ```
 
-La aplicación es pública y no utiliza autenticación, usuarios ni base de datos en esta etapa.
+La aplicación es pública y no utiliza autenticación ni usuarios. El laboratorio Junior crea `App_Data/orders.db` al iniciar y conserva las órdenes localmente mediante EF Core y SQLite; este archivo no se versiona.
+
+## Pruebas
+
+Abre `DotnetCodeMaturityLab.slnx` en Visual Studio para trabajar con la aplicación y el proyecto de pruebas.
+
+```powershell
+dotnet test DotnetCodeMaturityLab.slnx
+```

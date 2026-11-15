@@ -1,0 +1,317 @@
+@rendermode InteractiveServer
+@using System.Text.Json
+@using DotnetCodeMaturityLab.Features.Learning
+@using DotnetCodeMaturityLab.Features.Orders
+@inject CreateOrderService OrderService
+@inject IOrderStore OrderStore
+@inject IJSRuntime JS
+
+<section class="playground" aria-labelledby="playground-title">
+    <div class="playground-heading">
+        <div>
+            <span class="eyebrow">Demostración funcional</span>
+            <h2 id="playground-title">Prueba la creación de una orden</h2>
+        </div>
+        <div class="playground-endpoint">
+            <code>POST /api/orders</code>
+            <span>SQLite · EF Core</span>
+        </div>
+    </div>
+
+    <div class="playground-scenarios" aria-label="Escenarios del laboratorio">
+        <span>Escenario</span>
+        <button type="button" class="@(Scenario == "valid" ? "active" : null)" @onclick='() => ApplyScenario("valid")'>Orden válida</button>
+        <button type="button" class="@(Scenario == "product" ? "active" : null)" @onclick='() => ApplyScenario("product")'>Sin producto</button>
+        <button type="button" class="@(Scenario == "quantity" ? "active" : null)" @onclick='() => ApplyScenario("quantity")'>Cantidad inválida</button>
+        <button type="button" class="@(Scenario == "price" ? "active" : null)" @onclick='() => ApplyScenario("price")'>Precio inválido</button>
+    </div>
+
+    <section class="request-journey" aria-label="Recorrido de la solicitud" aria-live="polite" aria-busy="@IsSending">
+        <header>
+            <div>
+                <span class="eyebrow">Recorrido observable</span>
+                <strong>@RequestPhase</strong>
+            </div>
+            <span class="database-counter">@PersistedOrderCount @(PersistedOrderCount == 1 ? "orden guardada" : "órdenes guardadas")</span>
+        </header>
+        <div class="request-journey-track">
+            <article class="@StepClass(1)"><span>01</span><strong>POST</strong><small>/api/orders</small></article>
+            <i aria-hidden="true">→</i>
+            <article class="@StepClass(2)"><span>02</span><strong>Reglas</strong><small>Validar y calcular</small></article>
+            <i aria-hidden="true">→</i>
+            <article class="@StepClass(3)"><span>03</span><strong>EF Core</strong><small>Guardar entidad</small></article>
+            <i aria-hidden="true">→</i>
+            <article class="@StepClass(4)"><span>04</span><strong>SQLite</strong><small>App_Data/orders.db</small></article>
+            <i aria-hidden="true">→</i>
+            <article class="@StepClass(5)"><span>05</span><strong>Response</strong><small>201 o 400</small></article>
+        </div>
+    </section>
+
+    <div class="playground-grid">
+        <EditForm Model="Input" OnSubmit="CreateOrder" FormName="create-order-playground">
+            <div class="field-group">
+                <label for="product-code">Código del producto</label>
+                <InputText id="product-code" @bind-Value="Input.ProductCode" />
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label for="quantity">Cantidad</label>
+                    <InputNumber id="quantity" @bind-Value="Input.Quantity" />
+                </div>
+                <div class="field-group">
+                    <label for="unit-price">Precio unitario</label>
+                    <InputNumber id="unit-price" @bind-Value="Input.UnitPrice" step="0.01" />
+                </div>
+            </div>
+            <button class="button button-primary request-submit" type="submit" disabled="@IsSending">
+                @if (IsSending)
+                {
+                    <span class="request-spinner" aria-hidden="true"></span>
+                    <span>Enviando solicitud…</span>
+                }
+                else
+                {
+                    <span>Ejecutar solicitud</span><span aria-hidden="true">→</span>
+                }
+            </button>
+            <p class="playground-hint">Para completar el laboratorio ejecuta al menos una orden válida y una solicitud inválida.</p>
+        </EditForm>
+
+        <div class="response-console @(IsSending ? "loading" : null)" aria-live="polite">
+            <header>
+                <span>Respuesta</span>
+                @if (StatusCode is not null)
+                {
+                    <strong class="@(StatusCode == 201 ? "response-success" : "response-error")">@StatusCode @StatusText</strong>
+                }
+            </header>
+            <pre><code>@ResponseJson</code></pre>
+        </div>
+    </div>
+
+    <section class="lab-checks" aria-labelledby="lab-checks-title">
+        <div>
+            <span class="eyebrow">Comprobación</span>
+            <h3 id="lab-checks-title">Evidencia del ejercicio</h3>
+        </div>
+        <ul>
+            <li class="@(HasSuccessfulCase ? "passed" : null)"><span>@(HasSuccessfulCase ? "✓" : "○")</span> Una solicitud válida produce 201, Id y subtotal calculado.</li>
+            <li class="@(HasValidationCase ? "passed" : null)"><span>@(HasValidationCase ? "✓" : "○")</span> Una solicitud inválida produce 400 y no se persiste.</li>
+            <li class="@(LabCompleted ? "passed" : null)"><span>@(LabCompleted ? "✓" : "○")</span> Laboratorio registrado en tu progreso local.</li>
+        </ul>
+        <button type="button" class="button button-secondary" disabled="@(!HasSuccessfulCase || !HasValidationCase || LabCompleted)" @onclick="CompleteLab">
+            @(LabCompleted ? "Laboratorio completado ✓" : "Completar laboratorio")
+        </button>
+    </section>
+</section>
+
+@code {
+    private PlaygroundInput Input { get; } = new()
+    {
+        ProductCode = "MONITOR-24",
+        Quantity = 2,
+        UnitPrice = 3499.90m
+    };
+
+    private int? StatusCode { get; set; }
+
+    private string Scenario { get; set; } = "valid";
+
+    private bool HasSuccessfulCase { get; set; }
+
+    private bool HasValidationCase { get; set; }
+
+    private bool LabCompleted { get; set; }
+
+    private bool IsSending { get; set; }
+
+    private int PersistedOrderCount { get; set; }
+
+    private int RequestStep { get; set; }
+
+    private bool ValidationStopped { get; set; }
+
+    private string RequestPhase { get; set; } = "Listo para ejecutar una solicitud";
+
+    private string StatusText { get; set; } = string.Empty;
+
+    private string ResponseJson { get; set; } = "// Ejecuta el ejercicio para ver la respuesta de la API.";
+
+    private async Task CreateOrder()
+    {
+        if (IsSending) return;
+
+        IsSending = true;
+        ValidationStopped = false;
+        RequestStep = 1;
+        RequestPhase = "Enviando POST /api/orders";
+        StatusCode = null;
+        StatusText = string.Empty;
+        ResponseJson = "// La solicitud salió del cliente…";
+        try
+        {
+            StateHasChanged();
+            await Task.Delay(350);
+
+            var storedBefore = await OrderStore.CountAsync();
+            var request = new CreateOrderRequest(
+                Input.ProductCode,
+                Input.Quantity,
+                Input.UnitPrice);
+
+            RequestStep = 2;
+            RequestPhase = "Validando el contrato y calculando el subtotal";
+            StateHasChanged();
+            await Task.Delay(350);
+
+            var result = await OrderService.CreateAsync(request);
+
+            RequestStep = result.IsSuccess ? 3 : 5;
+            ValidationStopped = !result.IsSuccess;
+            RequestPhase = result.IsSuccess
+                ? "EF Core está persistiendo la orden"
+                : "La validación detuvo la escritura";
+            StateHasChanged();
+            await Task.Delay(300);
+
+            if (result.IsSuccess)
+            {
+                RequestStep = 4;
+                RequestPhase = "SQLite confirmó la escritura en orders.db";
+                PersistedOrderCount = await OrderStore.CountAsync();
+                StateHasChanged();
+                await Task.Delay(300);
+
+                StatusCode = 201;
+                StatusText = "Created";
+                ResponseJson = Serialize(CreateOrderResponse.FromOrder(result.Order!));
+                HasSuccessfulCase = result.Order is not null
+                    && result.Order.Subtotal == Input.Quantity * Input.UnitPrice
+                    && await OrderStore.FindAsync(result.Order.Id) is not null;
+                RequestStep = 6;
+                RequestPhase = "Respuesta 201 Created recibida";
+                return;
+            }
+
+            StatusCode = 400;
+            StatusText = "Bad Request";
+            ResponseJson = Serialize(new
+            {
+                title = "Uno o más errores de validación ocurrieron.",
+                status = 400,
+                errors = result.Errors
+            });
+            HasValidationCase = await OrderStore.CountAsync() == storedBefore;
+            PersistedOrderCount = storedBefore;
+            RequestStep = 6;
+            RequestPhase = "Respuesta 400 recibida · SQLite no cambió";
+        }
+        catch (Exception)
+        {
+            StatusCode = 500;
+            StatusText = "Internal Server Error";
+            RequestStep = 6;
+            RequestPhase = "La petición falló antes de completar la persistencia";
+            ResponseJson = Serialize(new
+            {
+                title = "No fue posible procesar la solicitud.",
+                status = 500,
+                detail = "Revisa la disponibilidad de la base local y vuelve a intentarlo."
+            });
+        }
+        finally
+        {
+            IsSending = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", ProgressKey);
+        LabCompleted = progress?.Completed?.Contains("crear-orden", StringComparer.OrdinalIgnoreCase) == true;
+        PersistedOrderCount = await OrderStore.CountAsync();
+        StateHasChanged();
+    }
+
+    private void ApplyScenario(string scenario)
+    {
+        Scenario = scenario;
+        Input.ProductCode = scenario == "product" ? "" : "MONITOR-24";
+        Input.Quantity = scenario == "quantity" ? 0 : 2;
+        Input.UnitPrice = scenario == "price" ? 0 : 3499.90m;
+        StatusCode = null;
+        StatusText = string.Empty;
+        ResponseJson = "// Ejecuta la solicitud para observar el contrato HTTP.";
+        RequestStep = 0;
+        ValidationStopped = false;
+        RequestPhase = "Listo para ejecutar una solicitud";
+    }
+
+    private string StepClass(int step)
+    {
+        if (ValidationStopped)
+        {
+            if (step is 1 or 2) return "done";
+            if (step is 3 or 4) return "skipped";
+            return step == 5
+                ? RequestStep > 5 ? "done" : "active"
+                : string.Empty;
+        }
+
+        return RequestStep switch
+        {
+            var current when current > step => "done",
+            var current when current == step => "active",
+            _ => string.Empty
+        };
+    }
+
+    private async Task CompleteLab()
+    {
+        if (!HasSuccessfulCase || !HasValidationCase) return;
+
+        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", ProgressKey)
+            ?? new StoredProgress([], [], [], ProgressVersion);
+        var viewed = (progress.Viewed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var reviewed = (progress.Reviewed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var completed = (progress.Completed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        if ((progress.Version ?? 0) < ProgressVersion)
+        {
+            var moduleSlugs = JuniorCurriculum.Topics.Take(12)
+                .Select(topic => topic.Slug)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var slug in completed.Where(moduleSlugs.Contains).ToArray())
+            {
+                completed.Remove(slug);
+                reviewed.Add(slug);
+            }
+        }
+
+        viewed.Add("crear-orden");
+        completed.Add("crear-orden");
+        await JS.InvokeVoidAsync("labProgress.set", ProgressKey, new StoredProgress(viewed.ToArray(), reviewed.ToArray(), completed.ToArray(), ProgressVersion));
+        LabCompleted = true;
+    }
+
+    private static string Serialize<T>(T value) =>
+        JsonSerializer.Serialize(value, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+    private sealed class PlaygroundInput
+    {
+        public string? ProductCode { get; set; }
+
+        public int Quantity { get; set; }
+
+        public decimal UnitPrice { get; set; }
+    }
+
+    private const string ProgressKey = "dotnet-code-maturity-lab-progress-v2";
+    private const int ProgressVersion = 3;
+    private sealed record StoredProgress(string[]? Viewed, string[]? Reviewed, string[]? Completed, int? Version);
+}

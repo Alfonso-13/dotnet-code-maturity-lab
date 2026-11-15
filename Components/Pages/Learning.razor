@@ -1,0 +1,683 @@
+@page "/aprender/{Level}"
+@page "/aprender/{Level}/{TopicSlug}"
+@rendermode InteractiveServer
+@using DotnetCodeMaturityLab.Components.Learning
+@using DotnetCodeMaturityLab.Features.Learning
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@CurrentTopic.Title | Ruta Junior</PageTitle>
+
+<div class="course-player junior-module-one junior-course-player">
+    <aside class="course-curriculum @(CurriculumOpen ? "open" : null)" aria-label="Contenido del nivel">
+        <header>
+            <div>
+                <span class="eyebrow">Ruta de aprendizaje</span>
+                <h2>Junior</h2>
+                <p>Doce módulos conectados con la misma experiencia visual.</p>
+            </div>
+            <button type="button" class="curriculum-toggle" @onclick="ToggleCurriculum" aria-expanded="@CurriculumOpen" aria-label="Mostrar u ocultar módulos">
+                <span>@(CurriculumOpen ? "Ocultar" : "Ver módulos")</span><b aria-hidden="true">⌄</b>
+            </button>
+        </header>
+
+        <div class="curriculum-progress" aria-label="Progreso del nivel">
+            <div><span>Tu progreso</span><strong>@AvailableCompleted de @AvailableTopicCount disponibles</strong></div>
+            <div><span style="width: @AvailableProgressPercent%"></span></div>
+            <small>@AvailableProgressPercent% completado</small>
+        </div>
+        <div class="curriculum-status-key" aria-label="Significado de los estados">
+            <span><b>◌</b> Visto</span>
+            <span><b>◉</b> Revisado</span>
+            <span><b>✓</b> Completado</span>
+        </div>
+
+        <nav>
+            @for (var index = 0; index < Topics.Count; index++)
+            {
+                var topicIndex = index;
+                var topic = Topics[index];
+                @if (index == 0 || !Topics[index - 1].Block.Equals(topic.Block, StringComparison.Ordinal))
+                {
+                    <span class="curriculum-group">@topic.Block</span>
+                }
+                <button type="button" class="@TopicClass(topic, index)" @onclick="() => SelectTopic(topicIndex)" aria-current="@(index == ActiveTopicIndex ? "page" : null)">
+                    <span class="curriculum-state">@TopicStateIcon(topic, index)</span>
+                    <span>
+                        <small>Módulo @(index + 1)</small>
+                        @topic.ShortTitle
+                        @if (index >= AvailableTopicCount)
+                        {
+                            <em>En mantenimiento</em>
+                        }
+                    </span>
+                    <i aria-hidden="true">›</i>
+                </button>
+            }
+        </nav>
+        <a class="course-lab-link" href="laboratorio/junior"><span>Laboratorio del nivel</span><strong>Crear una orden →</strong></a>
+    </aside>
+
+    <main class="course-stage @(IsMaintenance ? "maintenance" : null)" aria-labelledby="lesson-title">
+        <header class="course-header">
+            <div>
+                <a class="course-back" href="ruta">← Ruta de madurez</a>
+                <span class="eyebrow">Junior · Módulo @((ActiveTopicIndex + 1).ToString("00"))</span>
+                <h1 id="lesson-title">@CurrentTopic.Title</h1>
+            </div>
+        </header>
+
+        @if (IsMaintenance)
+        {
+            <section class="course-maintenance-panel">
+                <div class="maintenance-symbol" aria-hidden="true">⌁</div>
+                <span class="step-label">Contenido protegido</span>
+                <h2>Este módulo se retomará después de validar los dos primeros.</h2>
+                <p>Su contenido permanece guardado. Por ahora estamos afinando la experiencia de Fundamentos y Métodos y clases antes de replicar el formato.</p>
+                <button type="button" class="button button-primary" @onclick="OpenFirstModule">Abrir módulo 1 →</button>
+            </section>
+        }
+        else
+        {
+            <nav class="course-perspectives" role="tablist" aria-label="Perspectivas del módulo">
+                @for (var index = 0; index < PerspectiveNames.Length; index++)
+                {
+                    var perspectiveIndex = index;
+                    <button type="button" role="tab" class="@(ActivePerspective == index ? "active" : null)" aria-selected="@(ActivePerspective == index ? "true" : "false")" @onclick="() => SelectPerspective(perspectiveIndex)">
+                        <span>@(index + 1).</span> @PerspectiveNames[index]
+                    </button>
+                }
+            </nav>
+
+            <section class="course-perspective module-one-perspective code-first-panel" role="tabpanel" @key="ActivePerspective">
+                <button type="button" class="hint-lamp" @onclick="OpenHint" aria-label="Abrir pista de @PerspectiveNames[ActivePerspective]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21h6m-5-3h4m-7-7a5 5 0 1 1 10 0c0 2-1.1 3.2-2.2 4.3-.5.5-.8 1.1-.8 1.7h-4c0-.6-.3-1.2-.8-1.7C8.1 14.2 7 13 7 11Z"/></svg>
+                </button>
+
+                @if (ActiveTopicIndex == 0)
+                {
+                    @switch (ActivePerspective)
+                    {
+                        case 0:
+                        <header class="code-scene-header"><span class="step-label">Entiende</span><p>Tipos básicos dentro de una orden</p></header>
+                        <CSharpCodeWindow FileName="OrderData.cs" PlainCode="@UnderstandCode">
+                            <span class="cs-comment">// string representa texto. Sin ? es un dato requerido.</span>
+<span class="cs-type">string</span> productCode = <span class="cs-string">"MONITOR-24"</span>;
+
+<span class="cs-comment">// int representa números enteros: 1, 2, 3...</span>
+<span class="cs-type">int</span> quantity = <span class="cs-number">2</span>;
+
+<span class="cs-comment">// decimal conserva la precisión necesaria para dinero.</span>
+<span class="cs-type">decimal</span> unitPrice = <span class="cs-number">3499.90m</span>;
+
+<span class="cs-comment">// El operador * combina los valores y produce un resultado.</span>
+<span class="cs-type">decimal</span> subtotal = quantity * unitPrice;</CSharpCodeWindow>
+                        break;
+
+                    case 1:
+                        <header class="code-scene-header"><span class="step-label">Compara</span><p>El contrato incorrecto y el contrato explícito</p></header>
+                        <div class="code-compare-grid">
+                            <CSharpCodeWindow FileName="OrderData.cs" Label="Mala práctica" CssClass="bad-practice" PlainCode="@BadPracticeCode">
+                                <span class="cs-comment">// ❌ El tipo promete texto, pero recibe ausencia.</span>
+<span class="cs-type">string</span> productCode = <span class="cs-keyword">null</span>;
+
+<span class="cs-comment">// "" tampoco explica si el dato era opcional.</span>
+<span class="cs-type">string</span> notes = <span class="cs-string">""</span>;</CSharpCodeWindow>
+                            <CSharpCodeWindow FileName="OrderData.cs" Label="Buena práctica" CssClass="good-practice" PlainCode="@GoodPracticeCode">
+                                <span class="cs-comment">// ✅ El código de producto es obligatorio.</span>
+<span class="cs-type">string</span> productCode = <span class="cs-string">"MONITOR-24"</span>;
+
+<span class="cs-comment">// ✅ El signo ? declara que notes puede no existir.</span>
+<span class="cs-type">string</span>? notes = <span class="cs-keyword">null</span>;</CSharpCodeWindow>
+                        </div>
+                        break;
+
+                    case 2:
+                        <header class="code-scene-header"><span class="step-label">Condiciones</span><p>Dos formas de elegir qué camino ejecutar</p></header>
+                        <div class="code-compare-grid lesson-dual-code">
+                            <CSharpCodeWindow FileName="IfElseRules.cs" Label="if / else" PlainCode="@IfElseCode" />
+                            <CSharpCodeWindow FileName="SwitchRules.cs" Label="switch" PlainCode="@SwitchCode" />
+                        </div>
+                        break;
+
+                    case 3:
+                        <header class="code-scene-header"><span class="step-label">Ciclos</span><p>Recorrer elementos o repetir mientras exista una condición</p></header>
+                        <div class="code-compare-grid lesson-dual-code">
+                            <CSharpCodeWindow FileName="ForeachExample.cs" Label="foreach" PlainCode="@ForeachCode" />
+                            <CSharpCodeWindow FileName="ForWhileExample.cs" Label="for / while" PlainCode="@ForWhileCode" />
+                        </div>
+                        break;
+
+                    default:
+                        <header class="code-scene-header"><span class="step-label">Integra</span><p>Compara todo lo revisado en el módulo</p></header>
+                        <div class="code-compare-grid final-code-review">
+                            <CSharpCodeWindow FileName="OrderProcessor.Before.cs" Label="Código deficiente" CssClass="bad-practice review-code" PlainCode="@BadReviewCode" />
+                            <CSharpCodeWindow FileName="OrderProcessor.After.cs" Label="Código correcto" CssClass="good-practice review-code" PlainCode="@GoodReviewCode" />
+                        </div>
+                            break;
+                    }
+                }
+                else if (ActiveTopicIndex == 1)
+                {
+                    @switch (ActivePerspective)
+                    {
+                        case 0:
+                            <header class="code-scene-header"><span class="step-label">Entiende</span><p>Una clase reúne estado y comportamiento</p></header>
+                            <CSharpCodeWindow FileName="Order.cs" PlainCode="@ClassAnatomyCode" />
+                            break;
+
+                        case 1:
+                            <header class="code-scene-header"><span class="step-label">Compara</span><p>Estado expuesto frente a estado protegido</p></header>
+                            <div class="code-compare-grid">
+                                <CSharpCodeWindow FileName="Order.Before.cs" Label="Mala práctica" CssClass="bad-practice" PlainCode="@BadClassCode" />
+                                <CSharpCodeWindow FileName="Order.After.cs" Label="Buena práctica" CssClass="good-practice" PlainCode="@GoodClassCode" />
+                            </div>
+                            break;
+
+                        case 2:
+                            <header class="code-scene-header"><span class="step-label">Constructores</span><p>Crear objetos válidos desde el primer momento</p></header>
+                            <div class="code-compare-grid lesson-dual-code">
+                                <CSharpCodeWindow FileName="Order.Empty.cs" Label="Sin garantías" CssClass="bad-practice" PlainCode="@EmptyConstructorCode" />
+                                <CSharpCodeWindow FileName="Order.Valid.cs" Label="Contrato explícito" CssClass="good-practice" PlainCode="@ValidConstructorCode" />
+                            </div>
+                            break;
+
+                        case 3:
+                            <header class="code-scene-header"><span class="step-label">Métodos</span><p>void ejecuta una acción; return entrega un resultado</p></header>
+                            <div class="code-compare-grid lesson-dual-code">
+                                <CSharpCodeWindow FileName="OrderActions.cs" Label="void" PlainCode="@VoidMethodCode" />
+                                <CSharpCodeWindow FileName="OrderCalculations.cs" Label="return" PlainCode="@ReturnMethodCode" />
+                            </div>
+                            break;
+
+                        default:
+                            <header class="code-scene-header"><span class="step-label">Integra</span><p>Compara una clase anémica con una clase que protege sus reglas</p></header>
+                            <div class="code-compare-grid final-code-review">
+                                <CSharpCodeWindow FileName="Order.Before.cs" Label="Código deficiente" CssClass="bad-practice review-code" PlainCode="@BadClassReviewCode" />
+                                <CSharpCodeWindow FileName="Order.After.cs" Label="Código correcto" CssClass="good-practice review-code" PlainCode="@GoodClassReviewCode" />
+                            </div>
+                            break;
+                    }
+                }
+                else
+                {
+                    <header class="code-scene-header"><span class="step-label">@CurrentCatalogStep.Label</span><p>@CurrentCatalogStep.Caption</p></header>
+
+                    @if (CurrentCatalogStep.Right is null)
+                    {
+                        <CSharpCodeWindow FileName="@CurrentCatalogStep.Left.FileName" Label="@CurrentCatalogStep.Left.Label" CssClass="@CurrentCatalogStep.Left.CssClass" PlainCode="@CurrentCatalogStep.Left.Code" />
+                    }
+                    else
+                    {
+                        <div class="code-compare-grid lesson-dual-code @(ActivePerspective == PerspectiveNames.Length - 1 ? "final-code-review" : null)">
+                            <CSharpCodeWindow FileName="@CurrentCatalogStep.Left.FileName" Label="@CurrentCatalogStep.Left.Label" CssClass="@($"{CurrentCatalogStep.Left.CssClass} review-code")" PlainCode="@CurrentCatalogStep.Left.Code" />
+                            <CSharpCodeWindow FileName="@CurrentCatalogStep.Right.FileName" Label="@CurrentCatalogStep.Right.Label" CssClass="@($"{CurrentCatalogStep.Right.CssClass} review-code")" PlainCode="@CurrentCatalogStep.Right.Code" />
+                        </div>
+                    }
+                }
+            </section>
+
+            @if (HintOpen)
+            {
+                <div class="hint-modal-backdrop" role="presentation" @onclick="CloseHint" @onkeydown="HandleHintKey" tabindex="-1">
+                    <section class="hint-modal" role="dialog" aria-modal="true" aria-labelledby="hint-title" @onclick:stopPropagation="true">
+                        <header class="hint-modal-header">
+                            <div class="hint-modal-heading">
+                                <div class="hint-modal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 21h6m-5-3h4m-7-7a5 5 0 1 1 10 0c0 2-1.1 3.2-2.2 4.3-.5.5-.8 1.1-.8 1.7h-4c0-.6-.3-1.2-.8-1.7C8.1 14.2 7 13 7 11Z"/></svg></div>
+                                <span class="eyebrow">Pista del paso</span>
+                            </div>
+                            <button type="button" class="hint-modal-close" @onclick="CloseHint" aria-label="Cerrar pista">×</button>
+                        </header>
+                        <div class="hint-modal-body">
+                            <h2 id="hint-title">@HintTitle</h2>
+                            <p>@HintBody</p>
+                            <code>@HintExample</code>
+                        </div>
+                    </section>
+                </div>
+            }
+
+            <footer class="course-navigation">
+                <button type="button" @onclick="GoPreviousStep" disabled="@(ActivePerspective == 0)">← <span><small>Anterior</small>@PreviousStepLabel</span></button>
+                <div class="course-position" aria-label="Progreso dentro del módulo">
+                    @for (var index = 0; index < PerspectiveNames.Length; index++)
+                    {
+                        var perspectiveIndex = index;
+                        <button type="button" class="@(ActivePerspective == index ? "active" : ActivePerspective > index ? "visited" : null)" @onclick="() => SelectPerspective(perspectiveIndex)" aria-label="Ir a @PerspectiveNames[index]"></button>
+                    }
+                </div>
+                <button type="button" class="next" @onclick="GoNextStep"><span><small>@NextActionLabel</small>@NextStepLabel</span> →</button>
+            </footer>
+        }
+    </main>
+</div>
+
+@code {
+    private const string ProgressKey = "dotnet-code-maturity-lab-progress-v2";
+    private const string UnderstandCode = """
+        // string representa texto. Sin ? es un dato requerido.
+        string productCode = "MONITOR-24";
+
+        // int representa números enteros: 1, 2, 3...
+        int quantity = 2;
+
+        // decimal conserva la precisión necesaria para dinero.
+        decimal unitPrice = 3499.90m;
+
+        // El operador * combina los valores y produce un resultado.
+        decimal subtotal = quantity * unitPrice;
+        """;
+    private const string BadPracticeCode = """
+        // ❌ El tipo promete texto, pero recibe ausencia.
+        string productCode = null;
+
+        // "" tampoco explica si el dato era opcional.
+        string notes = "";
+        """;
+    private const string GoodPracticeCode = """
+        // ✅ El código de producto es obligatorio.
+        string productCode = "MONITOR-24";
+
+        // ✅ El signo ? declara que notes puede no existir.
+        string? notes = null;
+        """;
+    private const string IfElseCode = """
+        // if evalúa la primera condición.
+        if (quantity <= 0)
+        {
+            return "Cantidad inválida";
+        }
+        else if (quantity >= 10)
+        {
+            return "Aplicar descuento";
+        }
+        else
+        {
+            return "Procesar orden";
+        }
+        """;
+    private const string SwitchCode = """
+        // switch compara un valor contra casos conocidos.
+        switch (status)
+        {
+            case OrderStatus.Draft:
+                return "La orden puede editarse";
+            case OrderStatus.Confirmed:
+                return "La orden está confirmada";
+            default:
+                return "Estado no reconocido";
+        }
+        """;
+    private const string ForeachCode = """
+        // foreach recorre cada elemento sin usar un índice.
+        decimal total = 0m;
+
+        foreach (OrderItem item in orderItems)
+        {
+            total += item.Quantity * item.UnitPrice;
+        }
+        """;
+    private const string ForWhileCode = """
+        // for resulta útil cuando necesitas el índice.
+        for (int index = 0; index < orderItems.Count; index++)
+        {
+            Console.WriteLine(orderItems[index]);
+        }
+
+        // while repite mientras la condición sea verdadera.
+        while (pendingOrders.Count > 0)
+        {
+            Order nextOrder = pendingOrders.Dequeue();
+            Process(nextOrder);
+        }
+        """;
+    private const string BadReviewCode = """
+        // ❌ No expresa qué datos pueden faltar.
+        string productCode = null;
+        string notes = "";
+        int quantity = 0;
+        decimal unitPrice = 3499.90m;
+
+        // ❌ Calcula antes de validar.
+        decimal subtotal = quantity * unitPrice;
+
+        // ❌ Repite lógica sin explicar la intención.
+        for (int index = 0; index < orderItems.Count; index++)
+        {
+            subtotal += orderItems[index].UnitPrice;
+        }
+
+        if (quantity <= 0)
+        {
+            return "Cantidad inválida";
+        }
+        """;
+    private const string GoodReviewCode = """
+        // ✅ El contrato distingue datos requeridos y opcionales.
+        string productCode = "MONITOR-24";
+        string? notes = null;
+        int quantity = 2;
+        decimal unitPrice = 3499.90m;
+
+        // ✅ La condición protege el flujo antes de calcular.
+        if (quantity <= 0)
+        {
+            return "Cantidad inválida";
+        }
+
+        // ✅ foreach comunica que recorremos todos los elementos.
+        decimal subtotal = 0m;
+
+        foreach (OrderItem item in orderItems)
+        {
+            subtotal += item.Quantity * item.UnitPrice;
+        }
+
+        return $"Orden {productCode}: {subtotal:C}";
+        """;
+    private const string ClassAnatomyCode = """
+        // Una clase reúne datos y operaciones relacionadas.
+        public sealed class Order
+        {
+            // La propiedad expone el dato; private set protege sus cambios.
+            public string ProductCode { get; }
+            public decimal Total { get; private set; }
+
+            // El constructor recibe lo necesario para crear la instancia.
+            public Order(string productCode)
+            {
+                ProductCode = productCode;
+            }
+
+            // El método expresa una operación válida de la orden.
+            public void Recalculate(int quantity, decimal unitPrice)
+            {
+                Total = quantity * unitPrice;
+            }
+        }
+        """;
+    private const string BadClassCode = """
+        // ❌ Cualquier consumidor puede dejar la orden inconsistente.
+        public sealed class Order
+        {
+            public string ProductCode { get; set; } = "";
+            public decimal Total { get; set; }
+        }
+
+        var order = new Order();
+        order.Total = -500m;
+        """;
+    private const string GoodClassCode = """
+        // ✅ La clase controla cómo nace y cómo cambia su estado.
+        public sealed class Order
+        {
+            public string ProductCode { get; }
+            public decimal Total { get; private set; }
+
+            public Order(string productCode)
+            {
+                ProductCode = productCode;
+            }
+        }
+        """;
+    private const string EmptyConstructorCode = """
+        // ❌ El objeto existe antes de tener los datos obligatorios.
+        public sealed class Order
+        {
+            public string ProductCode { get; set; } = "";
+        }
+
+        var order = new Order();
+        order.ProductCode = "MONITOR-24";
+        """;
+    private const string ValidConstructorCode = """
+        // ✅ El constructor exige el dato para crear una orden válida.
+        public sealed class Order
+        {
+            public string ProductCode { get; }
+
+            public Order(string productCode)
+            {
+                ProductCode = productCode;
+            }
+        }
+
+        var order = new Order("MONITOR-24");
+        """;
+    private const string VoidMethodCode = """
+        // void comunica que el método no entrega un valor.
+        // Su efecto observable es el cambio de estado.
+        public void Confirm()
+        {
+            Status = OrderStatus.Confirmed;
+        }
+
+        order.Confirm();
+        """;
+    private const string ReturnMethodCode = """
+        // decimal comunica qué resultado recibe el llamador.
+        public decimal CalculateSubtotal(
+            int quantity,
+            decimal unitPrice)
+        {
+            return quantity * unitPrice;
+        }
+
+        decimal subtotal = order.CalculateSubtotal(2, 3499.90m);
+        """;
+    private const string BadClassReviewCode = """
+        // ❌ Solo almacena datos y permite cualquier modificación.
+        public sealed class Order
+        {
+            public string ProductCode { get; set; } = "";
+            public int Quantity { get; set; }
+            public decimal UnitPrice { get; set; }
+            public decimal Total { get; set; }
+            public string Status { get; set; } = "";
+        }
+
+        var order = new Order();
+        order.Quantity = -2;
+        order.Total = -6999.80m;
+        order.Status = "cualquier texto";
+        """;
+    private const string GoodClassReviewCode = """
+        // ✅ Constructor, propiedades y métodos forman un contrato claro.
+        public sealed class Order
+        {
+            public string ProductCode { get; }
+            public decimal Total { get; private set; }
+            public OrderStatus Status { get; private set; }
+
+            public Order(string productCode)
+            {
+                ProductCode = productCode;
+                Status = OrderStatus.Draft;
+            }
+
+            public void Recalculate(int quantity, decimal unitPrice)
+            {
+                if (quantity <= 0) return;
+                Total = quantity * unitPrice;
+            }
+
+            public void Confirm()
+            {
+                Status = OrderStatus.Confirmed;
+            }
+        }
+        """;
+    private static readonly string[] ModuleOnePerspectiveNames = ["Entiende", "Compara", "Condiciones", "Ciclos", "Integra"];
+    private static readonly string[] ModuleTwoPerspectiveNames = ["Entiende", "Compara", "Constructores", "Métodos", "Integra"];
+    private static IReadOnlyList<LabTopic> Topics => JuniorCurriculum.Topics.Take(JuniorCurriculum.Topics.Count - 1).ToArray();
+
+    [Parameter] public string Level { get; set; } = "junior";
+    [Parameter] public string? TopicSlug { get; set; }
+
+    private int ActiveTopicIndex { get; set; }
+    private int ActivePerspective { get; set; }
+    private bool CurriculumOpen { get; set; }
+    private bool ProgressLoaded { get; set; }
+    private bool HintOpen { get; set; }
+    private HashSet<string> Viewed { get; } = new(StringComparer.OrdinalIgnoreCase);
+    private HashSet<string> Reviewed { get; } = new(StringComparer.OrdinalIgnoreCase);
+    private HashSet<string> Completed { get; } = new(StringComparer.OrdinalIgnoreCase);
+    private LabTopic CurrentTopic => Topics[ActiveTopicIndex];
+    private int AvailableTopicCount => Topics.Count;
+    private JuniorModuleLesson CurrentCatalogModule => JuniorLessonCatalog.Get(CurrentTopic.Slug);
+    private JuniorLessonStep CurrentCatalogStep => CurrentCatalogModule.Steps[ActivePerspective];
+    private string[] PerspectiveNames => ActiveTopicIndex switch
+    {
+        0 => ModuleOnePerspectiveNames,
+        1 => ModuleTwoPerspectiveNames,
+        _ => CurrentCatalogModule.Steps.Select(step => step.Name).ToArray()
+    };
+    private bool IsMaintenance => ActiveTopicIndex >= AvailableTopicCount;
+    private int AvailableCompleted => Topics.Take(AvailableTopicCount).Count(topic => Completed.Contains(topic.Slug));
+    private int AvailableProgressPercent => AvailableCompleted * 100 / AvailableTopicCount;
+    private bool IsCurrentModuleCompleted => Completed.Contains(CurrentTopic.Slug);
+    private string PreviousStepLabel => ActivePerspective > 0 ? PerspectiveNames[ActivePerspective - 1] : "Ruta";
+    private string NextStepLabel => ActivePerspective < PerspectiveNames.Length - 1
+        ? PerspectiveNames[ActivePerspective + 1]
+        : !IsCurrentModuleCompleted ? "Completar módulo"
+        : ActiveTopicIndex < AvailableTopicCount - 1 ? Topics[ActiveTopicIndex + 1].ShortTitle : "Ruta de madurez";
+    private string NextActionLabel => ActivePerspective < PerspectiveNames.Length - 1
+        ? "Siguiente"
+        : !IsCurrentModuleCompleted ? "Confirmar revisión" : "Siguiente";
+    private string HintTitle => ActiveTopicIndex >= 2 ? CurrentCatalogStep.HintTitle : ActiveTopicIndex == 1 ? ActivePerspective switch
+    {
+        0 => "Una clase define qué puede hacer una instancia",
+        1 => "Encapsular no significa esconderlo todo",
+        2 => "El constructor protege el punto de entrada",
+        3 => "La firma del método comunica su resultado",
+        _ => "El objeto debe proteger sus propias reglas"
+    } : ActivePerspective switch
+    {
+        0 => "El tipo funciona como un contrato",
+        1 => "null y texto vacío no significan lo mismo",
+        2 => "Elige la condición que mejor expresa la decisión",
+        3 => "Elige el ciclo según cómo necesitas recorrer",
+        _ => "El orden de las decisiones también importa"
+    };
+    private string HintBody => ActiveTopicIndex >= 2 ? CurrentCatalogStep.HintBody : ActiveTopicIndex == 1 ? ActivePerspective switch
+    {
+        0 => "Las propiedades describen el estado y los métodos describen operaciones válidas sobre ese estado.",
+        1 => "Permite consultar lo necesario, pero limita los cambios para que la clase no acepte estados imposibles.",
+        2 => "Si un dato es obligatorio, recíbelo en el constructor en lugar de esperar que alguien lo asigne después.",
+        3 => "void no devuelve un valor. Un tipo como decimal declara que el llamador recibirá un resultado de ese tipo.",
+        _ => "Una clase útil no es solo una bolsa de propiedades: conserva juntas las reglas y los datos que protege."
+    } : ActivePerspective switch
+    {
+        0 => "Antes de pensar en sintaxis, pregunta qué representa el dato, si puede faltar y qué operaciones admite.",
+        1 => "Usa ? únicamente cuando la ausencia sea un estado válido del dominio. No lo agregues solo para silenciar advertencias.",
+        2 => "Usa if cuando evalúas condiciones diferentes. Usa switch cuando comparas un mismo valor contra un conjunto claro de casos.",
+        3 => "foreach prioriza claridad; for ofrece un índice; while repite mientras una condición permanezca verdadera.",
+        _ => "Primero declara un contrato claro, después valida y finalmente calcula o recorre los elementos."
+    };
+    private string HintExample => ActiveTopicIndex >= 2 ? CurrentCatalogStep.HintExample : ActiveTopicIndex == 1 ? ActivePerspective switch
+    {
+        0 => "clase = estado + comportamiento",
+        1 => "get público  |  cambio controlado",
+        2 => "new Order(productCode)",
+        3 => "void Confirm()  |  decimal Calculate()",
+        _ => "constructor → propiedades → métodos → estado válido"
+    } : ActivePerspective switch
+    {
+        0 => "tipo nombre = valor;",
+        1 => "string requerido;  |  string? opcional;",
+        2 => "if / else  |  switch",
+        3 => "foreach  |  for  |  while",
+        _ => "contrato → validación → recorrido → resultado"
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (!Level.Equals("junior", StringComparison.OrdinalIgnoreCase)) { Navigation.NavigateTo($"/en-preparacion/{Level}"); return; }
+        ActiveTopicIndex = string.IsNullOrWhiteSpace(TopicSlug) ? 0 : IndexOf(TopicSlug);
+        if (ActiveTopicIndex < 0) ActiveTopicIndex = 0;
+        ActivePerspective = 0;
+        CurriculumOpen = false;
+        HintOpen = false;
+        if (ProgressLoaded && !IsMaintenance) MarkViewed();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", ProgressKey);
+        var availableSlugs = Topics.Take(AvailableTopicCount).Select(topic => topic.Slug).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var slug in progress?.Viewed ?? []) Viewed.Add(slug);
+
+        if ((progress?.Version ?? 0) < ProgressVersion)
+        {
+            // En la versión anterior, abrir el quinto panel marcaba el módulo como completado.
+            // Se migra a "revisado" para reservar "completado" a una confirmación explícita.
+            foreach (var slug in progress?.Completed ?? [])
+            {
+                if (availableSlugs.Contains(slug)) Reviewed.Add(slug);
+                else Completed.Add(slug);
+            }
+        }
+        else
+        {
+            foreach (var slug in progress?.Reviewed ?? []) Reviewed.Add(slug);
+            foreach (var slug in progress?.Completed ?? []) Completed.Add(slug);
+        }
+
+        ProgressLoaded = true;
+        if (!IsMaintenance) MarkViewed();
+        await PersistProgress();
+        StateHasChanged();
+    }
+
+    private int IndexOf(string slug) { for (var index = 0; index < Topics.Count; index++) if (Topics[index].Slug.Equals(slug, StringComparison.OrdinalIgnoreCase)) return index; return -1; }
+    private void SelectTopic(int index) => Navigation.NavigateTo($"/aprender/junior/{Topics[index].Slug}");
+    private void OpenFirstModule() => SelectTopic(0);
+    private void SelectPerspective(int index) { ActivePerspective = index; HintOpen = false; if (index == PerspectiveNames.Length - 1) MarkReviewed(); }
+    private void ToggleCurriculum() => CurriculumOpen = !CurriculumOpen;
+    private void GoPreviousStep() { if (ActivePerspective > 0) ActivePerspective--; HintOpen = false; }
+    private void GoNextStep()
+    {
+        if (ActivePerspective < PerspectiveNames.Length - 1)
+        {
+            ActivePerspective++;
+            if (ActivePerspective == PerspectiveNames.Length - 1) MarkReviewed();
+        }
+        else if (!IsCurrentModuleCompleted)
+        {
+            CompleteAvailableModule();
+        }
+        else if (ActiveTopicIndex < AvailableTopicCount - 1)
+        {
+            SelectTopic(ActiveTopicIndex + 1);
+        }
+        else
+        {
+            Navigation.NavigateTo("/ruta");
+        }
+
+        HintOpen = false;
+    }
+    private void OpenHint() => HintOpen = true;
+    private void CloseHint() => HintOpen = false;
+    private void HandleHintKey(KeyboardEventArgs args) { if (args.Key == "Escape") CloseHint(); }
+    private void CompleteAvailableModule() { MarkViewed(); if (Completed.Add(CurrentTopic.Slug)) _ = PersistProgress(); }
+    private void MarkReviewed() { MarkViewed(); if (Reviewed.Add(CurrentTopic.Slug)) _ = PersistProgress(); }
+    private string TopicClass(LabTopic topic, int index) => index >= AvailableTopicCount
+        ? index == ActiveTopicIndex ? "maintenance active" : "maintenance"
+        : topic.Slug.Equals(CurrentTopic.Slug, StringComparison.OrdinalIgnoreCase) ? "active"
+        : Completed.Contains(topic.Slug) ? "completed"
+        : Reviewed.Contains(topic.Slug) ? "reviewed"
+        : Viewed.Contains(topic.Slug) ? "viewed"
+        : string.Empty;
+    private string TopicStateIcon(LabTopic topic, int index) => index >= AvailableTopicCount ? "–"
+        : topic.Slug.Equals(CurrentTopic.Slug, StringComparison.OrdinalIgnoreCase) ? "●"
+        : Completed.Contains(topic.Slug) ? "✓"
+        : Reviewed.Contains(topic.Slug) ? "◉"
+        : Viewed.Contains(topic.Slug) ? "◌"
+        : "○";
+    private void MarkViewed() { if (!IsMaintenance && Viewed.Add(CurrentTopic.Slug)) _ = PersistProgress(); }
+    private async Task PersistProgress() { if (ProgressLoaded) await JS.InvokeVoidAsync("labProgress.set", ProgressKey, new StoredProgress(Viewed.ToArray(), Reviewed.ToArray(), Completed.ToArray(), ProgressVersion)); }
+    private const int ProgressVersion = 3;
+    private sealed record StoredProgress(string[]? Viewed, string[]? Reviewed, string[]? Completed, int? Version);
+}

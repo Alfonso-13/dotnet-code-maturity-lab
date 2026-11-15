@@ -1,13 +1,166 @@
 @page "/ruta"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
 
 <PageTitle>Ruta de madurez | .NET Code Maturity Lab</PageTitle>
 
-<header class="page-header"><span class="eyebrow">Ruta de madurez</span><h1>Tres niveles, una evolución con propósito.</h1><p class="lead">La dificultad no crece por agregar herramientas, sino porque aparecen nuevas condiciones, riesgos y responsabilidades.</p></header>
+<header class="maturity-map-intro">
+    <span class="eyebrow">Ruta de madurez</span>
+    <h1>Una API. Tres niveles de ingeniería.</h1>
+    <p>Aprende cómo una solución pasa de funcionar correctamente a ser mantenible y finalmente resistir condiciones reales de producción.</p>
+</header>
 
-<section class="roadmap-grid page-section">
-    <article class="roadmap-card junior"><div class="roadmap-level"><span>01</span><small>Fundamentos</small></div><h2>Junior</h2><p class="roadmap-goal">Lograr que funcione correctamente.</p><ul class="check-list"><li>C# y programación orientada a objetos</li><li>Contratos REST y códigos HTTP</li><li>Validación y manejo de datos</li><li>LINQ y colecciones</li><li>Pruebas unitarias con AAA</li></ul><span class="status-chip">Contenido por construir</span></article>
-    <article class="roadmap-card middle"><div class="roadmap-level"><span>02</span><small>Diseño</small></div><h2>Middle</h2><p class="roadmap-goal">Hacerlo mantenible y comprobable.</p><ul class="check-list"><li>Principios SOLID</li><li>Inyección de dependencias</li><li>Strategy y patrones justificados</li><li>Pruebas de integración</li><li>Manejo consistente de errores</li></ul><span class="status-chip">Contenido por construir</span></article>
-    <article class="roadmap-card senior"><div class="roadmap-level"><span>03</span><small>Producción</small></div><h2>Senior</h2><p class="roadmap-goal">Prepararlo para condiciones reales.</p><ul class="check-list"><li>Idempotencia y concurrencia</li><li>Resiliencia ante dependencias</li><li>Observabilidad y operación</li><li>Seguridad por diseño</li><li>Escalabilidad y trade-offs</li></ul><span class="status-chip">Contenido por construir</span></article>
+<section class="maturity-map" aria-label="Mapa de aprendizaje por niveles">
+    <header class="maturity-map-header">
+        <div><span>Tu recorrido</span><strong>28 módulos · 3 laboratorios integradores</strong></div>
+        <span class="maturity-current">@ActiveLevel.Label en @ActiveLevel.Stage.ToLowerInvariant()</span>
+    </header>
+
+    <div class="maturity-level-selector" role="group" aria-label="Selecciona un nivel">
+        @foreach (var level in Levels)
+        {
+            var completed = CompletedModules(level);
+            var progress = Progress(level);
+            <button type="button" class="maturity-level-card @level.Key @(level.Key == SelectedLevel ? "active" : null)" aria-pressed="@(level.Key == SelectedLevel ? "true" : "false")" @onclick="() => SelectLevel(level.Key)">
+                <span class="maturity-level-badge" aria-hidden="true"></span>
+                <span class="maturity-level-copy"><small>@level.Stage</small><strong>@level.Label</strong><span>@level.Verb</span></span>
+                <span class="maturity-level-progress"><i><b style="width:@(progress)%"></b></i><small>@completed de @level.Modules.Count módulos</small></span>
+            </button>
+        }
+    </div>
+
+    <div class="maturity-module-heading">
+        <div><small>@ActiveLevel.Label</small><h2>@ActiveLevel.Goal</h2></div>
+        <span>@CompletedModules(ActiveLevel) / @ActiveLevel.Modules.Count completados</span>
+    </div>
+
+    <div class="maturity-module-grid">
+        @foreach (var module in ActiveLevel.Modules)
+        {
+            var state = ModuleState(ActiveLevel, module);
+            <a class="maturity-module @StateClass(state)" href="@ModuleRoute(ActiveLevel, module)">
+                <span class="maturity-module-icon" aria-hidden="true">@module.Icon</span>
+                <span><strong>@module.Title</strong><small>@state</small></span>
+                <span class="maturity-module-arrow" aria-hidden="true">→</span>
+            </a>
+        }
+    </div>
+
+    <a class="maturity-lab-card" href="@ActiveLevel.LabRoute">
+        <img src="images/dotnet-code-maturity-lab-icon.png" alt="" />
+        <span><small>Laboratorio @ActiveLevel.Label</small><strong>@ActiveLevel.LabTitle</strong><span>@ActiveLevel.LabDescription</span></span>
+        <b>@LabStateLabel</b>
+    </a>
 </section>
 
-<aside class="callout page-section"><span class="callout-icon">!</span><div><strong>Madurez no significa complejidad.</strong><p>La solución correcta es la que responde a los requisitos y riesgos actuales sin cerrar innecesariamente el camino futuro.</p></div></aside>
+@code {
+    private string SelectedLevel { get; set; } = "junior";
+    private HashSet<string> Viewed { get; } = new(StringComparer.OrdinalIgnoreCase);
+    private HashSet<string> Reviewed { get; } = new(StringComparer.OrdinalIgnoreCase);
+    private HashSet<string> Completed { get; } = new(StringComparer.OrdinalIgnoreCase);
+    private RoadmapLevel ActiveLevel => Levels.First(level => level.Key == SelectedLevel);
+
+    private static IReadOnlyList<RoadmapLevel> Levels { get; } =
+    [
+        new("junior", "Junior", "Fundamentos", "Construir", "Construye una API correcta",
+            "Crear una orden correctamente", "Integra lenguaje, dominio, persistencia, pruebas y contrato HTTP.", "/laboratorio/junior",
+            [
+                new("Fundamentos de C#", "</>", ["fundamentos-csharp"]),
+                new("Métodos y clases", "ƒ", ["metodos-y-clases"]),
+                new("Modelos y memoria", "◫", ["modelos-y-memoria"]),
+                new("Programación orientada a objetos", "◎", ["poo"]),
+                new("Errores y validación", "!", ["errores-y-validacion"]),
+                new("Colecciones y complejidad", "▤", ["colecciones-y-genericos"]),
+                new("Lambdas y LINQ", "λ", ["linq"]),
+                new("Task y async", "⇢", ["task-async-await"]),
+                new("Pruebas y AAA", "△", ["pruebas-aaa"]),
+                new("REST y HTTP", "↗", ["rest-http"]),
+                new("SQL y EF Core", "▱", ["persistencia-ef-core"]),
+                new("ASP.NET Core", "⌘", ["aspnet-core"])
+            ]),
+        new("middle", "Middle", "Diseño", "Diseñar", "Haz que la API sea mantenible y comprobable",
+            "Refactorizar el flujo de órdenes", "Aplica diseño, persistencia y pruebas de integración sobre el mismo caso.", "/en-preparacion/laboratorio-middle",
+            [
+                new("SOLID aplicado", "◇", ["solid"]),
+                new("Inyección de dependencias", "⌘", ["inyeccion-dependencias"]),
+                new("Strategy y patrones", "⇄", ["strategy-patrones"]),
+                new("Refactorización segura", "↻", ["refactorizacion"]),
+                new("Persistencia con EF Core", "▱", ["ef-core"]),
+                new("Errores y ProblemDetails", "!", ["problem-details"]),
+                new("Pruebas de integración", "⛓", ["pruebas-integracion"]),
+                new("Límites de arquitectura", "▦", ["limites-arquitectura"])
+            ]),
+        new("senior", "Senior", "Producción", "Operar", "Prepara la API para condiciones reales",
+            "Operar bajo presión", "Resiste duplicados, concurrencia, fallos externos y crecimiento en Azure.", "/en-preparacion/laboratorio-senior",
+            [
+                new("Idempotencia", "↺", ["idempotencia"]),
+                new("Concurrencia y consistencia", "≋", ["concurrencia"]),
+                new("Resiliencia", "⚡", ["resiliencia"]),
+                new("Mensajería y Outbox", "⇢", ["mensajeria-outbox"]),
+                new("Observabilidad", "◉", ["observabilidad"]),
+                new("Seguridad de API", "◆", ["seguridad-api"]),
+                new("Decisiones de arquitectura", "⌁", ["decisiones-arquitectura"]),
+                new("Azure y escalabilidad", "☁", ["azure-escalabilidad"])
+            ])
+    ];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", "dotnet-code-maturity-lab-progress-v2");
+        foreach (var slug in progress?.Viewed ?? []) Viewed.Add(slug);
+        var juniorSlugs = Levels.First(level => level.Key == "junior").Modules
+            .SelectMany(module => module.Slugs)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        if ((progress?.Version ?? 0) < ProgressVersion)
+        {
+            foreach (var slug in progress?.Completed ?? [])
+            {
+                if (juniorSlugs.Contains(slug)) Reviewed.Add(slug);
+                else Completed.Add(slug);
+            }
+        }
+        else
+        {
+            foreach (var slug in progress?.Reviewed ?? []) Reviewed.Add(slug);
+            foreach (var slug in progress?.Completed ?? []) Completed.Add(slug);
+        }
+
+        StateHasChanged();
+    }
+
+    private void SelectLevel(string level) => SelectedLevel = level;
+    private int CompletedModules(RoadmapLevel level) => level.Modules.Count(module => module.Slugs.All(Completed.Contains));
+    private int Progress(RoadmapLevel level) => (int)Math.Round(CompletedModules(level) * 100d / level.Modules.Count);
+    private string LabStateLabel => ActiveLevel.Key == "junior"
+        ? Completed.Contains("crear-orden") ? "Completado ✓" : "Integrador →"
+        : "Próximamente →";
+
+    private string ModuleState(RoadmapLevel level, RoadmapModule module)
+    {
+        if (module.Slugs.All(Completed.Contains)) return "Completado";
+        if (level.Key == "junior" && module.Slugs.All(Reviewed.Contains)) return "Revisado";
+        if (level.Key == "junior" && module.Slugs.Any(slug => Viewed.Contains(slug) || Reviewed.Contains(slug) || Completed.Contains(slug))) return "En progreso";
+        return level.Key == "junior" ? "Pendiente" : "Próximamente";
+    }
+
+    private static string StateClass(string state) => state switch
+    {
+        "Completado" => "completed",
+        "Revisado" => "reviewed",
+        "En progreso" => "in-progress",
+        "En mantenimiento" => "upcoming",
+        "Próximamente" => "upcoming",
+        _ => "pending"
+    };
+
+    private static string ModuleRoute(RoadmapLevel level, RoadmapModule module) => level.Key == "junior"
+        ? $"/aprender/junior/{module.Slugs[0]}"
+        : $"/en-preparacion/{level.Key}";
+
+    private sealed record RoadmapModule(string Title, string Icon, string[] Slugs);
+    private sealed record RoadmapLevel(string Key, string Label, string Stage, string Verb, string Goal, string LabTitle, string LabDescription, string LabRoute, IReadOnlyList<RoadmapModule> Modules);
+    private const int ProgressVersion = 3;
+    private sealed record StoredProgress(string[]? Viewed, string[]? Reviewed, string[]? Completed, int? Version);
+}
