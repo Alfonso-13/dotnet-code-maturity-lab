@@ -1,4 +1,6 @@
 using DotnetCodeMaturityLab.Components;
+using DotnetCodeMaturityLab.Features.Configuration;
+using DotnetCodeMaturityLab.Features.Localization;
 using DotnetCodeMaturityLab.Features.Orders;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Data.Sqlite;
@@ -9,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddSingleton(SiteOptions.Default);
+builder.Services.AddScoped<AppLanguageState>();
 var sqliteDirectory = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
 Directory.CreateDirectory(sqliteDirectory);
 builder.Services.AddDataProtection()

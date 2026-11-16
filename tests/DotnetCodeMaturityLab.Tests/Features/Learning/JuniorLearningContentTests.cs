@@ -1,5 +1,6 @@
 using System.Reflection;
 using DotnetCodeMaturityLab.Features.Learning;
+using DotnetCodeMaturityLab.Features.Localization;
 
 namespace DotnetCodeMaturityLab.Tests.Features.Learning;
 
@@ -11,61 +12,69 @@ public sealed class JuniorLearningContentTests
         var moduleTopics = JuniorCurriculum.Topics.Take(12).ToArray();
 
         Assert.Equal(12, moduleTopics.Length);
-        AssertPerspectiveCount("ModuleOnePerspectiveNames");
-        AssertPerspectiveCount("ModuleTwoPerspectiveNames");
 
-        foreach (var topic in moduleTopics.Skip(2))
+        foreach (var topic in moduleTopics)
         {
             var module = JuniorLessonCatalog.Get(topic.Slug);
             Assert.Equal(topic.Slug, module.Slug);
             Assert.Equal(5, module.Steps.Length);
+            Assert.All(module.Steps, step => Assert.False(string.IsNullOrWhiteSpace(step.Name)));
         }
     }
 
     [Fact]
     public void CatalogSteps_ContainLegibleHintsAndCopyableCode()
     {
-        foreach (var module in JuniorLessonCatalog.Modules.Values)
+        foreach (var language in new[] { AppLanguage.English, AppLanguage.Spanish })
         {
-            foreach (var step in module.Steps)
+            foreach (var topic in JuniorCurriculum.Topics.Take(12))
             {
-                Assert.False(string.IsNullOrWhiteSpace(step.Name));
-                Assert.False(string.IsNullOrWhiteSpace(step.Label));
-                Assert.False(string.IsNullOrWhiteSpace(step.Caption));
-                Assert.False(string.IsNullOrWhiteSpace(step.HintTitle));
-                Assert.False(string.IsNullOrWhiteSpace(step.HintBody));
-                Assert.False(string.IsNullOrWhiteSpace(step.HintExample));
+                var module = JuniorLessonCatalog.Get(topic.Slug, language);
 
-                AssertCodePane(step.Left);
-                if (step.Right is not null) AssertCodePane(step.Right);
+                foreach (var step in module.Steps)
+                {
+                    Assert.False(string.IsNullOrWhiteSpace(step.Name));
+                    Assert.False(string.IsNullOrWhiteSpace(step.Label));
+                    Assert.False(string.IsNullOrWhiteSpace(step.Caption));
+                    Assert.False(string.IsNullOrWhiteSpace(step.HintTitle));
+                    Assert.False(string.IsNullOrWhiteSpace(step.HintBody));
+                    Assert.False(string.IsNullOrWhiteSpace(step.HintExample));
+
+                    AssertCodePane(step.Left);
+                    if (step.Right is not null) AssertCodePane(step.Right);
+                }
             }
         }
     }
 
     [Fact]
-    public void FirstTwoModules_ContainFiveHintsAndCopyableCode()
+    public void EnglishAndSpanishCatalogs_HaveTheSameSixtyPerspectiveStructure()
     {
-        var componentType = typeof(Components.Pages.Learning);
-        var component = new Components.Pages.Learning();
+        var topics = JuniorCurriculum.Topics.Take(12).ToArray();
+        var perspectiveCount = 0;
 
-        for (var moduleIndex = 0; moduleIndex < 2; moduleIndex++)
+        foreach (var topic in topics)
         {
-            SetField(component, "ActiveTopicIndex", moduleIndex);
+            var spanish = JuniorLessonCatalog.Get(topic.Slug, AppLanguage.Spanish);
+            var english = JuniorLessonCatalog.Get(topic.Slug, AppLanguage.English);
 
-            for (var perspectiveIndex = 0; perspectiveIndex < 5; perspectiveIndex++)
+            Assert.Equal(topic.Slug, english.Slug);
+            Assert.Equal(spanish.Steps.Length, english.Steps.Length);
+            Assert.Equal(5, english.Steps.Length);
+
+            for (var index = 0; index < spanish.Steps.Length; index++)
             {
-                SetField(component, "ActivePerspective", perspectiveIndex);
-                Assert.False(string.IsNullOrWhiteSpace(GetProperty<string>(component, "HintTitle")));
-                Assert.False(string.IsNullOrWhiteSpace(GetProperty<string>(component, "HintBody")));
-                Assert.False(string.IsNullOrWhiteSpace(GetProperty<string>(component, "HintExample")));
+                Assert.Equal(spanish.Steps[index].Right is null, english.Steps[index].Right is null);
             }
+
+            var metadata = JuniorModuleMetadataCatalog.Get(topic, AppLanguage.English);
+            Assert.False(string.IsNullOrWhiteSpace(metadata.ShortTitle));
+            Assert.False(string.IsNullOrWhiteSpace(metadata.Title));
+            Assert.Equal("C# FUNDAMENTALS", metadata.Block);
+            perspectiveCount += english.Steps.Length;
         }
 
-        var codeFields = componentType.GetFields(BindingFlags.NonPublic | BindingFlags.Static)
-            .Where(field => field.FieldType == typeof(string) && field.Name.EndsWith("Code", StringComparison.Ordinal));
-
-        Assert.NotEmpty(codeFields);
-        foreach (var field in codeFields) AssertCopyableCode(Assert.IsType<string>(field.GetValue(null)));
+        Assert.Equal(60, perspectiveCount);
     }
 
     [Fact]
@@ -106,17 +115,6 @@ public sealed class JuniorLearningContentTests
         Assert.Contains(closingCode, code => code.Contains("UseSqlite", StringComparison.Ordinal));
         Assert.DoesNotContain(closingCode, code => code.Contains("EfOrderStore", StringComparison.Ordinal));
         Assert.DoesNotContain(closingCode, code => code.Contains("UseSqlServer", StringComparison.Ordinal));
-    }
-
-    private static void AssertPerspectiveCount(string fieldName)
-    {
-        var field = typeof(Components.Pages.Learning).GetField(
-            fieldName,
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        var names = Assert.IsType<string[]>(field?.GetValue(null));
-        Assert.Equal(5, names.Length);
-        Assert.All(names, name => Assert.False(string.IsNullOrWhiteSpace(name)));
     }
 
     private static void AssertCodePane(JuniorCodePane pane)
