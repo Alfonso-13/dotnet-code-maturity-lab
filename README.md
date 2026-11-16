@@ -38,6 +38,27 @@ dotnet run
 
 La aplicación es pública y no utiliza autenticación ni usuarios. El laboratorio Junior crea `App_Data/orders.db` al iniciar y conserva las órdenes localmente mediante EF Core y SQLite; este archivo no se versiona.
 
+## Configuración para GitHub Pages
+
+El repositorio conserva dos escenarios sin reemplazar la aplicación principal:
+
+- `DotnetCodeMaturityLab.csproj`: aplicación ASP.NET Core real con endpoints HTTP, EF Core y SQLite.
+- `GitHubPages/DotnetCodeMaturityLab.GitHubPages.csproj`: cliente Blazor WebAssembly estático que reutiliza las páginas, estilos y currículo. Como GitHub Pages no ejecuta un servidor ni SQLite, el laboratorio usa `InMemoryOrderStore` y muestra una advertencia visible de simulación local.
+
+Para probar la variante estática localmente:
+
+```powershell
+dotnet run --project GitHubPages/DotnetCodeMaturityLab.GitHubPages.csproj
+```
+
+Para generar los archivos que en el futuro podrán subirse como artefacto de GitHub Pages:
+
+```powershell
+.\build-github-pages.ps1
+```
+
+El script publica en `artifacts/github-pages/wwwroot`, configura el `base href` del repositorio e incluye `.nojekyll` y el fallback `404.html` para las rutas de la SPA. Esta configuración no habilita Pages ni publica contenido por sí sola.
+
 ## Pruebas
 
 Abre `DotnetCodeMaturityLab.slnx` en Visual Studio para trabajar con la aplicación y el proyecto de pruebas.

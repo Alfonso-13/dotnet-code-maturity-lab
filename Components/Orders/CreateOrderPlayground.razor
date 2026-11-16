@@ -1,9 +1,9 @@
-@rendermode InteractiveServer
 @using System.Text.Json
 @using DotnetCodeMaturityLab.Features.Learning
 @using DotnetCodeMaturityLab.Features.Orders
 @inject CreateOrderService OrderService
 @inject IOrderStore OrderStore
+@inject LabHostingProfile HostingProfile
 @inject IJSRuntime JS
 
 <section class="playground" aria-labelledby="playground-title">
@@ -14,9 +14,17 @@
         </div>
         <div class="playground-endpoint">
             <code>POST /api/orders</code>
-            <span>SQLite · EF Core</span>
+            <span>@HostingProfile.RuntimeLabel</span>
         </div>
     </div>
+
+    @if (HostingProfile.IsStaticDemo)
+    {
+        <aside class="pages-demo-notice" role="note">
+            <strong>Modo GitHub Pages</strong>
+            <span>La interfaz ejecuta las mismas reglas con almacenamiento temporal en el navegador. La API, EF Core y SQLite reales permanecen en el proyecto principal y en sus pruebas.</span>
+        </aside>
+    }
 
     <div class="playground-scenarios" aria-label="Escenarios del laboratorio">
         <span>Escenario</span>
@@ -39,9 +47,9 @@
             <i aria-hidden="true">→</i>
             <article class="@StepClass(2)"><span>02</span><strong>Reglas</strong><small>Validar y calcular</small></article>
             <i aria-hidden="true">→</i>
-            <article class="@StepClass(3)"><span>03</span><strong>EF Core</strong><small>Guardar entidad</small></article>
+            <article class="@StepClass(3)"><span>03</span><strong>@HostingProfile.PersistenceStep</strong><small>@HostingProfile.PersistenceDetail</small></article>
             <i aria-hidden="true">→</i>
-            <article class="@StepClass(4)"><span>04</span><strong>SQLite</strong><small>App_Data/orders.db</small></article>
+            <article class="@StepClass(4)"><span>04</span><strong>@HostingProfile.StorageStep</strong><small>@HostingProfile.StorageDetail</small></article>
             <i aria-hidden="true">→</i>
             <article class="@StepClass(5)"><span>05</span><strong>Response</strong><small>201 o 400</small></article>
         </div>
@@ -169,7 +177,7 @@
             RequestStep = result.IsSuccess ? 3 : 5;
             ValidationStopped = !result.IsSuccess;
             RequestPhase = result.IsSuccess
-                ? "EF Core está persistiendo la orden"
+                ? HostingProfile.PersistingMessage
                 : "La validación detuvo la escritura";
             StateHasChanged();
             await Task.Delay(300);
@@ -177,7 +185,7 @@
             if (result.IsSuccess)
             {
                 RequestStep = 4;
-                RequestPhase = "SQLite confirmó la escritura en orders.db";
+                RequestPhase = HostingProfile.StoredMessage;
                 PersistedOrderCount = await OrderStore.CountAsync();
                 StateHasChanged();
                 await Task.Delay(300);
@@ -204,7 +212,7 @@
             HasValidationCase = await OrderStore.CountAsync() == storedBefore;
             PersistedOrderCount = storedBefore;
             RequestStep = 6;
-            RequestPhase = "Respuesta 400 recibida · SQLite no cambió";
+            RequestPhase = HostingProfile.InvalidMessage;
         }
         catch (Exception)
         {

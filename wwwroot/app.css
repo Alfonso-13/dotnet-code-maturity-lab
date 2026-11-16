@@ -2483,3 +2483,37 @@ body:has(.course-player) .main-content { height: 100%; min-height: 0; padding: c
     .request-journey-track article { width: 100%; min-height: 64px; }
     .request-submit { width: 100%; }
 }
+
+.pages-demo-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: .85rem;
+    margin: 1rem 0;
+    padding: .9rem 1rem;
+    border: 1px solid rgba(255, 208, 73, .5);
+    background: rgba(255, 208, 73, .1);
+    color: var(--surface);
+}
+
+.pages-demo-notice strong {
+    flex: none;
+    color: #ffd049;
+}
+
+.pages-demo-notice span {
+    color: #d6dde2;
+    line-height: 1.55;
+}
+
+.boot-loading {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #0c151b;
+    color: white;
+    font-weight: 800;
+}
+
+@media (max-width: 760px) {
+    .pages-demo-notice { flex-direction: column; }
+}
