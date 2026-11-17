@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>DotnetCodeMaturityLab</RootNamespace>
+    <AssemblyName>DotnetCodeMaturityLab.GitHubPages</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.15" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Components\Layout\MainLayout.razor" Link="Components\Layout\MainLayout.razor" />
+    <Content Include="..\Components\Layout\NavMenu.razor" Link="Components\Layout\NavMenu.razor" />
+    <Content Include="..\Components\Learning\*.razor" Link="Components\Learning\%(Filename)%(Extension)" />
+    <Content Include="..\Components\Orders\CreateOrderPlayground.razor" Link="Components\Orders\CreateOrderPlayground.razor" />
+    <Content Include="..\Components\Pages\*.razor" Exclude="..\Components\Pages\Error.razor" Link="Components\Pages\%(Filename)%(Extension)" />
+
+    <Compile Include="..\Features\Learning\*.cs" Link="Features\Learning\%(Filename)%(Extension)" />
+    <Compile Include="..\Features\Orders\CreateOrderRequest.cs" Link="Features\Orders\CreateOrderRequest.cs" />
+    <Compile Include="..\Features\Orders\CreateOrderResponse.cs" Link="Features\Orders\CreateOrderResponse.cs" />
+    <Compile Include="..\Features\Orders\CreateOrderResult.cs" Link="Features\Orders\CreateOrderResult.cs" />
+    <Compile Include="..\Features\Orders\CreateOrderService.cs" Link="Features\Orders\CreateOrderService.cs" />
+    <Compile Include="..\Features\Orders\IOrderStore.cs" Link="Features\Orders\IOrderStore.cs" />
+    <Compile Include="..\Features\Orders\InMemoryOrderStore.cs" Link="Features\Orders\InMemoryOrderStore.cs" />
+    <Compile Include="..\Features\Orders\LabHostingProfile.cs" Link="Features\Orders\LabHostingProfile.cs" />
+    <Compile Include="..\Features\Orders\Order.cs" Link="Features\Orders\Order.cs" />
+
+    <Content Include="..\wwwroot\app.css" Link="wwwroot\app.css" />
+    <Content Include="..\wwwroot\intro.js" Link="wwwroot\intro.js" />
+    <Content Include="..\wwwroot\lab-progress.js" Link="wwwroot\lab-progress.js" />
+    <Content Include="..\wwwroot\section-reveal.js" Link="wwwroot\section-reveal.js" />
+    <Content Include="..\wwwroot\history-timeline.js" Link="wwwroot\history-timeline.js" />
+    <Content Include="..\wwwroot\images\**\*" Link="wwwroot\images\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

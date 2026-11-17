@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <meta name="description" content="Laboratorio visual para explorar la madurez de código, arquitectura e infraestructura en .NET." />
+    <meta name="application-name" content=".NET Code Maturity Lab" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content=".NET Code Maturity Lab" />
+    <meta property="og:description" content="Aprende .NET visualmente con código, pruebas y decisiones reales." />
+    <meta property="og:image" content="images/dotnet-code-maturity-lab-icon.png" />
+    <meta name="theme-color" content="#e53935" />
+    <link rel="icon" type="image/png" href="images/dotnet-code-maturity-lab-icon.png" />
+    <link rel="apple-touch-icon" href="images/dotnet-code-maturity-lab-icon.png" />
+    <link rel="stylesheet" href="app.css" />
+    <script>
+        (function (location) {
+            if (location.search[1] !== "/") return;
+            const decoded = location.search.slice(1).split("&").map(value => value.replace(/~and~/g, "&")).join("?");
+            window.history.replaceState(null, "", location.pathname.slice(0, -1) + decoded + location.hash);
+        })(window.location);
+
+        try {
+            if (window.sessionStorage.getItem("dotnet-code-maturity-intro-seen") === "true") {
+                document.documentElement.classList.add("intro-seen");
+            }
+        } catch { }
+    </script>
+</head>
+<body>
+    <div id="site-intro" class="site-intro" aria-hidden="true">
+        <div class="intro-accent"></div>
+        <div class="intro-content">
+            <span class="intro-kicker">Red &amp; Black Codeworkers presenta</span>
+            <div class="intro-mark"><span class="intro-tile intro-tile-red">&lt;</span><span class="intro-tile intro-tile-dark">&gt;</span></div>
+            <div class="intro-wordmark"><strong><span>Red</span> &amp; Black</strong><small>Codeworkers</small></div>
+            <div class="intro-product"><span></span><p>.NET Code Maturity Lab</p><span></span></div>
+            <div class="intro-loading"><i></i><small>Preparando el laboratorio</small></div>
+        </div>
+    </div>
+
+    <div id="app">
+        <div class="boot-loading" role="status">Cargando laboratorio…</div>
+    </div>
+
+    <script src="intro.js"></script>
+    <script src="lab-progress.js"></script>
+    <script src="section-reveal.js"></script>
+    <script src="history-timeline.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>

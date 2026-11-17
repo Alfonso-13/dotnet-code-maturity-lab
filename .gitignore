@@ -430,5 +430,8 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+# Generated GitHub Pages output
+artifacts/
+
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache

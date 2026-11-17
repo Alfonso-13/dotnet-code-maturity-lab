@@ -26,6 +26,7 @@ builder.Services.AddDbContextFactory<OrderDbContext>(options =>
     options.UseSqlite(sqliteConnectionBuilder.ConnectionString));
 builder.Services.AddScoped<IOrderStore, SqliteOrderStore>();
 builder.Services.AddScoped<CreateOrderService>();
+builder.Services.AddSingleton(LabHostingProfile.Server);
 
 var app = builder.Build();
 

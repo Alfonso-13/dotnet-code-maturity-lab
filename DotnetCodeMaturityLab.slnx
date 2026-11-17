@@ -3,4 +3,5 @@
     <Project Path="tests/DotnetCodeMaturityLab.Tests/DotnetCodeMaturityLab.Tests.csproj" />
   </Folder>
   <Project Path="DotnetCodeMaturityLab.csproj" />
+  <Project Path="GitHubPages/DotnetCodeMaturityLab.GitHubPages.csproj" />
 </Solution>
