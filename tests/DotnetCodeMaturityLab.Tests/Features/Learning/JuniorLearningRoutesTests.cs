@@ -43,6 +43,9 @@ public sealed class JuniorLearningRoutesTests : IClassFixture<WebApplicationFact
         Assert.Contains("class=\"code-copy-icon\"", html, StringComparison.Ordinal);
         Assert.Contains("class=\"course-navigation\"", html, StringComparison.Ordinal);
         Assert.Contains("class=\"course-curriculum", html, StringComparison.Ordinal);
+        Assert.Contains("C# FUNDAMENTALS", html, StringComparison.Ordinal);
+        Assert.Contains("Understand", html, StringComparison.Ordinal);
+        Assert.DoesNotContain(">Entiende<", html, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -54,7 +57,23 @@ public sealed class JuniorLearningRoutesTests : IClassFixture<WebApplicationFact
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("code-compare-grid", html, StringComparison.Ordinal);
         Assert.Contains("request-journey", html, StringComparison.Ordinal);
-        Assert.Contains("Ejecutar solicitud", html, StringComparison.Ordinal);
+        Assert.Contains("Execute request", html, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("/historia-dotnet", "A platform that changed to reach more places.", "From the original CLR to a unified platform")]
+    [InlineData("/ecosistema-dotnet", "Choose the tool according to what you need to build.", "Which one should you use?")]
+    public async Task DotNetReferencePages_DefaultToCompleteEnglishContent(
+        string route,
+        string heading,
+        string section)
+    {
+        var response = await client.GetAsync(route);
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains(heading, html, StringComparison.Ordinal);
+        Assert.Contains(section, html, StringComparison.Ordinal);
     }
 
     private static int Count(string value, string fragment)

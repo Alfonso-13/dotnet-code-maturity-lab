@@ -1,6 +1,8 @@
 (() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let observer;
+    let mutationObserver;
+    let scanQueued = false;
 
     const show = element => {
         element.classList.add("reveal-visible");
@@ -31,11 +33,41 @@
         });
     };
 
-    window.sectionReveal = { scan };
+    const scheduleScan = () => {
+        if (scanQueued) return;
+
+        scanQueued = true;
+        window.requestAnimationFrame(() => {
+            scanQueued = false;
+            scan();
+        });
+    };
+
+    const watchDynamicContent = () => {
+        if (!document.body || mutationObserver) {
+            scheduleScan();
+            return;
+        }
+
+        mutationObserver = new MutationObserver(mutations => {
+            if (mutations.some(mutation => mutation.addedNodes.length > 0)) {
+                scheduleScan();
+            }
+        });
+
+        mutationObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        scheduleScan();
+    };
+
+    window.sectionReveal = { scan: scheduleScan };
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", scan, { once: true });
+        document.addEventListener("DOMContentLoaded", watchDynamicContent, { once: true });
     } else {
-        scan();
+        watchDynamicContent();
     }
 })();

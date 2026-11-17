@@ -22,6 +22,8 @@
     <Content Include="..\Components\Pages\*.razor" Exclude="..\Components\Pages\Error.razor" Link="Components\Pages\%(Filename)%(Extension)" />
 
     <Compile Include="..\Features\Learning\*.cs" Link="Features\Learning\%(Filename)%(Extension)" />
+    <Compile Include="..\Features\Configuration\*.cs" Link="Features\Configuration\%(Filename)%(Extension)" />
+    <Compile Include="..\Features\Localization\*.cs" Link="Features\Localization\%(Filename)%(Extension)" />
     <Compile Include="..\Features\Orders\CreateOrderRequest.cs" Link="Features\Orders\CreateOrderRequest.cs" />
     <Compile Include="..\Features\Orders\CreateOrderResponse.cs" Link="Features\Orders\CreateOrderResponse.cs" />
     <Compile Include="..\Features\Orders\CreateOrderResult.cs" Link="Features\Orders\CreateOrderResult.cs" />

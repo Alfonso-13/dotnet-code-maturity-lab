@@ -1,4 +1,5 @@
 @using DotnetCodeMaturityLab.Components.Pages
+@inherits LocalizedComponentBase
 
 <article class="history-event @Branch @(Item.Current ? "current" : null)">
     <div class="history-event-heading">
@@ -6,12 +7,12 @@
         <span class="history-version-mark">@Item.Version</span>
         @if (Item.Current)
         {
-            <em>Actual</em>
+            <em>@T("Current", "Actual")</em>
         }
     </div>
     <dl>
-        <div><dt>Qué cambió</dt><dd>@Item.Changed</dd></div>
-        <div><dt>Qué buscó resolver</dt><dd>@Item.Purpose</dd></div>
+        <div><dt>@T("What changed", "Qué cambió")</dt><dd>@Item.Changed</dd></div>
+        <div><dt>@T("What it aimed to solve", "Qué buscó resolver")</dt><dd>@Item.Purpose</dd></div>
     </dl>
 </article>
 

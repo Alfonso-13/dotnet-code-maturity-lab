@@ -1,9 +1,23 @@
 using DotnetCodeMaturityLab.Features.Orders;
+using DotnetCodeMaturityLab.Features.Localization;
 
 namespace DotnetCodeMaturityLab.Tests.Features.Orders;
 
 public sealed class CreateOrderServiceTests
 {
+    [Fact]
+    public async Task ValidationMessages_FollowSelectedLanguage()
+    {
+        var service = new CreateOrderService(new InMemoryOrderStore());
+        var request = new CreateOrderRequest(null, 0, 0);
+
+        var english = await service.CreateAsync(request, AppLanguage.English);
+        var spanish = await service.CreateAsync(request, AppLanguage.Spanish);
+
+        Assert.Equal("The product code is required.", english.Errors[nameof(CreateOrderRequest.ProductCode)][0]);
+        Assert.Equal("El código del producto es obligatorio.", spanish.Errors[nameof(CreateOrderRequest.ProductCode)][0]);
+    }
+
     [Fact]
     public async Task Create_WithValidData_CreatesOrderAndCalculatesSubtotal()
     {

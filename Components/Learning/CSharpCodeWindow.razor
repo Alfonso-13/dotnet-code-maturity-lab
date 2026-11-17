@@ -1,4 +1,5 @@
 @inject IJSRuntime JS
+@inherits LocalizedComponentBase
 
 <article class="csharp-code-card code-protagonist @CssClass">
     <header>
@@ -10,11 +11,11 @@
                 <span class="code-window-label">@Label</span>
             }
         </div>
-        <button type="button" class="code-copy-icon" @onclick="CopyCode" aria-label="@(Copied ? $"Código copiado de {FileName}" : $"Copiar código de {FileName}")" title="@(Copied ? "Código copiado" : "Copiar código")">
+        <button type="button" class="code-copy-icon" @onclick="CopyCode" aria-label="@(Copied ? $"{T("Code copied from", "Código copiado de")} {FileName}" : $"{T("Copy code from", "Copiar código de")} {FileName}")" title="@(Copied ? T("Code copied", "Código copiado") : T("Copy code", "Copiar código"))">
             @if (Copied)
             {
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
-                <span class="visually-hidden" role="status">Código copiado</span>
+                <span class="visually-hidden" role="status">@T("Code copied", "Código copiado")</span>
             }
             else
             {
@@ -44,6 +45,8 @@
 
     private static string Highlight(string code)
     {
+        // This intentionally lightweight highlighter keeps examples copyable and avoids shipping
+        // a full editor/runtime merely to color the small, controlled C# snippets in the course.
         var keywords = new HashSet<string>(StringComparer.Ordinal)
         {
             "if", "else", "return", "foreach", "in", "switch", "case", "default", "for", "while", "null",

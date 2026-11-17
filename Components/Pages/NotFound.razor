@@ -1,11 +1,13 @@
 ﻿@page "/not-found"
 @layout MainLayout
 
-<PageTitle>Página no encontrada</PageTitle>
+@inherits LocalizedComponentBase
+
+<PageTitle>@T("Page not found", "Página no encontrada")</PageTitle>
 
 <section class="empty-state">
     <span class="eyebrow">Error 404</span>
-    <h1>Esta ruta todavía no forma parte del laboratorio.</h1>
-    <p role="alert">Vuelve al inicio para continuar explorando la ruta de madurez.</p>
-    <a class="button button-primary" href="">Volver al inicio</a>
+    <h1>@T("This route is not part of the laboratory yet.", "Esta ruta todavía no forma parte del laboratorio.")</h1>
+    <p role="alert">@T("Return home to keep exploring the maturity roadmap.", "Vuelve al inicio para continuar explorando la ruta de madurez.")</p>
+    <a class="button button-primary" href="">@T("Return home", "Volver al inicio")</a>
 </section>

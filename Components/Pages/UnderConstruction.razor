@@ -1,30 +1,31 @@
 @page "/en-preparacion/{Section}"
 @inject NavigationManager Navigation
+@inherits LocalizedComponentBase
 
-<PageTitle>@Content.Title en preparación | .NET Code Maturity Lab</PageTitle>
+<PageTitle>@Content.Title · @T("coming soon", "en preparación") | .NET Code Maturity Lab</PageTitle>
 
 <section class="maintenance-page">
     <div class="maintenance-copy">
-        <span class="eyebrow">Contenido en proceso</span>
-        <h1>@Content.Title todavía no está disponible.</h1>
+        <span class="eyebrow">@T("Content in progress", "Contenido en proceso")</span>
+        <h1>@Content.Title @T("is not available yet.", "todavía no está disponible.")</h1>
         <p>@Content.Description</p>
 
-        <div class="maintenance-status" aria-label="Estado del contenido">
-            <div><span>Estado</span><strong>Definición y diseño</strong></div>
+        <div class="maintenance-status" aria-label="@T("Content status", "Estado del contenido")">
+            <div><span>@T("Status", "Estado")</span><strong>@T("Definition and design", "Definición y diseño")</strong></div>
             <div class="maintenance-track"><span></span></div>
-            <small>Se publicará cuando el recorrido y sus ejemplos estén completos.</small>
+            <small>@T("It will be published when the learning path and its examples are complete.", "Se publicará cuando el recorrido y sus ejemplos estén completos.")</small>
         </div>
 
         <div class="button-row">
-            <a class="button button-primary" href="laboratorio">Continuar con Junior <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="ruta">Ver ruta de madurez</a>
+            <a class="button button-primary" href="laboratorio">@T("Continue with Junior", "Continuar con Junior") <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="ruta">@T("View maturity roadmap", "Ver ruta de madurez")</a>
         </div>
     </div>
 
     <div class="maintenance-visual" aria-hidden="true">
         <span class="maintenance-number">@Content.Number</span>
         <div class="maintenance-lines"><i></i><i></i><i></i></div>
-        <strong>En construcción</strong>
+        <strong>@T("Under construction", "En construcción")</strong>
         <small>@Content.Title</small>
     </div>
 </section>
@@ -42,11 +43,11 @@
 
     private MaintenanceContent Content => Section.ToLowerInvariant() switch
     {
-        "arquitectura" => new("04", "Arquitectura", "Aquí se explicarán límites, capas, dependencias y decisiones de solución después de completar la base Junior y Middle."),
-        "azure" => new("05", "Azure y escala", "Aquí se visualizarán recursos de Microsoft Azure, costos, escalamiento vertical, horizontal y automático, junto con sus límites reales."),
-        "glosario" => new("06", "Glosario", "Las definiciones se publicarán conforme cada concepto tenga un ejemplo verificable dentro del laboratorio."),
-        "solid" => new("S", "Ejemplo SOLID", "SOLID se desarrollará en el nivel Middle, donde podremos mostrar el problema, la refactorización y las consecuencias de cada decisión."),
-        _ => new("…", "Esta sección", "Estamos definiendo el contenido y su demostración antes de publicarlo.")
+        "arquitectura" => new("04", T("Architecture", "Arquitectura"), T("This section will explain boundaries, layers, dependencies, and solution decisions after the Junior and Middle foundations are complete.", "Aquí se explicarán límites, capas, dependencias y decisiones de solución después de completar la base Junior y Middle.")),
+        "azure" => new("05", T("Azure and scale", "Azure y escala"), T("This section will visualize Microsoft Azure resources, costs, vertical, horizontal, and automatic scaling, together with their real limits.", "Aquí se visualizarán recursos de Microsoft Azure, costos, escalamiento vertical, horizontal y automático, junto con sus límites reales.")),
+        "glosario" => new("06", T("Glossary", "Glosario"), T("Definitions will be published as each concept gains a verifiable laboratory example.", "Las definiciones se publicarán conforme cada concepto tenga un ejemplo verificable dentro del laboratorio.")),
+        "solid" => new("S", T("SOLID example", "Ejemplo SOLID"), T("SOLID will be developed at the Middle level, where the problem, refactoring, and consequences of each decision can be shown.", "SOLID se desarrollará en el nivel Middle, donde podremos mostrar el problema, la refactorización y las consecuencias de cada decisión.")),
+        _ => new("…", T("This section", "Esta sección"), T("We are defining the content and demonstration before publishing it.", "Estamos definiendo el contenido y su demostración antes de publicarlo."))
     };
 
     private sealed record MaintenanceContent(string Number, string Title, string Description);

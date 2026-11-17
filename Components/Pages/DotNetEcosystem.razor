@@ -1,62 +1,63 @@
 @page "/ecosistema-dotnet"
+@inherits LocalizedComponentBase
 
-<PageTitle>Ecosistema .NET | .NET Code Maturity Lab</PageTitle>
+<PageTitle>@T(".NET ecosystem", "Ecosistema .NET") | .NET Code Maturity Lab</PageTitle>
 
 <header class="history-hero ecosystem-hero">
     <div>
-        <span class="eyebrow">Ecosistema .NET</span>
-        <h1>Elige la herramienta según lo que necesitas construir.</h1>
-        <p>La versión define la base y el soporte. El modelo de aplicación define cómo construyes la interfaz, expones servicios o accedes a los datos.</p>
-        <div class="button-row"><a class="button button-secondary" href="historia-dotnet">← Ver de dónde viene .NET</a></div>
+        <span class="eyebrow">@T(".NET ecosystem", "Ecosistema .NET")</span>
+        <h1>@T("Choose the tool according to what you need to build.", "Elige la herramienta según lo que necesitas construir.")</h1>
+        <p>@T("The version defines the foundation and support lifecycle. The application model defines how you build the interface, expose services, or access data.", "La versión define la base y el soporte. El modelo de aplicación define cómo construyes la interfaz, expones servicios o accedes a los datos.")</p>
+        <div class="button-row"><a class="button button-secondary" href="historia-dotnet">← @T("See where .NET came from", "Ver de dónde viene .NET")</a></div>
     </div>
 </header>
 
 <section class="history-takeaway reveal-section" aria-labelledby="takeaway-title">
-    <span class="eyebrow">La idea que debes conservar</span>
-    <h2 id="takeaway-title">El número de versión importa menos que la intención del cambio.</h2>
-    <p class="history-takeaway-intro">Hoy no son tres alternativas equivalentes. Cada rama representa una decisión diferente sobre compatibilidad, soporte y evolución.</p>
+    <span class="eyebrow">@T("The idea to keep", "La idea que debes conservar")</span>
+    <h2 id="takeaway-title">@T("The version number matters less than the intent behind the change.", "El número de versión importa menos que la intención del cambio.")</h2>
+    <p class="history-takeaway-intro">@T("These are not three equivalent alternatives today. Each branch represents a different decision about compatibility, support, and evolution.", "Hoy no son tres alternativas equivalentes. Cada rama representa una decisión diferente sobre compatibilidad, soporte y evolución.")</p>
     <div class="history-current-grid">
         <article class="framework">
-            <header><span class="history-logo-frame"><img src="images/dotnet-framework-logo.png" alt="Microsoft .NET Framework" /></span><span><small>Compatibilidad Windows</small><strong>.NET Framework</strong></span></header>
-            <p class="history-verdict">Consérvalo cuando una aplicación existente depende profundamente del ecosistema clásico de Windows.</p>
-            <section class="history-pros"><h3>Ventajas actuales</h3><ul><li>Gran compatibilidad con aplicaciones empresariales existentes.</li><li>Mantiene tecnologías y bibliotecas exclusivas de Framework.</li></ul></section>
-            <section class="history-cons"><h3>Limitaciones actuales</h3><ul><li>Está ligado a Windows y se encuentra en mantenimiento.</li><li>Framework 4 se actualiza en toda la máquina y no funciona lado a lado.</li></ul></section>
-            <footer><span>Úsalo para preservar</span><strong>No como primera opción para una API nueva</strong></footer>
+            <header><span class="history-logo-frame"><img src="images/dotnet-framework-logo.png" alt="Microsoft .NET Framework" /></span><span><small>@T("Windows compatibility", "Compatibilidad Windows")</small><strong>.NET Framework</strong></span></header>
+            <p class="history-verdict">@T("Keep it when an existing application depends deeply on the classic Windows ecosystem.", "Consérvalo cuando una aplicación existente depende profundamente del ecosistema clásico de Windows.")</p>
+            <section class="history-pros"><h3>@T("Current advantages", "Ventajas actuales")</h3><ul><li>@T("Strong compatibility with existing enterprise applications.", "Gran compatibilidad con aplicaciones empresariales existentes.")</li><li>@T("Preserves Framework-only technologies and libraries.", "Mantiene tecnologías y bibliotecas exclusivas de Framework.")</li></ul></section>
+            <section class="history-cons"><h3>@T("Current limitations", "Limitaciones actuales")</h3><ul><li>@T("It is tied to Windows and is in maintenance mode.", "Está ligado a Windows y se encuentra en mantenimiento.")</li><li>@T("Framework 4 updates machine-wide and does not run side by side.", "Framework 4 se actualiza en toda la máquina y no funciona lado a lado.")</li></ul></section>
+            <footer><span>@T("Use it to preserve", "Úsalo para preservar")</span><strong>@T("Not as the first choice for a new API", "No como primera opción para una API nueva")</strong></footer>
         </article>
         <article class="core">
-            <header><span class="history-logo-frame"><img src="images/dotnet-core-logo.png" alt=".NET Core" /></span><span><small>Rama histórica</small><strong>.NET Core 1–3.1</strong></span></header>
-            <p class="history-verdict">Fue el puente que convirtió .NET en una plataforma abierta, rápida, modular y multiplataforma.</p>
-            <section class="history-pros"><h3>Ventajas que heredamos</h3><ul><li>Introdujo despliegues independientes y ejecución multiplataforma.</li><li>Sentó la base de ASP.NET Core y del .NET actual.</li></ul></section>
-            <section class="history-cons"><h3>Limitaciones actuales</h3><ul><li>Todas las versiones 1.0–3.1 están fuera de soporte.</li><li>No reciben correcciones de seguridad: deben migrarse.</li></ul></section>
-            <footer><span>Estúdialo para comprender</span><strong>No lo elijas para producción nueva</strong></footer>
+            <header><span class="history-logo-frame"><img src="images/dotnet-core-logo.png" alt=".NET Core" /></span><span><small>@T("Historical branch", "Rama histórica")</small><strong>.NET Core 1–3.1</strong></span></header>
+            <p class="history-verdict">@T("It was the bridge that turned .NET into an open, fast, modular, cross-platform system.", "Fue el puente que convirtió .NET en una plataforma abierta, rápida, modular y multiplataforma.")</p>
+            <section class="history-pros"><h3>@T("Advantages we inherited", "Ventajas que heredamos")</h3><ul><li>@T("Introduced self-contained deployments and cross-platform execution.", "Introdujo despliegues independientes y ejecución multiplataforma.")</li><li>@T("Established the foundation for ASP.NET Core and modern .NET.", "Sentó la base de ASP.NET Core y del .NET actual.")</li></ul></section>
+            <section class="history-cons"><h3>@T("Current limitations", "Limitaciones actuales")</h3><ul><li>@T("All versions from 1.0 through 3.1 are out of support.", "Todas las versiones 1.0–3.1 están fuera de soporte.")</li><li>@T("They receive no security fixes and should be migrated.", "No reciben correcciones de seguridad: deben migrarse.")</li></ul></section>
+            <footer><span>@T("Study it to understand", "Estúdialo para comprender")</span><strong>@T("Do not choose it for new production work", "No lo elijas para producción nueva")</strong></footer>
         </article>
         <article class="modern">
-            <header><span class="history-logo-frame"><img src="images/dotnet-modern-logo.png" alt=".NET" /></span><span><small>Plataforma principal</small><strong>.NET moderno</strong></span></header>
-            <p class="history-verdict">Es el camino recomendado para APIs, nube, servicios, escritorio moderno y aplicaciones multiplataforma.</p>
-            <section class="history-pros"><h3>Ventajas actuales</h3><ul><li>Multiplataforma, alto rendimiento y versiones lado a lado.</li><li>Evolución activa con opciones LTS y STS.</li></ul></section>
-            <section class="history-cons"><h3>Consideraciones</h3><ul><li>Exige mantener parches y planear actualizaciones periódicas.</li><li>Migrar desde Framework puede requerir sustituir tecnologías exclusivas.</li></ul></section>
-            <footer><span>Elige una versión soportada</span><strong>.NET 10 LTS o .NET 11 STS</strong></footer>
+            <header><span class="history-logo-frame"><img src="images/dotnet-modern-logo.png" alt=".NET" /></span><span><small>@T("Primary platform", "Plataforma principal")</small><strong>@T("Modern .NET", ".NET moderno")</strong></span></header>
+            <p class="history-verdict">@T("It is the recommended path for APIs, cloud workloads, services, modern desktop, and cross-platform applications.", "Es el camino recomendado para APIs, nube, servicios, escritorio moderno y aplicaciones multiplataforma.")</p>
+            <section class="history-pros"><h3>@T("Current advantages", "Ventajas actuales")</h3><ul><li>@T("Cross-platform, high performance, and side-by-side versions.", "Multiplataforma, alto rendimiento y versiones lado a lado.")</li><li>@T("Active evolution with LTS and STS options.", "Evolución activa con opciones LTS y STS.")</li></ul></section>
+            <section class="history-cons"><h3>@T("Considerations", "Consideraciones")</h3><ul><li>@T("Requires patch maintenance and planned periodic upgrades.", "Exige mantener parches y planear actualizaciones periódicas.")</li><li>@T("Migrating from Framework may require replacing exclusive technologies.", "Migrar desde Framework puede requerir sustituir tecnologías exclusivas.")</li></ul></section>
+            <footer><span>@T("Choose a supported version", "Elige una versión soportada")</span><strong>.NET 10 LTS @T("or", "o") .NET 11 STS</strong></footer>
         </article>
     </div>
-    <p class="history-source-note">Las versiones fuera de soporte se muestran por su importancia histórica, no como recomendación para proyectos nuevos.</p>
+    <p class="history-source-note">@T("Out-of-support versions are shown for their historical importance, not as recommendations for new projects.", "Las versiones fuera de soporte se muestran por su importancia histórica, no como recomendación para proyectos nuevos.")</p>
 </section>
 
 <section class="dotnet-family reveal-section" aria-labelledby="dotnet-family-title">
     <header class="dotnet-family-heading">
-        <div><span class="eyebrow">¿Cuál usar?</span><h2 id="dotnet-family-title">Primero elige qué vas a construir.</h2></div>
-        <p>.NET es la plataforma. ASP.NET Core, Blazor, Razor Pages y .NET MAUI son modelos o frameworks especializados que resuelven experiencias distintas.</p>
+        <div><span class="eyebrow">@T("Which one should you use?", "¿Cuál usar?")</span><h2 id="dotnet-family-title">@T("First choose what you are going to build.", "Primero elige qué vas a construir.")</h2></div>
+        <p>@T(".NET is the platform. ASP.NET Core, Blazor, Razor Pages, and .NET MAUI are specialized application models or frameworks for different experiences.", ".NET es la plataforma. ASP.NET Core, Blazor, Razor Pages y .NET MAUI son modelos o frameworks especializados que resuelven experiencias distintas.")</p>
     </header>
     <div class="dotnet-family-map">
-        <article class="family-card web-api"><span class="family-symbol" aria-hidden="true">API</span><small>Backend y servicios HTTP</small><h3>ASP.NET Core Web API</h3><p>Para APIs REST, backends de aplicaciones y servicios consumidos por web o móvil.</p><strong>Minimal APIs o Controllers</strong></article>
-        <article class="family-card blazor"><span class="family-symbol" aria-hidden="true">B</span><small>Web interactiva con C#</small><h3>Blazor</h3><p>Para interfaces web por componentes que pueden renderizarse en servidor o ejecutarse con WebAssembly.</p><strong>Este laboratorio usa Blazor</strong></article>
-        <article class="family-card razor"><span class="family-symbol" aria-hidden="true">R</span><small>Web orientada a páginas</small><h3>Razor Pages</h3><p>Para formularios, portales y sitios renderizados en servidor organizados alrededor de cada página.</p><strong>Menos interacción tipo SPA</strong></article>
-        <article class="family-card mvc"><span class="family-symbol" aria-hidden="true">MVC</span><small>Web con responsabilidades separadas</small><h3>ASP.NET Core MVC</h3><p>Para aplicaciones con controladores y vistas, especialmente soluciones empresariales o migraciones MVC.</p><strong>Model · View · Controller</strong></article>
-        <article class="family-card maui"><span class="family-symbol" aria-hidden="true">M</span><small>Móvil y escritorio nativo</small><h3>.NET MAUI</h3><p>Para Android, iOS, macOS y Windows compartiendo C#, XAML y buena parte del código.</p><strong>MAUI, no “MUI”</strong></article>
-        <article class="family-card windows"><span class="family-symbol" aria-hidden="true">W</span><small>Escritorio exclusivo de Windows</small><h3>WPF o Windows Forms</h3><p>Para aplicaciones de escritorio Windows, sistemas internos y modernización gradual de software existente.</p><strong>Úsalo cuando Windows sea el destino</strong></article>
+        <article class="family-card web-api"><span class="family-symbol" aria-hidden="true">API</span><small>@T("Backend and HTTP services", "Backend y servicios HTTP")</small><h3>ASP.NET Core Web API</h3><p>@T("For REST APIs, application backends, and services consumed by web or mobile clients.", "Para APIs REST, backends de aplicaciones y servicios consumidos por web o móvil.")</p><strong>Minimal APIs @T("or", "o") Controllers</strong></article>
+        <article class="family-card blazor"><span class="family-symbol" aria-hidden="true">B</span><small>@T("Interactive web with C#", "Web interactiva con C#")</small><h3>Blazor</h3><p>@T("For component-based web interfaces that render on the server or run with WebAssembly.", "Para interfaces web por componentes que pueden renderizarse en servidor o ejecutarse con WebAssembly.")</p><strong>@T("This laboratory uses Blazor", "Este laboratorio usa Blazor")</strong></article>
+        <article class="family-card razor"><span class="family-symbol" aria-hidden="true">R</span><small>@T("Page-oriented web", "Web orientada a páginas")</small><h3>Razor Pages</h3><p>@T("For forms, portals, and server-rendered sites organized around individual pages.", "Para formularios, portales y sitios renderizados en servidor organizados alrededor de cada página.")</p><strong>@T("Less SPA-style interaction", "Menos interacción tipo SPA")</strong></article>
+        <article class="family-card mvc"><span class="family-symbol" aria-hidden="true">MVC</span><small>@T("Web with separated responsibilities", "Web con responsabilidades separadas")</small><h3>ASP.NET Core MVC</h3><p>@T("For applications with controllers and views, especially enterprise solutions or MVC migrations.", "Para aplicaciones con controladores y vistas, especialmente soluciones empresariales o migraciones MVC.")</p><strong>Model · View · Controller</strong></article>
+        <article class="family-card maui"><span class="family-symbol" aria-hidden="true">M</span><small>@T("Native mobile and desktop", "Móvil y escritorio nativo")</small><h3>.NET MAUI</h3><p>@T("For Android, iOS, macOS, and Windows while sharing C#, XAML, and much of the codebase.", "Para Android, iOS, macOS y Windows compartiendo C#, XAML y buena parte del código.")</p><strong>MAUI, @T("not", "no") “MUI”</strong></article>
+        <article class="family-card windows"><span class="family-symbol" aria-hidden="true">W</span><small>@T("Windows-only desktop", "Escritorio exclusivo de Windows")</small><h3>WPF @T("or", "o") Windows Forms</h3><p>@T("For Windows desktop applications, internal systems, and gradual modernization of existing software.", "Para aplicaciones de escritorio Windows, sistemas internos y modernización gradual de software existente.")</p><strong>@T("Use it when Windows is the target", "Úsalo cuando Windows sea el destino")</strong></article>
     </div>
     <aside class="dotnet-family-note">
-        <div><span>Razor</span><p>Es la sintaxis que mezcla HTML y C#. La usan Razor Pages, vistas MVC y componentes Blazor; no es otra plataforma independiente.</p></div>
-        <div><span>EF Core</span><p>Es acceso a datos mediante objetos .NET. Puede acompañar una API, Blazor, Razor Pages, MVC o una aplicación de escritorio.</p></div>
-        <div><span>SignalR y gRPC</span><p>Son opciones de comunicación: tiempo real para clientes conectados y contratos eficientes entre servicios.</p></div>
+        <div><span>Razor</span><p>@T("It is the syntax that combines HTML and C#. Razor Pages, MVC views, and Blazor components use it; it is not another independent platform.", "Es la sintaxis que mezcla HTML y C#. La usan Razor Pages, vistas MVC y componentes Blazor; no es otra plataforma independiente.")</p></div>
+        <div><span>EF Core</span><p>@T("It provides data access through .NET objects. It can accompany an API, Blazor, Razor Pages, MVC, or a desktop application.", "Es acceso a datos mediante objetos .NET. Puede acompañar una API, Blazor, Razor Pages, MVC o una aplicación de escritorio.")</p></div>
+        <div><span>SignalR @T("and", "y") gRPC</span><p>@T("They are communication options: real-time updates for connected clients and efficient contracts between services.", "Son opciones de comunicación: tiempo real para clientes conectados y contratos eficientes entre servicios.")</p></div>
     </aside>
 </section>

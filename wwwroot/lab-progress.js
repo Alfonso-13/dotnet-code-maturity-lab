@@ -31,3 +31,25 @@ window.labProgress = {
         textArea.remove();
     }
 };
+
+window.uiLanguage = {
+    get(key) {
+        try {
+            return window.localStorage.getItem(key) || "en";
+        } catch {
+            return "en";
+        }
+    },
+    set(key, languageCode) {
+        try {
+            window.localStorage.setItem(key, languageCode);
+        } catch {
+            // Language selection remains usable for the current session.
+        }
+
+        this.apply(languageCode);
+    },
+    apply(languageCode) {
+        document.documentElement.lang = languageCode === "es" ? "es" : "en";
+    }
+};

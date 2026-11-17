@@ -1,3 +1,5 @@
+using DotnetCodeMaturityLab.Features.Localization;
+
 namespace DotnetCodeMaturityLab.Features.Learning;
 
 public sealed record JuniorCodePane(string FileName, string Label, string Code, string CssClass = "");
@@ -14,11 +16,286 @@ public sealed record JuniorLessonStep(
 
 public sealed record JuniorModuleLesson(string Slug, JuniorLessonStep[] Steps);
 
-public static class JuniorLessonCatalog
+public static partial class JuniorLessonCatalog
 {
     public static IReadOnlyDictionary<string, JuniorModuleLesson> Modules { get; } =
         new Dictionary<string, JuniorModuleLesson>(StringComparer.OrdinalIgnoreCase)
         {
+            ["fundamentos-csharp"] = Module("fundamentos-csharp",
+                Step("Entiende", "Entiende", "Tipos básicos dentro de una orden",
+                    Pane("OrderData.cs", "Tipos y operadores", """
+                        // string representa texto. Sin ? es un dato requerido.
+                        string productCode = "MONITOR-24";
+
+                        // int representa números enteros: 1, 2, 3...
+                        int quantity = 2;
+
+                        // decimal conserva la precisión necesaria para dinero.
+                        decimal unitPrice = 3499.90m;
+
+                        // El operador * combina los valores y produce un resultado.
+                        decimal subtotal = quantity * unitPrice;
+                        """), null,
+                    "El tipo funciona como un contrato", "Antes de pensar en sintaxis, pregunta qué representa el dato, si puede faltar y qué operaciones admite.", "tipo nombre = valor;"),
+                Step("Compara", "Compara", "El contrato incorrecto y el contrato explícito",
+                    Bad("OrderData.cs", "Mala práctica", """
+                        // ❌ El tipo promete texto, pero recibe ausencia.
+                        string productCode = null;
+
+                        // "" tampoco explica si el dato era opcional.
+                        string notes = "";
+                        """),
+                    Good("OrderData.cs", "Buena práctica", """
+                        // ✅ El código de producto es obligatorio.
+                        string productCode = "MONITOR-24";
+
+                        // ✅ El signo ? declara que notes puede no existir.
+                        string? notes = null;
+                        """),
+                    "null y texto vacío no significan lo mismo", "Usa ? únicamente cuando la ausencia sea un estado válido del dominio. No lo agregues solo para silenciar advertencias.", "string requerido; | string? opcional;"),
+                Step("Condiciones", "Condiciones", "Dos formas de elegir qué camino ejecutar",
+                    Pane("IfElseRules.cs", "if / else", """
+                        // if evalúa la primera condición.
+                        if (quantity <= 0)
+                        {
+                            return "Cantidad inválida";
+                        }
+                        else if (quantity >= 10)
+                        {
+                            return "Aplicar descuento";
+                        }
+                        else
+                        {
+                            return "Procesar orden";
+                        }
+                        """),
+                    Pane("SwitchRules.cs", "switch", """
+                        // switch compara un valor contra casos conocidos.
+                        switch (status)
+                        {
+                            case OrderStatus.Draft:
+                                return "La orden puede editarse";
+                            case OrderStatus.Confirmed:
+                                return "La orden está confirmada";
+                            default:
+                                return "Estado no reconocido";
+                        }
+                        """),
+                    "Elige la condición que mejor expresa la decisión", "Usa if cuando evalúas condiciones diferentes. Usa switch cuando comparas un mismo valor contra un conjunto claro de casos.", "if / else | switch"),
+                Step("Ciclos", "Ciclos", "Recorrer elementos o repetir mientras exista una condición",
+                    Pane("ForeachExample.cs", "foreach", """
+                        // foreach recorre cada elemento sin usar un índice.
+                        decimal total = 0m;
+
+                        foreach (OrderItem item in orderItems)
+                        {
+                            total += item.Quantity * item.UnitPrice;
+                        }
+                        """),
+                    Pane("ForWhileExample.cs", "for / while", """
+                        // for resulta útil cuando necesitas el índice.
+                        for (int index = 0; index < orderItems.Count; index++)
+                        {
+                            Console.WriteLine(orderItems[index]);
+                        }
+
+                        // while repite mientras la condición sea verdadera.
+                        while (pendingOrders.Count > 0)
+                        {
+                            Order nextOrder = pendingOrders.Dequeue();
+                            Process(nextOrder);
+                        }
+                        """),
+                    "Elige el ciclo según cómo necesitas recorrer", "foreach prioriza claridad; for ofrece un índice; while repite mientras una condición permanezca verdadera.", "foreach | for | while"),
+                Step("Integra", "Integra", "Compara todo lo revisado en el módulo",
+                    Bad("OrderProcessor.Before.cs", "Código deficiente", """
+                        // ❌ No expresa qué datos pueden faltar.
+                        string productCode = null;
+                        string notes = "";
+                        int quantity = 0;
+                        decimal unitPrice = 3499.90m;
+
+                        // ❌ Calcula antes de validar.
+                        decimal subtotal = quantity * unitPrice;
+
+                        // ❌ Repite lógica sin explicar la intención.
+                        for (int index = 0; index < orderItems.Count; index++)
+                        {
+                            subtotal += orderItems[index].UnitPrice;
+                        }
+
+                        if (quantity <= 0)
+                        {
+                            return "Cantidad inválida";
+                        }
+                        """),
+                    Good("OrderProcessor.After.cs", "Código correcto", """
+                        // ✅ El contrato distingue datos requeridos y opcionales.
+                        string productCode = "MONITOR-24";
+                        string? notes = null;
+                        int quantity = 2;
+                        decimal unitPrice = 3499.90m;
+
+                        // ✅ La condición protege el flujo antes de calcular.
+                        if (quantity <= 0)
+                        {
+                            return "Cantidad inválida";
+                        }
+
+                        // ✅ foreach comunica que recorremos todos los elementos.
+                        decimal subtotal = 0m;
+
+                        foreach (OrderItem item in orderItems)
+                        {
+                            subtotal += item.Quantity * item.UnitPrice;
+                        }
+
+                        return $"Orden {productCode}: {subtotal:C}";
+                        """),
+                    "El orden de las decisiones también importa", "Primero declara un contrato claro, después valida y finalmente calcula o recorre los elementos.", "contrato → validación → recorrido → resultado")),
+
+            ["metodos-y-clases"] = Module("metodos-y-clases",
+                Step("Entiende", "Entiende", "Una clase reúne estado y comportamiento",
+                    Pane("Order.cs", "Clase", """
+                        // Una clase reúne datos y operaciones relacionadas.
+                        public sealed class Order
+                        {
+                            // La propiedad expone el dato; private set protege sus cambios.
+                            public string ProductCode { get; }
+                            public decimal Total { get; private set; }
+
+                            // El constructor recibe lo necesario para crear la instancia.
+                            public Order(string productCode)
+                            {
+                                ProductCode = productCode;
+                            }
+
+                            // El método expresa una operación válida de la orden.
+                            public void Recalculate(int quantity, decimal unitPrice)
+                            {
+                                Total = quantity * unitPrice;
+                            }
+                        }
+                        """), null,
+                    "Una clase define qué puede hacer una instancia", "Las propiedades describen el estado y los métodos describen operaciones válidas sobre ese estado.", "clase = estado + comportamiento"),
+                Step("Compara", "Compara", "Estado expuesto frente a estado protegido",
+                    Bad("Order.Before.cs", "Mala práctica", """
+                        // ❌ Cualquier consumidor puede dejar la orden inconsistente.
+                        public sealed class Order
+                        {
+                            public string ProductCode { get; set; } = "";
+                            public decimal Total { get; set; }
+                        }
+
+                        var order = new Order();
+                        order.Total = -500m;
+                        """),
+                    Good("Order.After.cs", "Buena práctica", """
+                        // ✅ La clase controla cómo nace y cómo cambia su estado.
+                        public sealed class Order
+                        {
+                            public string ProductCode { get; }
+                            public decimal Total { get; private set; }
+
+                            public Order(string productCode)
+                            {
+                                ProductCode = productCode;
+                            }
+                        }
+                        """),
+                    "Encapsular no significa esconderlo todo", "Permite consultar lo necesario, pero limita los cambios para que la clase no acepte estados imposibles.", "get público | cambio controlado"),
+                Step("Constructores", "Constructores", "Crear objetos válidos desde el primer momento",
+                    Bad("Order.Empty.cs", "Sin garantías", """
+                        // ❌ El objeto existe antes de tener los datos obligatorios.
+                        public sealed class Order
+                        {
+                            public string ProductCode { get; set; } = "";
+                        }
+
+                        var order = new Order();
+                        order.ProductCode = "MONITOR-24";
+                        """),
+                    Good("Order.Valid.cs", "Contrato explícito", """
+                        // ✅ El constructor exige el dato para crear una orden válida.
+                        public sealed class Order
+                        {
+                            public string ProductCode { get; }
+
+                            public Order(string productCode)
+                            {
+                                ProductCode = productCode;
+                            }
+                        }
+
+                        var order = new Order("MONITOR-24");
+                        """),
+                    "El constructor protege el punto de entrada", "Si un dato es obligatorio, recíbelo en el constructor en lugar de esperar que alguien lo asigne después.", "new Order(productCode)"),
+                Step("Métodos", "Métodos", "void ejecuta una acción; return entrega un resultado",
+                    Pane("OrderActions.cs", "void", """
+                        // void comunica que el método no entrega un valor.
+                        // Su efecto observable es el cambio de estado.
+                        public void Confirm()
+                        {
+                            Status = OrderStatus.Confirmed;
+                        }
+
+                        order.Confirm();
+                        """),
+                    Pane("OrderCalculations.cs", "return", """
+                        // decimal comunica qué resultado recibe el llamador.
+                        public decimal CalculateSubtotal(int quantity, decimal unitPrice)
+                        {
+                            return quantity * unitPrice;
+                        }
+
+                        decimal subtotal = order.CalculateSubtotal(2, 3499.90m);
+                        """),
+                    "La firma del método comunica su resultado", "void no devuelve un valor. Un tipo como decimal declara que el llamador recibirá un resultado de ese tipo.", "void Confirm() | decimal Calculate()"),
+                Step("Integra", "Integra", "Compara una clase anémica con una clase que protege sus reglas",
+                    Bad("Order.Before.cs", "Código deficiente", """
+                        // ❌ Solo almacena datos y permite cualquier modificación.
+                        public sealed class Order
+                        {
+                            public string ProductCode { get; set; } = "";
+                            public int Quantity { get; set; }
+                            public decimal UnitPrice { get; set; }
+                            public decimal Total { get; set; }
+                            public string Status { get; set; } = "";
+                        }
+
+                        var order = new Order();
+                        order.Quantity = -2;
+                        order.Total = -6999.80m;
+                        order.Status = "cualquier texto";
+                        """),
+                    Good("Order.After.cs", "Código correcto", """
+                        // ✅ Constructor, propiedades y métodos forman un contrato claro.
+                        public sealed class Order
+                        {
+                            public string ProductCode { get; }
+                            public decimal Total { get; private set; }
+                            public OrderStatus Status { get; private set; }
+
+                            public Order(string productCode)
+                            {
+                                ProductCode = productCode;
+                                Status = OrderStatus.Draft;
+                            }
+
+                            public void Recalculate(int quantity, decimal unitPrice)
+                            {
+                                if (quantity <= 0) return;
+                                Total = quantity * unitPrice;
+                            }
+
+                            public void Confirm()
+                            {
+                                Status = OrderStatus.Confirmed;
+                            }
+                        }
+                        """),
+                    "El objeto debe proteger sus propias reglas", "Una clase útil no es solo una bolsa de propiedades: conserva juntas las reglas y los datos que protege.", "constructor → propiedades → métodos → estado válido")),
+
             ["modelos-y-memoria"] = Module("modelos-y-memoria",
                 Step("Entiende", "Modelos", "Identidad, valor y estados permitidos",
                     Pane("OrderModels.cs", "class / record / enum", """
@@ -1063,6 +1340,11 @@ public static class JuniorLessonCatalog
         };
 
     public static JuniorModuleLesson Get(string slug) => Modules[slug];
+
+    public static JuniorModuleLesson Get(string slug, AppLanguage language) =>
+        language == AppLanguage.English && EnglishModules.TryGetValue(slug, out var module)
+            ? module
+            : Modules[slug];
 
     private static JuniorModuleLesson Module(string slug, params JuniorLessonStep[] steps) => new(slug, steps);
 
