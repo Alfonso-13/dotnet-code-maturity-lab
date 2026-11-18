@@ -1,4 +1,5 @@
 @page "/en-preparacion/{Section}"
+@page "/coming-soon/{Section}"
 @inject NavigationManager Navigation
 @inherits LocalizedComponentBase
 
@@ -17,8 +18,8 @@
         </div>
 
         <div class="button-row">
-            <a class="button button-primary" href="laboratorio">@T("Continue with Junior", "Continuar con Junior") <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="ruta">@T("View maturity roadmap", "Ver ruta de madurez")</a>
+            <a class="button button-primary" href="@AppRoutes.Labs">@T("Continue with Junior", "Continuar con Junior") <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="@AppRoutes.Roadmap">@T("View maturity roadmap", "Ver ruta de madurez")</a>
         </div>
     </div>
 
@@ -35,17 +36,20 @@
 
     protected override void OnParametersSet()
     {
-        if (Section.Equals("laboratorio-junior", StringComparison.OrdinalIgnoreCase))
+        if (Section.Equals("laboratorio-junior", StringComparison.OrdinalIgnoreCase)
+            || Section.Equals("junior-lab", StringComparison.OrdinalIgnoreCase))
         {
-            Navigation.NavigateTo("/laboratorio/junior", replace: true);
+            Navigation.NavigateTo(AppRoutes.Lab("junior"), replace: true);
+            return;
         }
+
     }
 
     private MaintenanceContent Content => Section.ToLowerInvariant() switch
     {
-        "arquitectura" => new("04", T("Architecture", "Arquitectura"), T("This section will explain boundaries, layers, dependencies, and solution decisions after the Junior and Middle foundations are complete.", "Aquí se explicarán límites, capas, dependencias y decisiones de solución después de completar la base Junior y Middle.")),
+        "architecture" or "arquitectura" => new("04", T("Architecture", "Arquitectura"), T("This section will explain boundaries, layers, dependencies, and solution decisions after the Junior and Middle foundations are complete.", "Aquí se explicarán límites, capas, dependencias y decisiones de solución después de completar la base Junior y Middle.")),
         "azure" => new("05", T("Azure and scale", "Azure y escala"), T("This section will visualize Microsoft Azure resources, costs, vertical, horizontal, and automatic scaling, together with their real limits.", "Aquí se visualizarán recursos de Microsoft Azure, costos, escalamiento vertical, horizontal y automático, junto con sus límites reales.")),
-        "glosario" => new("06", T("Glossary", "Glosario"), T("Definitions will be published as each concept gains a verifiable laboratory example.", "Las definiciones se publicarán conforme cada concepto tenga un ejemplo verificable dentro del laboratorio.")),
+        "glossary" or "glosario" => new("06", T("Glossary", "Glosario"), T("Definitions will be published as each concept gains a verifiable laboratory example.", "Las definiciones se publicarán conforme cada concepto tenga un ejemplo verificable dentro del laboratorio.")),
         "solid" => new("S", T("SOLID example", "Ejemplo SOLID"), T("SOLID will be developed at the Middle level, where the problem, refactoring, and consequences of each decision can be shown.", "SOLID se desarrollará en el nivel Middle, donde podremos mostrar el problema, la refactorización y las consecuencias de cada decisión.")),
         _ => new("…", T("This section", "Esta sección"), T("We are defining the content and demonstration before publishing it.", "Estamos definiendo el contenido y su demostración antes de publicarlo."))
     };

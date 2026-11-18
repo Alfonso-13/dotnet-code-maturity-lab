@@ -10,6 +10,8 @@
         const rows = [...chronology.querySelectorAll(".history-year-row")];
         if (!rows.length) return;
 
+        // A row becomes active slightly below the viewport center so the highlighted
+        // year follows the content the reader is currently scanning.
         const activationY = window.innerHeight * 0.62;
         let lastReached = -1;
 
@@ -23,6 +25,9 @@
         if (lastReached < 0) lastReached = 0;
         rows[lastReached].classList.add("is-current-step");
 
+        // The progress line connects the center of the first marker to the current one.
+        // Keeping the calculation in row coordinates prevents horizontal branch cards
+        // from shifting the chronology.
         const start = rows[0].offsetTop + 27;
         const finish = rows[lastReached].offsetTop + 27;
         chronology.style.setProperty("--history-progress-top", `${start}px`);
@@ -31,6 +36,8 @@
 
     const requestUpdate = () => {
         if (frameRequested) return;
+        // Scroll and resize can fire many times per frame. Coalescing them avoids layout
+        // thrashing while update() reads marker geometry.
         frameRequested = true;
         window.requestAnimationFrame(update);
     };

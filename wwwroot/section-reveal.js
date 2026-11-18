@@ -36,6 +36,8 @@
     const scheduleScan = () => {
         if (scanQueued) return;
 
+        // Blazor can render several sections in one UI update. One animation-frame scan
+        // handles the batch without repeatedly querying and measuring the DOM.
         scanQueued = true;
         window.requestAnimationFrame(() => {
             scanQueued = false;
@@ -49,6 +51,8 @@
             return;
         }
 
+        // Client-side navigation and interactive rendering add sections after the first
+        // page load, so observe inserted nodes instead of initializing only once.
         mutationObserver = new MutationObserver(mutations => {
             if (mutations.some(mutation => mutation.addedNodes.length > 0)) {
                 scheduleScan();

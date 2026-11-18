@@ -261,6 +261,26 @@ public static class JuniorCurriculum
             block: "Aplicación ASP.NET Core"),
 
         Topic(
+            "ia-llm", "IA y LLM", "Fundamentos de IA generativa y LLM",
+            "Un LLM propone texto probable; la aplicación conserva la responsabilidad sobre reglas, permisos y datos.",
+            "Un modelo de lenguaje recibe instrucciones y contexto para generar una salida no determinista. La aplicación debe llamar al proveedor desde el servidor, proteger credenciales, limitar los datos enviados, validar la respuesta y ofrecer un fallback.",
+            ["El prompt no reemplaza una regla de negocio.", "Las claves del proveedor permanecen en el servidor.", "Toda salida del modelo se trata como dato externo no confiable."],
+            new("Asistente", "LLM → sugerencia", "Resume o clasifica información sin decidir por el dominio."),
+            new("Aplicación", "validar → aceptar/rechazar", "Comprueba estructura, límites y permisos antes de usar la salida."),
+            "Usa IA para asistir tareas ambiguas; conserva las decisiones deterministas en código y exige revisión cuando el impacto lo requiera.",
+            "OrderAiAssistant.cs",
+            "AiSuggestion suggestion = await assistant.SuggestAsync(\n    request.CustomerNote,\n    cancellationToken);\n\nif (!AllowedCategories.Contains(suggestion.Category))\n{\n    return AiSuggestion.Fallback;\n}\n\n// La sugerencia no modifica la orden automáticamente.\nreturn suggestion with { RequiresReview = true };",
+            "¿Qué debes hacer antes de usar una respuesta generada por un LLM?",
+            [
+                new("Validar su estructura y reglas antes de aplicarla", true, "Correcto: la salida del modelo es entrada externa y puede ser incorrecta o inesperada."),
+                new("Confiar en ella porque el proveedor ya entrenó el modelo", false, "El entrenamiento no garantiza exactitud ni cumplimiento de tus reglas."),
+                new("Guardar la clave del proveedor en el navegador", false, "Una clave en el cliente queda expuesta y puede ser utilizada por terceros.")
+            ],
+            "¿Qué diferencia existe entre una regla de negocio y una sugerencia de un LLM?",
+            "La regla de negocio debe ser determinista y verificable; la sugerencia de un LLM es probabilística, puede variar y debe validarse antes de influir en el sistema.",
+            block: "IA aplicada"),
+
+        Topic(
             "crear-orden", "Crear una orden", "Laboratorio: crear una orden",
             "Integra C#, POO, validación, asincronía, pruebas, persistencia y HTTP en un flujo funcional.",
             "El cliente envía ProductCode, Quantity y UnitPrice. El servidor valida, genera Id, calcula Subtotal, persiste la orden y responde con un contrato HTTP preciso.",

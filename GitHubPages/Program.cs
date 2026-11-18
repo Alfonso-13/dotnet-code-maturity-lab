@@ -1,4 +1,5 @@
 using DotnetCodeMaturityLab;
+using DotnetCodeMaturityLab.Features.AI;
 using DotnetCodeMaturityLab.Features.Configuration;
 using DotnetCodeMaturityLab.Features.Localization;
 using DotnetCodeMaturityLab.Features.Orders;
@@ -14,6 +15,7 @@ builder.Services.AddSingleton(SiteOptions.Default);
 builder.Services.AddScoped<AppLanguageState>();
 builder.Services.AddSingleton<IOrderStore, InMemoryOrderStore>();
 builder.Services.AddScoped<CreateOrderService>();
+builder.Services.AddSingleton<IAiOrderSuggestionService, SimulatedAiOrderSuggestionService>();
 builder.Services.AddSingleton(LabHostingProfile.GitHubPages);
 
 await builder.Build().RunAsync();

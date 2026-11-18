@@ -26,7 +26,8 @@ public static class JuniorModuleMetadataCatalog
             ["pruebas-aaa"] = new("Testing and AAA", "Unit tests, integration tests, and AAA", EnglishBlock),
             ["rest-http"] = new("REST and HTTP", "REST, DTOs, routes, and HTTP status codes", EnglishBlock),
             ["persistencia-ef-core"] = new("SQL and EF Core", "Relational persistence with SQL and Entity Framework Core", EnglishBlock),
-            ["aspnet-core"] = new("ASP.NET Core", "ASP.NET Core application fundamentals", EnglishBlock)
+            ["aspnet-core"] = new("ASP.NET Core", "ASP.NET Core application fundamentals", EnglishBlock),
+            ["ia-llm"] = new("AI and LLMs", "Generative AI and LLM fundamentals", "APPLIED AI")
         };
 
     public static JuniorModuleMetadata Get(LabTopic topic, AppLanguage language)

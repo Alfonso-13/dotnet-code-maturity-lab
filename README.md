@@ -1,18 +1,54 @@
+<div align="center">
+
 # .NET Code Maturity Lab
 
-A bilingual, visual, and interactive learning laboratory that shows how a .NET solution grows from language fundamentals into maintainable application code.
+**A bilingual, visual learning laboratory for understanding and defending practical .NET engineering decisions.**
 
-The first published stage focuses on the **Junior path**: twelve connected modules, sixty code-first perspectives, and one order-processing laboratory. English is the default language and Spanish can be selected from the interface; the choice and learning progress stay in browser `localStorage`.
+`.NET 10` · `Blazor` · `ASP.NET Core` · `EF Core` · `SQLite` · `xUnit`
 
-> **Live demo:** pending the first GitHub Pages deployment from `main`.
+[Live demo](https://alfonso-13.github.io/dotnet-code-maturity-lab/) · [Technical guide](DEV.md) · [MIT license](LICENSE)
+
+</div>
+
+---
+
+## About the project
+
+.NET Code Maturity Lab shows how one order-processing solution grows from C# fundamentals into a complete Junior application. Instead of presenting isolated syntax, it connects language features, design intent, tests, persistence, HTTP, and safe LLM boundaries through one domain.
+
+The first portfolio stage contains thirteen modules, sixty-five code-first perspectives, a fourteen-question interview simulator, and one integrative laboratory. English is the default interface language; Spanish can be selected without duplicating the rendering model.
+
+![Junior, Middle, and Senior learning levels](wwwroot/images/learning-level-badges.png)
+
+<details>
+<summary><strong>Resumen en español</strong></summary>
+
+.NET Code Maturity Lab es un laboratorio visual bilingüe para estudiar y defender decisiones prácticas de ingeniería .NET. La primera etapa conecta trece módulos Junior, sesenta y cinco perspectivas, catorce preguntas de entrevista y un laboratorio integrador de órdenes con persistencia, HTTP y un caso seguro de asistencia mediante LLM.
+
+La aplicación local ejecuta ASP.NET Core, EF Core y SQLite. La demo pública de GitHub Pages comparte la misma interfaz y reglas, pero usa memoria temporal y una simulación determinista; nunca afirma disponer de una API, base de datos o proveedor de IA externos.
+
+</details>
+
+## Interactive demo
+
+[Open the .NET Code Maturity Lab](https://alfonso-13.github.io/dotnet-code-maturity-lab/)
+
+The public build lets reviewers explore the complete Junior learning path, interview simulator, history and ecosystem guides, and laboratory flow without credentials or a server process.
+
+| Profile | Runtime | Persistence | Intended use |
+| --- | --- | --- | --- |
+| Local application | ASP.NET Core interactive server | EF Core + SQLite | Execute real endpoints, persistence, and HTTP integration tests. |
+| GitHub Pages | Static Blazor WebAssembly host | Browser-session memory | Review the portfolio experience through an explicitly labeled simulation. |
+
+The static host links the shared components and domain code instead of maintaining a second learning interface. Runtime differences are selected at the composition boundary through `IOrderStore` and `LabHostingProfile` registrations.
 
 ## Junior stage
 
-The same order-processing domain connects all twelve modules:
+The order-processing domain connects all thirteen modules:
 
 1. C# fundamentals: data, decisions, and repetition.
 2. Methods, constructors, and properties.
-3. Value, reference, class, struct, record, enum, and interface.
+3. Value and reference types, class, struct, record, enum, and interface.
 4. Object-oriented programming and its pillars.
 5. Validation, results, and exceptions.
 6. Collections, generics, and complexity.
@@ -22,43 +58,40 @@ The same order-processing domain connects all twelve modules:
 10. REST, DTOs, routes, methods, and common HTTP status codes.
 11. Relational persistence with SQL and Entity Framework Core.
 12. ASP.NET Core composition, middleware, configuration, and dependency injection.
+13. Generative AI and LLM fundamentals: server boundaries, secrets, minimum context, output validation, fallback, and human review.
 
-Every module contains five perspectives with copyable, consistently formatted C# examples, an optional side-by-side comparison, contextual hints, and explicit reviewed/completed progress.
+Every module uses five perspectives with copyable C# examples, contextual hints, navigation, and explicit viewed, reviewed, and completed progress.
 
-## What can be explored
+## Engineering highlights
 
-- A maturity roadmap for Junior, Middle, and Senior engineering concerns.
-- A visual .NET history timeline from .NET Framework through modern .NET.
-- A practical ecosystem guide covering ASP.NET Core, Blazor, Razor Pages, MVC, .NET MAUI, WPF, EF Core, SignalR, and gRPC.
-- A functional Junior laboratory for creating orders and observing validation, persistence, and HTTP responses.
-- English and Spanish content using one shared component and rendering model.
+- One shared bilingual component model with English-first canonical routes.
+- Thin server and static hosts that select persistence and runtime capabilities through dependency injection.
+- EF Core and SQLite persistence behind an `IOrderStore` contract.
+- Real Minimal API endpoints with unit, persistence, route-contract, and HTTP integration coverage.
+- Deterministic LLM simulation that demonstrates validation, fallback, prompt-boundary protection, and human review without sending data externally.
+- Browser-local learning progress with an explicit versioned migration.
+- GitHub Pages deep-link recovery and repository base-path handling.
+- Automated Pages workflow that tests, builds, validates, and deploys only from `main`.
 
-Middle and Senior content is intentionally marked **Coming soon**. It is not presented as completed work.
+## Visual learning model
 
-## Two execution profiles
+| Compare | Experiment | Decide |
+| --- | --- | --- |
+| ![Compare code alternatives](wwwroot/images/learning-compare.svg) | ![Experiment and observe behavior](wwwroot/images/learning-experiment.svg) | ![Decide through context and trade-offs](wwwroot/images/learning-decide.svg) |
 
-The repository preserves the real application and the static portfolio demo without duplicating the learning UI.
-
-| Profile | Project | Persistence | Purpose |
-| --- | --- | --- | --- |
-| ASP.NET Core | `DotnetCodeMaturityLab.csproj` | EF Core + SQLite | Real endpoints, HTTP integration tests, and local persistence. |
-| GitHub Pages | `GitHubPages/DotnetCodeMaturityLab.GitHubPages.csproj` | Browser-session memory | Static WebAssembly portfolio demo with a visible simulation notice. |
-
-GitHub Pages cannot execute ASP.NET Core endpoints or SQLite. The static laboratory therefore runs the same validation and domain flow through `InMemoryOrderStore`; it does not claim to be a deployed server API.
+The application also includes a maturity roadmap, a visual .NET history timeline, and an ecosystem guide covering ASP.NET Core, Blazor, Razor Pages, MVC, .NET MAUI, WPF, EF Core, SignalR, and gRPC.
 
 ## Run locally
 
-Requirements:
-
-- .NET 10 SDK.
-
-Run the complete ASP.NET Core application:
+Requirement: .NET 10 SDK.
 
 ```powershell
+git clone https://github.com/Alfonso-13/dotnet-code-maturity-lab.git
+cd dotnet-code-maturity-lab
 ./start-local.ps1
 ```
 
-or:
+Alternatively:
 
 ```powershell
 dotnet run --project DotnetCodeMaturityLab.csproj
@@ -66,55 +99,21 @@ dotnet run --project DotnetCodeMaturityLab.csproj
 
 The server profile creates `App_Data/orders.db`. Local database files, build output, and deployment artifacts are ignored by Git.
 
-Run the static WebAssembly profile:
-
-```powershell
-dotnet run --project GitHubPages/DotnetCodeMaturityLab.GitHubPages.csproj
-```
-
-## Verification
-
-Run the automated suite:
+Run the automated suite and build the static artifact with:
 
 ```powershell
 dotnet test tests/DotnetCodeMaturityLab.Tests/DotnetCodeMaturityLab.Tests.csproj -c Release
-```
-
-The tests cover the twelve lesson routes, sixty bilingual perspectives, copyable code formatting, explicit reviewed/completed progress, order rules, SQLite persistence, and HTTP integration behavior.
-
-Build and validate the static artifact:
-
-```powershell
 ./build-github-pages.ps1
 ```
 
-The script publishes into a staging directory, validates the required Pages files, sets the repository base path, and only then replaces `artifacts/github-pages`.
+Architecture, configuration, route behavior, verification, troubleshooting, and deployment are documented in [DEV.md](DEV.md).
 
-## GitHub Pages deployment
+## Scope and reuse
 
-The workflow at `.github/workflows/deploy-pages.yml` runs only from `main` or by manual dispatch from `main`. It executes the test suite, builds the static artifact, uploads it through the official GitHub Pages actions, and deploys it to the `github-pages` environment.
+This repository is an educational portfolio project, not a hosted production learning platform or a public AI service. The Pages build does not execute ASP.NET Core endpoints, SQLite, or an external model. A real public service would additionally require authentication, authorization, global abuse and budget controls, observability, migrations, secret management, and an explicit privacy policy.
 
-The repository must use **Settings → Pages → Source: GitHub Actions** before the first deployment.
-
-## Repository structure
-
-```text
-Components/             Shared Blazor layout, pages, lessons, and laboratory UI
-Features/Learning/      Junior curriculum, bilingual lesson catalog, and metadata
-Features/Orders/        Domain, application service, stores, EF Core, and endpoints
-Features/Localization/  Language state and shared localization behavior
-GitHubPages/            Static WebAssembly host
-tests/                  Unit, content-contract, persistence, and HTTP tests
-```
-
-## Español
-
-.NET Code Maturity Lab es un laboratorio visual bilingüe para estudiar cómo una solución .NET pasa de los fundamentos de C# a una aplicación Junior completa. Esta primera etapa incluye doce módulos, sesenta perspectivas, historia y ecosistema .NET, ejemplos copiables y un laboratorio de órdenes.
-
-La aplicación ASP.NET Core usa EF Core y SQLite con endpoints reales. La versión de GitHub Pages es una demostración WebAssembly estática que usa memoria de la sesión del navegador y lo comunica explícitamente; no simula tener un servidor desplegado.
-
-El contenido Middle y Senior permanece marcado como **Próximamente** hasta que esté implementado y validado.
+Middle and Senior are intentionally marked **Coming soon** until their learning paths, laboratories, and interview questions are implemented and verified.
 
 ## License
 
-This project is available under the [MIT License](LICENSE).
+Available under the [MIT License](LICENSE).

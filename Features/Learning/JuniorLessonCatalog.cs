@@ -1336,7 +1336,102 @@ public static partial class JuniorLessonCatalog
                         app.MapOrderEndpoints();
                         app.Run();
                         """),
-                    "Una API es más que sus endpoints", "El laboratorio es público: DI compone EF Core y el servicio, mientras el pipeline sirve la interfaz y publica los endpoints. Autenticación y autorización se agregan cuando exista identidad.", "DI + SQLite + middleware + endpoints"))
+                    "Una API es más que sus endpoints", "El laboratorio es público: DI compone EF Core y el servicio, mientras el pipeline sirve la interfaz y publica los endpoints. Autenticación y autorización se agregan cuando exista identidad.", "DI + SQLite + middleware + endpoints")),
+
+            ["ia-llm"] = Module("ia-llm",
+                Step("Entiende", "LLM", "Una herramienta probabilística dentro de una aplicación determinista",
+                    Pane("AiConcepts.cs", "Modelo de lenguaje", """
+                        // Un LLM genera una continuación probable a partir
+                        // de instrucciones y contexto.
+                        string prompt = "Resume la nota del cliente";
+
+                        // La misma entrada puede producir variantes.
+                        AiSuggestion suggestion = await assistant.SuggestAsync(
+                            customerNote,
+                            cancellationToken);
+                        """), null,
+                    "Generar no significa conocer la verdad", "Un LLM trabaja con patrones del lenguaje. Puede ayudar a resumir, clasificar o redactar, pero puede inventar datos y variar entre ejecuciones.", "entrada + instrucciones → salida probable"),
+                Step("Compara", "Límite seguro", "Proteger credenciales y mantener la llamada en el servidor",
+                    Bad("BrowserAiCall.cs", "Clave expuesta", """
+                        // ❌ El navegador entrega esta clave a cualquier visitante.
+                        string apiKey = "provider-secret";
+
+                        await httpClient.PostAsync(
+                            "https://provider.example/chat",
+                            request);
+                        """),
+                    Good("OrderAiAssistant.cs", "Servicio del servidor", """
+                        public sealed class OrderAiAssistant(
+                            IAiProvider provider,
+                            IOptions<AiOptions> options)
+                        {
+                            public Task<AiSuggestion> SuggestAsync(
+                                string note,
+                                CancellationToken token) =>
+                                provider.GenerateAsync(note, token);
+                        }
+                        """),
+                    "La clave nunca pertenece al cliente", "El servidor obtiene secretos desde configuración segura, controla qué datos salen y puede aplicar límites, logs y autorización.", "browser → API propia → proveedor IA"),
+                Step("Contexto", "Prompt y datos", "Enviar solo el contexto necesario",
+                    Pane("SuggestionPrompt.cs", "Instrucciones", """
+                        string prompt =
+                            "Clasifica la nota como delivery, billing, " +
+                            "product u other. Devuelve JSON y no inventes " +
+                            $"datos de la orden. Nota: {Sanitize(customerNote)}";
+                        """),
+                    Pane("DataBoundary.cs", "Minimización", """
+                        // No envíes secretos, credenciales ni datos personales
+                        // si la tarea no los necesita.
+                        string safeContext = customerNote[..Math.Min(
+                            customerNote.Length,
+                            500)];
+                        """),
+                    "El contexto también es una frontera de datos", "Una instrucción clara reduce ambigüedad, pero no garantiza la respuesta. Minimiza datos y trata el texto del usuario como contenido no confiable.", "instrucciones + contexto mínimo + formato esperado"),
+                Step("Valida", "Salida estructurada", "Comprobar la respuesta antes de usarla",
+                    Bad("AiResult.Before.cs", "Confianza automática", """
+                        // ❌ La salida cambia el dominio sin comprobación.
+                        order.Category = modelResponse.Category;
+                        order.ApproveDiscount(modelResponse.Discount);
+                        """),
+                    Good("AiResult.After.cs", "Validación y fallback", """
+                        if (!AllowedCategories.Contains(result.Category)
+                            || result.Summary.Length > 160)
+                        {
+                            return AiSuggestion.Fallback;
+                        }
+
+                        return result with { RequiresReview = true };
+                        """),
+                    "La salida del modelo es entrada externa", "Valida esquema, longitud, valores permitidos y permisos. Si falla, usa un fallback seguro; no escondas una decisión crítica dentro del prompt.", "parsear → validar → aceptar o fallback"),
+                Step("Integra", "Caso Junior", "Asistir una orden sin entregar el control del dominio",
+                    Pane("OrderSuggestionService.cs", "Orquestación", """
+                        public async Task<AiSuggestion> ReviewNoteAsync(
+                            string customerNote,
+                            CancellationToken token)
+                        {
+                            AiSuggestion suggestion =
+                                await assistant.SuggestAsync(customerNote, token);
+
+                            return validator.IsValid(suggestion)
+                                ? suggestion
+                                : AiSuggestion.Fallback;
+                        }
+                        """),
+                    Pane("OrderSuggestionTests.cs", "Prueba con fake", """
+                        [Fact]
+                        public async Task InvalidCategory_UsesFallback()
+                        {
+                            var provider = new FakeAiProvider(
+                                new("unknown", "text", false));
+
+                            AiSuggestion result = await service.ReviewNoteAsync(
+                                "Deliver after 5 PM",
+                                default);
+
+                            Assert.True(result.RequiresReview);
+                        }
+                        """),
+                    "Integra mediante un contrato reemplazable", "Las pruebas usan un fake determinista. El laboratorio simula el proveedor y demuestra la frontera; una integración real se conecta desde configuración del servidor.", "LLM sugiere → código valida → persona revisa"))
         };
 
     public static JuniorModuleLesson Get(string slug) => Modules[slug];

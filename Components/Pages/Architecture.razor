@@ -1,7 +1,8 @@
 @page "/arquitectura"
+@page "/architecture"
 @inject NavigationManager Navigation
 
 @code {
     protected override void OnInitialized() =>
-        Navigation.NavigateTo("/en-preparacion/arquitectura", replace: true);
+        Navigation.NavigateTo(AppRoutes.ComingSoon("architecture"), replace: true);
 }

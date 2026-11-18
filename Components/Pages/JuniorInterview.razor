@@ -1,0 +1,320 @@
+@page "/interview/{Level?}"
+@page "/entrevista/{Level?}"
+@using DotnetCodeMaturityLab.Features.Learning
+@inject IJSRuntime JS
+@inherits LocalizedComponentBase
+
+<PageTitle>@T("Prepare for interview", "Prepárate para la entrevista") | .NET Code Maturity Lab</PageTitle>
+
+<div class="interview-page @InterviewPageClass">
+@if (string.IsNullOrWhiteSpace(Level))
+{
+    <header class="interview-hero interview-catalog-hero">
+        <div>
+            <span class="eyebrow">@T("Prepare for interview", "Prepárate para la entrevista")</span>
+            <h1>@T("Practice the decisions expected at each .NET level.", "Practica las decisiones esperadas en cada nivel .NET.")</h1>
+            <p>@T("Choose a level, answer its technical test, and use the follow-up evidence to practice defending your reasoning aloud.", "Elige un nivel, responde su prueba técnica y usa la evidencia de seguimiento para practicar cómo defender tu razonamiento en voz alta.")</p>
+        </div>
+        <aside>
+            <span>@T("Interview practice", "Práctica de entrevista")</span>
+            <strong>3 @T("levels", "niveles")</strong>
+            <small>@T("One preparation space · progressive difficulty", "Un espacio de preparación · dificultad progresiva")</small>
+        </aside>
+    </header>
+
+    <section class="interview-level-grid" aria-label="@T("Interview tests by level", "Pruebas de entrevista por nivel")">
+        <article class="interview-level-card available">
+            <span class="interview-level-index">01</span>
+            <small>@T("Fundamentals · available", "Fundamentos · disponible")</small>
+            <h2>Junior</h2>
+            <p>@T("C#, OOP, collections, async, testing, HTTP, persistence, ASP.NET Core, and safe LLM integration.", "C#, POO, colecciones, async, pruebas, HTTP, persistencia, ASP.NET Core e integración segura con LLM.")</p>
+            <strong>14 @T("questions", "preguntas")</strong>
+            <a class="button button-primary" href="@AppRoutes.InterviewFor("junior")">@T("Open Junior test", "Abrir prueba Junior") →</a>
+        </article>
+        <article class="interview-level-card">
+            <span class="interview-level-index">02</span>
+            <small>@T("Design · coming soon", "Diseño · próximamente")</small>
+            <h2>Middle</h2>
+            <p>@T("SOLID, dependency injection, design patterns, refactoring, and integration boundaries.", "SOLID, inyección de dependencias, patrones de diseño, refactorización y fronteras de integración.")</p>
+            <strong>@T("Test in preparation", "Prueba en preparación")</strong>
+            <a class="button button-secondary" href="@AppRoutes.InterviewFor("middle")">@T("View test status", "Ver estado de la prueba") →</a>
+        </article>
+        <article class="interview-level-card dark">
+            <span class="interview-level-index">03</span>
+            <small>@T("Production · coming soon", "Producción · próximamente")</small>
+            <h2>Senior</h2>
+            <p>@T("Architecture, security, resilience, observability, concurrency, and cloud-scale trade-offs.", "Arquitectura, seguridad, resiliencia, observabilidad, concurrencia y decisiones de escala en nube.")</p>
+            <strong>@T("Test in preparation", "Prueba en preparación")</strong>
+            <a class="button button-secondary dark" href="@AppRoutes.InterviewFor("senior")">@T("View test status", "Ver estado de la prueba") →</a>
+        </article>
+    </section>
+}
+else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
+{
+    @if (!Started)
+    {
+        <a class="course-back interview-back" href="@AppRoutes.Interview">← @T("All interview tests", "Todas las pruebas de entrevista")</a>
+        <header class="interview-hero">
+            <div>
+                <span class="eyebrow">@T("Interview simulator", "Simulador de entrevista")</span>
+                <h1>@T("Defend the Junior fundamentals, not only the syntax.", "Defiende los fundamentos Junior, no solo la sintaxis.")</h1>
+                <p>@T("Fourteen questions connect the learning path with the decisions a .NET interviewer may ask you to explain, including safe LLM integration.", "Catorce preguntas conectan la ruta de aprendizaje con las decisiones que un entrevistador .NET puede pedirte explicar, incluida una integración segura con LLM.")</p>
+            </div>
+            <aside>
+                <span>@T("Format", "Formato")</span>
+                <strong>14 @T("questions", "preguntas")</strong>
+                <small>@T("All Junior modules · two AI questions", "Todos los módulos Junior · dos preguntas de IA")</small>
+            </aside>
+        </header>
+
+        <section class="interview-start-card">
+            <span class="interview-number">01</span>
+            <div>
+                <span class="eyebrow">@T("Before you begin", "Antes de comenzar")</span>
+                <h2>@T("Choose an answer, read the evidence, and explain the follow-up aloud.", "Elige una respuesta, revisa la evidencia y explica en voz alta la repregunta.")</h2>
+                <ul>
+                    <li>@T("The score evaluates the selected option.", "La puntuación evalúa la opción seleccionada.")</li>
+                    <li>@T("The defense section shows what a complete spoken answer should cover.", "La sección de defensa muestra qué debe cubrir una respuesta oral completa.")</li>
+                    <li>@T("Nothing is sent to a server; the attempt remains in this session.", "Nada se envía a un servidor; el intento permanece en esta sesión.")</li>
+                </ul>
+                <button type="button" class="button button-primary" @onclick="Start">@T("Start interview", "Iniciar entrevista") →</button>
+            </div>
+        </section>
+    }
+    else if (!Finished)
+    {
+        <div class="interview-session-shell">
+            <aside class="interview-question-index" aria-label="@T("Interview questions", "Preguntas de entrevista")">
+                <header>
+                    <a class="course-back" href="@AppRoutes.Interview">← @T("All tests", "Todas las pruebas")</a>
+                    <span class="eyebrow">@T("Interview simulator", "Simulador de entrevista")</span>
+                    <h2>Junior</h2>
+                    <p>@T("Question", "Pregunta") @(CurrentIndex + 1) @T("of", "de") @Questions.Count · @PositionPercent%</p>
+                </header>
+
+                <ol>
+                    @for (var index = 0; index < Questions.Count; index++)
+                    {
+                        var question = Questions[index];
+                        <li class="@QuestionStateClass(index)" aria-current="@(index == CurrentIndex ? "step" : null)">
+                            <span class="interview-question-number">@((index + 1).ToString("00"))</span>
+                            <span class="interview-question-label"><strong>@question.ModuleTitle</strong><small>@QuestionStateLabel(index)</small></span>
+                            <span class="interview-question-state" aria-hidden="true">@QuestionStateSymbol(index)</span>
+                        </li>
+                    }
+                </ol>
+
+                <footer><span>@T("Score", "Puntuación")</span><strong>@Score / @Questions.Count</strong></footer>
+            </aside>
+
+            <main class="interview-question-stage">
+                <header class="interview-session-toolbar">
+                    <span><b>@T("Question", "Pregunta") @((CurrentIndex + 1).ToString("00"))</b> / @Questions.Count</span>
+                    <span>@T("Completed", "Completado") @PositionPercent%</span>
+                </header>
+
+                <ol class="interview-progress-steps" aria-label="@T("Question progression", "Progresión de preguntas")">
+                    @for (var index = 0; index < Questions.Count; index++)
+                    {
+                        <li class="@ProgressStepClass(index)" aria-current="@(index == CurrentIndex ? "step" : null)">
+                            <span>@(index + 1)</span>
+                        </li>
+                    }
+                </ol>
+
+                <section class="interview-question-card" @key="CurrentIndex">
+                    <header>
+                        <span class="interview-module">Junior · @Current.ModuleTitle</span>
+                        <span>@T("Select the best answer", "Selecciona la mejor respuesta")</span>
+                    </header>
+                    <h2>@Current.Prompt</h2>
+
+                    <div class="interview-options">
+                        @for (var index = 0; index < Current.Options.Length; index++)
+                        {
+                            var optionIndex = index;
+                            var option = Current.Options[index];
+                            <button type="button" class="@OptionClass(optionIndex, option)" disabled="@Answered" @onclick="() => SelectOption(optionIndex)">
+                                <span>@((char)('A' + index))</span>
+                                <strong>@option.Text</strong>
+                                @if (Answered && (option.IsCorrect || optionIndex == SelectedOption))
+                                {
+                                    <span class="interview-option-explanation">
+                                        <small>@(option.IsCorrect ? T("Correct answer", "Respuesta correcta") : T("Why it is incorrect", "Por qué es incorrecta"))</small>
+                                        <span>@option.Feedback</span>
+                                    </span>
+                                }
+                            </button>
+                        }
+                    </div>
+
+                    @if (Answered)
+                    {
+                        <div class="interview-defense">
+                            <div>
+                                <span class="eyebrow">@T("What you should be able to defend", "Lo que debes poder defender")</span>
+                                <h3>@Current.DefenseQuestion</h3>
+                                <p>@Current.ExpectedAnswer</p>
+                            </div>
+                            <button type="button" class="button button-primary interview-next" @onclick="Next">
+                                @(CurrentIndex == Questions.Count - 1 ? T("View result", "Ver resultado") : T("Next question", "Siguiente pregunta")) →
+                            </button>
+                        </div>
+                    }
+                </section>
+            </main>
+        </div>
+    }
+    else
+    {
+        <div class="interview-session-toolbar">
+            <a class="course-back" href="@AppRoutes.Interview">← @T("All tests", "Todas las pruebas")</a>
+            <span><b>@T("Interview completed", "Entrevista completada")</b> · Junior</span>
+        </div>
+        <section class="interview-result">
+            <span class="eyebrow">@T("Interview result", "Resultado de la entrevista")</span>
+            <div class="interview-score"><strong>@Score</strong><span>/ @Questions.Count</span></div>
+            <h2>@ResultTitle</h2>
+            <p>@ResultDescription</p>
+            <div class="button-row">
+                <button type="button" class="button button-primary" @onclick="Restart">@T("Try again", "Intentar de nuevo")</button>
+                <a class="button button-secondary" href="@AppRoutes.Learn("junior")">@T("Review Junior modules", "Repasar módulos Junior")</a>
+            </div>
+        </section>
+    }
+}
+else
+{
+    <section class="interview-coming-soon">
+        <a class="course-back" href="@AppRoutes.Interview">← @T("All interview tests", "Todas las pruebas de entrevista")</a>
+        <span class="eyebrow">@Level · @T("interview test", "prueba de entrevista")</span>
+        <h1>@T("This level's test is in preparation.", "La prueba de este nivel está en preparación.")</h1>
+        <p>@T("Its questions will be published with the corresponding learning path so the expected answers match implemented and verifiable content.", "Sus preguntas se publicarán junto con la ruta de aprendizaje correspondiente para que las respuestas esperadas coincidan con contenido implementado y verificable.")</p>
+        <a class="button button-primary" href="@AppRoutes.Interview">@T("Choose another level", "Elegir otro nivel") →</a>
+    </section>
+}
+</div>
+
+@code {
+    [Parameter] public string? Level { get; set; }
+
+    private IReadOnlyList<JuniorInterviewQuestion> Questions => JuniorInterviewCatalog.Get(Language.Current);
+    private JuniorInterviewQuestion Current => Questions[CurrentIndex];
+    private bool Started { get; set; }
+    private bool Finished { get; set; }
+    private bool Answered { get; set; }
+    private int CurrentIndex { get; set; }
+    private int SelectedOption { get; set; } = -1;
+    private int Score { get; set; }
+    private bool?[] AnswerResults { get; } = new bool?[14];
+    private bool ScrollToSessionTop { get; set; }
+    private int PositionPercent => (int)Math.Round((CurrentIndex + 1d) * 100 / Questions.Count);
+    private string InterviewPageClass => Started
+        ? "interview-session-active"
+        : Level?.Equals("junior", StringComparison.OrdinalIgnoreCase) == true
+            ? "interview-intro-active"
+            : string.Empty;
+    private string ResultTitle => Score >= 10
+        ? T("Strong Junior foundation", "Base Junior sólida")
+        : Score >= 7
+            ? T("Ready, with a few topics to reinforce", "Listo, con algunos temas por reforzar")
+            : T("Return to the modules and try again", "Vuelve a los módulos e inténtalo de nuevo");
+    private string ResultDescription => Score >= 10
+        ? T("You can identify the correct decisions. Practice saying the defense answers in your own words.", "Identificas las decisiones correctas. Practica explicar las respuestas de defensa con tus propias palabras.")
+        : Score >= 7
+            ? T("Review the modules where the decision was unclear, then repeat the interview.", "Repasa los módulos donde la decisión no fue clara y después repite la entrevista.")
+            : T("Use the learning path to reconnect syntax, design intent, tests, persistence, and HTTP.", "Usa la ruta para volver a conectar sintaxis, intención de diseño, pruebas, persistencia y HTTP.");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!ScrollToSessionTop) return;
+
+        ScrollToSessionTop = false;
+        await JS.InvokeVoidAsync("window.scrollTo", 0, 0);
+    }
+
+    private void Start()
+    {
+        Started = true;
+        ScrollToSessionTop = true;
+    }
+
+    private void SelectOption(int index)
+    {
+        if (Answered) return;
+        SelectedOption = index;
+        Answered = true;
+        AnswerResults[CurrentIndex] = Current.Options[index].IsCorrect;
+        if (AnswerResults[CurrentIndex] == true) Score++;
+    }
+
+    private void Next()
+    {
+        if (!Answered) return;
+        if (CurrentIndex == Questions.Count - 1)
+        {
+            Finished = true;
+            ScrollToSessionTop = true;
+            return;
+        }
+
+        CurrentIndex++;
+        SelectedOption = -1;
+        Answered = false;
+        ScrollToSessionTop = true;
+    }
+
+    private void Restart()
+    {
+        CurrentIndex = 0;
+        SelectedOption = -1;
+        Score = 0;
+        Array.Clear(AnswerResults);
+        Answered = false;
+        Finished = false;
+        Started = true;
+        ScrollToSessionTop = true;
+    }
+
+    private string OptionClass(int index, JuniorInterviewOption option)
+    {
+        if (!Answered) return string.Empty;
+        if (option.IsCorrect) return "correct has-explanation";
+        return index == SelectedOption ? "incorrect has-explanation" : "muted";
+    }
+
+    private string ProgressStepClass(int index)
+    {
+        if (index < CurrentIndex) return "complete";
+        if (index == CurrentIndex) return Answered ? "current complete" : "current";
+        return string.Empty;
+    }
+
+    private string QuestionStateClass(int index)
+    {
+        var current = index == CurrentIndex ? " current" : string.Empty;
+        return AnswerResults[index] switch
+        {
+            true => $"correct{current}",
+            false => $"incorrect{current}",
+            _ when index == CurrentIndex => "current",
+            _ => "pending"
+        };
+    }
+
+    private string QuestionStateLabel(int index) => AnswerResults[index] switch
+    {
+        true => T("Correct", "Correcta"),
+        false => T("Review", "Revisar"),
+        _ when index == CurrentIndex => T("In progress", "En curso"),
+        _ => T("Pending", "Pendiente")
+    };
+
+    private string QuestionStateSymbol(int index) => AnswerResults[index] switch
+    {
+        true => "✓",
+        false => "×",
+        _ when index == CurrentIndex => "●",
+        _ => "○"
+    };
+}
