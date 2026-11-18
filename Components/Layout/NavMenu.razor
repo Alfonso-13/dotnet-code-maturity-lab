@@ -5,16 +5,17 @@
     <div class="nav-section">
         <span class="nav-label">@Text.Explore</span>
         <NavLink href="" Match="NavLinkMatch.All"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v9h-6v-6H9v6H3z"/></svg></span> @Text.Home</NavLink>
-        <NavLink href="ruta"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="18" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="19" cy="15" r="2"/><path d="m6.5 16.5 4.2-8.7m2.9-.3 4 5.8"/></svg></span> @Text.Roadmap</NavLink>
-        <NavLink href="laboratorio"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m9 8-2 2 2 2m6-4 2 2-2 2m-3-5-2 6M8 21h8m-4-4v4"/></svg></span> @Text.Laboratories</NavLink>
-        <NavLink href="historia-dotnet"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M4.5 5.5 2.5 8M19.5 5.5 21.5 8"/></svg></span> @Text.DotNetHistory</NavLink>
-        <NavLink href="ecosistema-dotnet"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="m7 7 4 9m6-9-4 9M7 6h10"/></svg></span> @Text.DotNetEcosystem</NavLink>
+        <NavLink href="@AppRoutes.Roadmap"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="18" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="19" cy="15" r="2"/><path d="m6.5 16.5 4.2-8.7m2.9-.3 4 5.8"/></svg></span> @Text.Roadmap</NavLink>
+        <NavLink href="@AppRoutes.Labs"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m9 8-2 2 2 2m6-4 2 2-2 2m-3-5-2 6M8 21h8m-4-4v4"/></svg></span> @Text.Laboratories</NavLink>
+        <NavLink href="@AppRoutes.Interview"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v11H9l-4 4V5Z"/><path d="M9 9h6M9 12h4"/></svg></span> @Text.PrepareForInterview</NavLink>
+        <NavLink href="@AppRoutes.DotNetHistory"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M4.5 5.5 2.5 8M19.5 5.5 21.5 8"/></svg></span> @Text.DotNetHistory</NavLink>
+        <NavLink href="@AppRoutes.DotNetEcosystem"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="m7 7 4 9m6-9-4 9M7 6h10"/></svg></span> @Text.DotNetEcosystem</NavLink>
     </div>
     <div class="nav-section">
         <span class="nav-label">@Text.DesignAndOperate</span>
-        <NavLink href="en-preparacion/arquitectura"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="8.5" y="14" width="7" height="7"/><path d="M6.5 10v2h11v-2M12 12v2"/></svg></span><span>@Text.Architecture<small class="nav-status">@Text.InProgress</small></span></NavLink>
-        <NavLink href="en-preparacion/azure"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18H5a4 4 0 0 1-.3-8A7 7 0 0 1 18 8.5 4.8 4.8 0 0 1 19 18h-2M9 16l3 3 3-3M12 11v8"/></svg></span><span>@Text.AzureAndScale<small class="nav-status">@Text.InProgress</small></span></NavLink>
-        <NavLink href="en-preparacion/glosario"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4zM20 4h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4z"/></svg></span><span>@Text.Glossary<small class="nav-status">@Text.InProgress</small></span></NavLink>
+        <NavLink href="@AppRoutes.ComingSoon("architecture")"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="8.5" y="14" width="7" height="7"/><path d="M6.5 10v2h11v-2M12 12v2"/></svg></span><span>@Text.Architecture<small class="nav-status">@Text.InProgress</small></span></NavLink>
+        <NavLink href="@AppRoutes.ComingSoon("azure")"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18H5a4 4 0 0 1-.3-8A7 7 0 0 1 18 8.5 4.8 4.8 0 0 1 19 18h-2M9 16l3 3 3-3M12 11v8"/></svg></span><span>@Text.AzureAndScale<small class="nav-status">@Text.InProgress</small></span></NavLink>
+        <NavLink href="@AppRoutes.ComingSoon("glossary")"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4zM20 4h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4z"/></svg></span><span>@Text.Glossary<small class="nav-status">@Text.InProgress</small></span></NavLink>
     </div>
 </nav>
 

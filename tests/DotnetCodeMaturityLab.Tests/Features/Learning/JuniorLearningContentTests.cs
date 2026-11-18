@@ -7,11 +7,11 @@ namespace DotnetCodeMaturityLab.Tests.Features.Learning;
 public sealed class JuniorLearningContentTests
 {
     [Fact]
-    public void Curriculum_ContainsTwelveModulesWithFivePerspectives()
+    public void Curriculum_ContainsThirteenModulesWithFivePerspectives()
     {
-        var moduleTopics = JuniorCurriculum.Topics.Take(12).ToArray();
+        var moduleTopics = JuniorCurriculum.Topics.Take(13).ToArray();
 
-        Assert.Equal(12, moduleTopics.Length);
+        Assert.Equal(13, moduleTopics.Length);
 
         foreach (var topic in moduleTopics)
         {
@@ -27,7 +27,7 @@ public sealed class JuniorLearningContentTests
     {
         foreach (var language in new[] { AppLanguage.English, AppLanguage.Spanish })
         {
-            foreach (var topic in JuniorCurriculum.Topics.Take(12))
+            foreach (var topic in JuniorCurriculum.Topics.Take(13))
             {
                 var module = JuniorLessonCatalog.Get(topic.Slug, language);
 
@@ -48,9 +48,9 @@ public sealed class JuniorLearningContentTests
     }
 
     [Fact]
-    public void EnglishAndSpanishCatalogs_HaveTheSameSixtyPerspectiveStructure()
+    public void EnglishAndSpanishCatalogs_HaveTheSameSixtyFivePerspectiveStructure()
     {
-        var topics = JuniorCurriculum.Topics.Take(12).ToArray();
+        var topics = JuniorCurriculum.Topics.Take(13).ToArray();
         var perspectiveCount = 0;
 
         foreach (var topic in topics)
@@ -70,11 +70,11 @@ public sealed class JuniorLearningContentTests
             var metadata = JuniorModuleMetadataCatalog.Get(topic, AppLanguage.English);
             Assert.False(string.IsNullOrWhiteSpace(metadata.ShortTitle));
             Assert.False(string.IsNullOrWhiteSpace(metadata.Title));
-            Assert.Equal("C# FUNDAMENTALS", metadata.Block);
+            Assert.Equal(topic.Slug == "ia-llm" ? "APPLIED AI" : "C# FUNDAMENTALS", metadata.Block);
             perspectiveCount += english.Steps.Length;
         }
 
-        Assert.Equal(60, perspectiveCount);
+        Assert.Equal(65, perspectiveCount);
     }
 
     [Fact]

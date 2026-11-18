@@ -1,4 +1,5 @@
 @page "/historia-dotnet"
+@page "/dotnet-history"
 @using DotnetCodeMaturityLab.Components.Learning
 @inherits LocalizedComponentBase
 
@@ -9,7 +10,7 @@
         <span class="eyebrow">@T(".NET history", "Historia de .NET")</span>
         <h1>@T("A platform that changed to reach more places.", "Una plataforma que cambió para llegar a más lugares.")</h1>
         <p>@T(".NET did not replace one version with another along a single line. It branched: one path remained tied to Windows, another made the platform cross-platform, and both ideas converged in modern .NET.", ".NET no reemplazó una versión con otra siguiendo una sola línea. Se abrió en ramas: una permaneció ligada a Windows, otra hizo la plataforma multiplataforma y ambas ideas convergieron en el .NET moderno.")</p>
-        <div class="button-row"><a class="button button-secondary" href="ecosistema-dotnet">@T("Which technology should you use today?", "¿Qué tecnología usar hoy?") <span aria-hidden="true">→</span></a></div>
+        <div class="button-row"><a class="button button-secondary" href="@AppRoutes.DotNetEcosystem">@T("Which technology should you use today?", "¿Qué tecnología usar hoy?") <span aria-hidden="true">→</span></a></div>
     </div>
 </header>
 
@@ -80,7 +81,7 @@
 
 <aside class="history-next-step">
     <div><span class="eyebrow">@T("From the past to the decision", "Del pasado a la decisión")</span><strong>@T("Now choose which part of .NET your project needs.", "Ahora elige qué parte de .NET necesita tu proyecto.")</strong></div>
-    <a class="button button-primary" href="ecosistema-dotnet">@T("Explore the .NET ecosystem", "Explorar el ecosistema .NET") <span aria-hidden="true">→</span></a>
+    <a class="button button-primary" href="@AppRoutes.DotNetEcosystem">@T("Explore the .NET ecosystem", "Explorar el ecosistema .NET") <span aria-hidden="true">→</span></a>
 </aside>
 
 @code {

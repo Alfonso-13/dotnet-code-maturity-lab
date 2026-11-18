@@ -15,7 +15,7 @@
         </div>
         <div class="playground-endpoint">
             <code>POST /api/orders</code>
-            <span>@HostingProfile.RuntimeLabel</span>
+            <span>@HostingProfile.RuntimeLabel.Get(Language.Current)</span>
         </div>
     </div>
 
@@ -48,9 +48,9 @@
             <i aria-hidden="true">→</i>
             <article class="@StepClass(2)"><span>02</span><strong>@T("Rules", "Reglas")</strong><small>@T("Validate and calculate", "Validar y calcular")</small></article>
             <i aria-hidden="true">→</i>
-            <article class="@StepClass(3)"><span>03</span><strong>@LocalizedHostingMessage(HostingProfile.PersistenceStep)</strong><small>@LocalizedHostingMessage(HostingProfile.PersistenceDetail)</small></article>
+            <article class="@StepClass(3)"><span>03</span><strong>@HostingProfile.PersistenceStep.Get(Language.Current)</strong><small>@HostingProfile.PersistenceDetail.Get(Language.Current)</small></article>
             <i aria-hidden="true">→</i>
-            <article class="@StepClass(4)"><span>04</span><strong>@LocalizedHostingMessage(HostingProfile.StorageStep)</strong><small>@LocalizedHostingMessage(HostingProfile.StorageDetail)</small></article>
+            <article class="@StepClass(4)"><span>04</span><strong>@HostingProfile.StorageStep.Get(Language.Current)</strong><small>@HostingProfile.StorageDetail.Get(Language.Current)</small></article>
             <i aria-hidden="true">→</i>
             <article class="@StepClass(5)"><span>05</span><strong>Response</strong><small>201 @T("or", "o") 400</small></article>
         </div>
@@ -156,6 +156,9 @@
     {
         if (IsSending) return;
 
+        // The delays below are presentation-only. They expose the request journey one
+        // stage at a time; validation and persistence still run once through the real
+        // application service selected by the current hosting profile.
         IsSending = true;
         ValidationStopped = false;
         RequestStep = 1;
@@ -184,7 +187,7 @@
             RequestStep = result.IsSuccess ? 3 : 5;
             ValidationStopped = !result.IsSuccess;
             RequestPhase = result.IsSuccess
-                ? LocalizedHostingMessage(HostingProfile.PersistingMessage)
+                ? HostingProfile.PersistingMessage.Get(Language.Current)
                 : T("Validation stopped the write", "La validación detuvo la escritura");
             StateHasChanged();
             await Task.Delay(300);
@@ -192,7 +195,7 @@
             if (result.IsSuccess)
             {
                 RequestStep = 4;
-                RequestPhase = LocalizedHostingMessage(HostingProfile.StoredMessage);
+                RequestPhase = HostingProfile.StoredMessage.Get(Language.Current);
                 PersistedOrderCount = await OrderStore.CountAsync();
                 StateHasChanged();
                 await Task.Delay(300);
@@ -203,6 +206,8 @@
                 HasSuccessfulCase = result.Order is not null
                     && result.Order.Subtotal == Input.Quantity * Input.UnitPrice
                     && await OrderStore.FindAsync(result.Order.Id) is not null;
+                // Six is the terminal sentinel after the five visible stages. StepClass
+                // uses it to mark every rendered stage as completed.
                 RequestStep = 6;
                 RequestPhase = T("201 Created response received", "Respuesta 201 Created recibida");
                 return;
@@ -219,7 +224,7 @@
             HasValidationCase = await OrderStore.CountAsync() == storedBefore;
             PersistedOrderCount = storedBefore;
             RequestStep = 6;
-            RequestPhase = LocalizedHostingMessage(HostingProfile.InvalidMessage);
+            RequestPhase = HostingProfile.InvalidMessage.Get(Language.Current);
         }
         catch (Exception)
         {
@@ -282,22 +287,6 @@
         };
     }
 
-    private string LocalizedHostingMessage(string spanish) => spanish switch
-    {
-        "Guardar entidad" => T("Save entity", spanish),
-        "Aplicar reglas" => T("Apply rules", spanish),
-        "Servicio" => T("Service", spanish),
-        "Memoria" => T("Memory", spanish),
-        "Sesión del navegador" => T("Browser session", spanish),
-        "EF Core está persistiendo la orden" => T("EF Core is persisting the order", spanish),
-        "SQLite confirmó la escritura en orders.db" => T("SQLite confirmed the write to orders.db", spanish),
-        "Respuesta 400 recibida · SQLite no cambió" => T("400 response received · SQLite did not change", spanish),
-        "El servicio está creando la orden en el navegador" => T("The service is creating the order in the browser", spanish),
-        "La sesión local confirmó la escritura en memoria" => T("The local session confirmed the in-memory write", spanish),
-        "Respuesta 400 simulada · la memoria no cambió" => T("Simulated 400 response · memory did not change", spanish),
-        _ => spanish
-    };
-
     private async Task CompleteLab()
     {
         if (!HasSuccessfulCase || !HasValidationCase) return;
@@ -308,9 +297,12 @@
         var reviewed = (progress.Reviewed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var completed = (progress.Completed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
+        // Version 3 separated "reviewed" from evidence-based completion. Older data
+        // marked a module complete merely for reaching its last panel, so preserve the
+        // visit while downgrading those module entries to the honest reviewed state.
         if ((progress.Version ?? 0) < ProgressVersion)
         {
-            var moduleSlugs = JuniorCurriculum.Topics.Take(12)
+            var moduleSlugs = JuniorCurriculum.Topics.Take(13)
                 .Select(topic => topic.Slug)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
             foreach (var slug in completed.Where(moduleSlugs.Contains).ToArray())

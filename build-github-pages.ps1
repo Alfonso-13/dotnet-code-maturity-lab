@@ -15,6 +15,8 @@ $pathSeparators = [char[]]@(
 $projectRootPrefix = [System.IO.Path]::GetFullPath($projectRoot).TrimEnd($pathSeparators) +
     [System.IO.Path]::DirectorySeparatorChar
 
+# Both deletion targets are derived from command arguments. Resolve and constrain them
+# before any recursive operation so the script cannot remove data outside the repository.
 foreach ($path in @($publishPath, $stagingPath)) {
     if (-not $path.StartsWith($projectRootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "La ruta de publicación debe permanecer dentro del repositorio: $path"
@@ -25,6 +27,7 @@ if (Test-Path -LiteralPath $stagingPath) {
     Remove-Item -LiteralPath $stagingPath -Recurse -Force
 }
 
+# Build in staging and keep the previous artifact intact until every contract below passes.
 dotnet publish $projectPath -c Release -o $stagingPath --nologo
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet publish terminó con el código $LASTEXITCODE. No se reemplazó el artefacto anterior."
@@ -40,6 +43,17 @@ foreach ($relativePath in $requiredFiles) {
     }
 }
 
+$fallbackPath = Join-Path $webRoot "404.html"
+$fallback = Get-Content -LiteralPath $fallbackPath -Raw
+# Direct Pages routes depend on this fallback. Validate its known failure mode and its
+# redirect marker before publishing an artifact that would turn refreshes into 404s.
+if ($fallback.Contains("const location = window.location;", [System.StringComparison]::Ordinal)) {
+    throw "404.html redeclara el global location y rompería la recuperación de rutas profundas."
+}
+if (-not $fallback.Contains("currentLocation.replace(", [System.StringComparison]::Ordinal)) {
+    throw "404.html no contiene la redirección esperada para rutas profundas."
+}
+
 $indexPath = Join-Path $webRoot "index.html"
 $index = Get-Content -LiteralPath $indexPath -Raw
 $pagesBase = '<base href="/{0}/" />' -f $RepositoryName
@@ -52,6 +66,7 @@ if (-not $index.Contains($defaultBase, [System.StringComparison]::Ordinal)) {
 $index = $index.Replace($defaultBase, $pagesBase)
 Set-Content -LiteralPath $indexPath -Value $index -NoNewline
 
+# Only a validated staging build is allowed to replace the last usable artifact.
 if (Test-Path -LiteralPath $publishPath) {
     Remove-Item -LiteralPath $publishPath -Recurse -Force
 }

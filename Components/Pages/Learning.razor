@@ -1,5 +1,5 @@
-@page "/aprender/{Level}"
-@page "/aprender/{Level}/{TopicSlug}"
+@page "/aprender/{Level}/{TopicSlug?}"
+@page "/learn/{Level}/{TopicSlug?}"
 @using DotnetCodeMaturityLab.Components.Learning
 @using DotnetCodeMaturityLab.Features.Learning
 @inject NavigationManager Navigation
@@ -14,7 +14,7 @@
             <div>
                 <span class="eyebrow">@T("Learning path", "Ruta de aprendizaje")</span>
                 <h2>Junior</h2>
-                <p>@T("Twelve modules connected through the same visual experience.", "Doce módulos conectados con la misma experiencia visual.")</p>
+                <p>@T("Thirteen modules connected through the same visual experience.", "Trece módulos conectados con la misma experiencia visual.")</p>
             </div>
             <button type="button" class="curriculum-toggle" @onclick="ToggleCurriculum" aria-expanded="@CurriculumOpen" aria-label="@T("Show or hide modules", "Mostrar u ocultar módulos")">
                 <span>@(CurriculumOpen ? T("Hide", "Ocultar") : T("View modules", "Ver módulos"))</span><b aria-hidden="true">⌄</b>
@@ -55,13 +55,13 @@
                 </button>
             }
         </nav>
-        <a class="course-lab-link" href="laboratorio/junior"><span>@T("Level laboratory", "Laboratorio del nivel")</span><strong>@T("Create an order", "Crear una orden") →</strong></a>
+        <a class="course-lab-link" href="@AppRoutes.Lab("junior")"><span>@T("Level laboratory", "Laboratorio del nivel")</span><strong>@T("Create an order", "Crear una orden") →</strong></a>
     </aside>
 
     <main class="course-stage @(IsMaintenance ? "maintenance" : null)" aria-labelledby="lesson-title">
         <header class="course-header">
             <div>
-                <a class="course-back" href="ruta">← @T("Maturity roadmap", "Ruta de madurez")</a>
+                <a class="course-back" href="@AppRoutes.Roadmap">← @T("Maturity roadmap", "Ruta de madurez")</a>
                 <span class="eyebrow">Junior · @T("Module", "Módulo") @((ActiveTopicIndex + 1).ToString("00"))</span>
                 <h1 id="lesson-title">@CurrentMetadata.Title</h1>
             </div>
@@ -185,9 +185,14 @@
 
     protected override void OnParametersSet()
     {
-        if (!Level.Equals("junior", StringComparison.OrdinalIgnoreCase)) { Navigation.NavigateTo($"/en-preparacion/{Level}"); return; }
-        ActiveTopicIndex = string.IsNullOrWhiteSpace(TopicSlug) ? 0 : IndexOf(TopicSlug);
+        if (!Level.Equals("junior", StringComparison.OrdinalIgnoreCase)) { Navigation.NavigateTo(AppRoutes.ComingSoon(Level)); return; }
+
+        var internalSlug = string.IsNullOrWhiteSpace(TopicSlug)
+            ? Topics[0].Slug
+            : AppRoutes.InternalModuleSlug(TopicSlug);
+        ActiveTopicIndex = IndexOf(internalSlug);
         if (ActiveTopicIndex < 0) ActiveTopicIndex = 0;
+
         ActivePerspective = 0;
         CurriculumOpen = false;
         HintOpen = false;
@@ -224,7 +229,7 @@
     }
 
     private int IndexOf(string slug) { for (var index = 0; index < Topics.Count; index++) if (Topics[index].Slug.Equals(slug, StringComparison.OrdinalIgnoreCase)) return index; return -1; }
-    private void SelectTopic(int index) => Navigation.NavigateTo($"/aprender/junior/{Topics[index].Slug}");
+    private void SelectTopic(int index) => Navigation.NavigateTo(AppRoutes.LearnJunior(Topics[index].Slug));
     private void OpenFirstModule() => SelectTopic(0);
     private void SelectPerspective(int index) { ActivePerspective = index; HintOpen = false; if (index == PerspectiveNames.Length - 1) MarkReviewed(); }
     private void ToggleCurriculum() => CurriculumOpen = !CurriculumOpen;
@@ -246,7 +251,7 @@
         }
         else
         {
-            Navigation.NavigateTo("/ruta");
+            Navigation.NavigateTo(AppRoutes.Roadmap);
         }
 
         HintOpen = false;

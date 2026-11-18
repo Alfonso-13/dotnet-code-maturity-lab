@@ -1,5 +1,5 @@
-@page "/laboratorio"
-@page "/laboratorio/{Level}"
+@page "/laboratorio/{Level?}"
+@page "/labs/{Level?}"
 @using DotnetCodeMaturityLab.Components.Learning
 @using DotnetCodeMaturityLab.Components.Orders
 @inherits LocalizedComponentBase
@@ -10,9 +10,9 @@
 {
     <header class="page-header lab-catalog-header"><span class="eyebrow">@T("Practice by level", "Práctica por nivel")</span><h1>@T("Three laboratories. One API that matures.", "Tres laboratorios. Una API que madura.")</h1><p class="lead">@T("Each exercise brings together what you learned at that level. You do not study isolated topics here: you make decisions and observe the result.", "Cada ejercicio reúne lo aprendido en su nivel. Aquí no estudias temas aislados: tomas decisiones y observas el resultado.")</p></header>
     <section class="lab-level-grid page-section">
-        <article class="lab-level-card available"><div class="lab-level-icon">⌨</div><small>Junior · @T("available", "disponible")</small><h2>@T("Create an order", "Crear una orden")</h2><p>@T("Model, validate, persist, and verify an order's HTTP contract.", "Modela, valida, persiste y comprueba el contrato HTTP de una orden.")</p><ul><li>@T("C#, OOP, and collections", "C#, POO y colecciones")</li><li>REST, @T("persistence, and ASP.NET Core", "persistencia y ASP.NET Core")</li><li>@T("Tests and observable evidence", "Pruebas y evidencia observable")</li></ul><a class="button button-primary" href="laboratorio/junior">@T("Open laboratory", "Abrir laboratorio") →</a></article>
-        <article class="lab-level-card"><div class="lab-level-icon">⌘</div><small>Middle · @T("coming soon", "próximamente")</small><h2>@T("Refactor the flow", "Refactorizar el flujo")</h2><p>@T("Separate responsibilities and make the solution maintainable and testable.", "Separa responsabilidades y vuelve la solución mantenible y comprobable.")</p><ul><li>SOLID @T("and DI", "y DI")</li><li>Strategy</li><li>@T("Integration tests", "Pruebas de integración")</li></ul><a class="button button-secondary" href="en-preparacion/laboratorio-middle">@T("Coming soon", "Próximamente") →</a></article>
-        <article class="lab-level-card dark"><div class="lab-level-icon">⚙</div><small>Senior · @T("coming soon", "próximamente")</small><h2>@T("Operate under pressure", "Operar bajo presión")</h2><p>@T("Protect order creation against retries, concurrency, and external failures.", "Protege la creación de órdenes ante reintentos, concurrencia y fallos externos.")</p><ul><li>@T("Idempotency", "Idempotencia")</li><li>@T("Resilience", "Resiliencia")</li><li>@T("Observability", "Observabilidad")</li></ul><a class="button button-secondary dark" href="en-preparacion/laboratorio-senior">@T("Coming soon", "Próximamente") →</a></article>
+        <article class="lab-level-card available"><div class="lab-level-icon">⌨</div><small>Junior · @T("available", "disponible")</small><h2>@T("Create an order", "Crear una orden")</h2><p>@T("Model, validate, persist, and verify an order's HTTP contract.", "Modela, valida, persiste y comprueba el contrato HTTP de una orden.")</p><ul><li>@T("C#, OOP, and collections", "C#, POO y colecciones")</li><li>REST, @T("persistence, and ASP.NET Core", "persistencia y ASP.NET Core")</li><li>@T("Tests, LLM boundary, and observable evidence", "Pruebas, frontera LLM y evidencia observable")</li></ul><a class="button button-primary" href="@AppRoutes.Lab("junior")">@T("Open laboratory", "Abrir laboratorio") →</a></article>
+        <article class="lab-level-card"><div class="lab-level-icon">⌘</div><small>Middle · @T("coming soon", "próximamente")</small><h2>@T("Refactor the flow", "Refactorizar el flujo")</h2><p>@T("Separate responsibilities and make the solution maintainable and testable.", "Separa responsabilidades y vuelve la solución mantenible y comprobable.")</p><ul><li>SOLID @T("and DI", "y DI")</li><li>Strategy</li><li>@T("Integration tests", "Pruebas de integración")</li></ul><a class="button button-secondary" href="@AppRoutes.ComingSoon("middle-lab")">@T("Coming soon", "Próximamente") →</a></article>
+        <article class="lab-level-card dark"><div class="lab-level-icon">⚙</div><small>Senior · @T("coming soon", "próximamente")</small><h2>@T("Operate under pressure", "Operar bajo presión")</h2><p>@T("Protect order creation against retries, concurrency, and external failures.", "Protege la creación de órdenes ante reintentos, concurrencia y fallos externos.")</p><ul><li>@T("Idempotency", "Idempotencia")</li><li>@T("Resilience", "Resiliencia")</li><li>@T("Observability", "Observabilidad")</li></ul><a class="button button-secondary dark" href="@AppRoutes.ComingSoon("senior-lab")">@T("Coming soon", "Próximamente") →</a></article>
     </section>
 }
 else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
@@ -20,7 +20,7 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
     <div class="level-lab-page">
         <header class="level-lab-header">
             <div>
-                <a class="course-back" href="laboratorio">← @T("Laboratories", "Laboratorios")</a>
+                <a class="course-back" href="@AppRoutes.Labs">← @T("Laboratories", "Laboratorios")</a>
                 <span class="eyebrow">@T("Junior laboratory · capstone", "Laboratorio Junior · integrador")</span>
                 <h1>@T("Create an order that protects its contract.", "Crea una orden que proteja su contrato.")</h1>
                 <p>@T("Start from a request, apply domain rules, persist the order in SQLite through EF Core, and observe a verifiable HTTP response.", "Partes de una solicitud, aplicas reglas de dominio, conservas la orden en SQLite mediante EF Core y observas una respuesta HTTP verificable.")</p>
@@ -35,7 +35,7 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
         <section class="lab-brief" aria-label="@T("Laboratory objectives", "Objetivos del laboratorio")">
             <article><span>01</span><div><strong>@T("Protect the domain", "Protege el dominio")</strong><p>@T("The server generates the Id and subtotal; the client only chooses product, quantity, and price.", "El servidor genera Id y subtotal; el cliente solo decide producto, cantidad y precio.")</p></div></article>
             <article><span>02</span><div><strong>@T("Persist intentionally", "Persiste con intención")</strong><p>@T("The DTO, service, and EF Core repository collaborate without mixing HTTP, rules, and SQLite.", "DTO, servicio y un repositorio EF Core colaboran sin mezclar HTTP, reglas y SQLite.")</p></div></article>
-            <article><span>03</span><div><strong>@T("Verify the result", "Comprueba el resultado")</strong><p>@T("A valid order is persisted; an invalid one returns errors without being saved.", "Una orden válida se conserva; una inválida devuelve errores sin persistirse.")</p></div></article>
+            <article><span>03</span><div><strong>@T("Verify and assist", "Comprueba y asiste")</strong><p>@T("Verify the HTTP result, then let a simulated LLM suggest without changing the order automatically.", "Comprueba el resultado HTTP y después permite que un LLM simulado sugiera sin cambiar la orden automáticamente.")</p></div></article>
         </section>
 
         <section class="lab-code-section" aria-labelledby="lab-code-title">
@@ -48,15 +48,17 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
 
         <CreateOrderPlayground />
 
+        <AiOrderAssistantPlayground />
+
         <section class="lab-takeaway">
             <div><span class="eyebrow">@T("What a Junior should be able to defend", "Qué debe defender un Junior")</span><h2>@T("Returning JSON is not enough: explain who controls each value and how the rule is verified.", "No basta con devolver JSON: explica quién controla cada dato y cómo compruebas la regla.")</h2></div>
-            <p>@T("An interviewer may ask you to justify the DTO, the 201 status, early validation, subtotal calculation, the persistence abstraction, and the difference between a service test and an endpoint test.", "Un entrevistador puede pedirte justificar el DTO, el código 201, la validación previa, el cálculo del subtotal, la abstracción de persistencia y la diferencia entre una prueba de servicio y una prueba del endpoint.")</p>
+            <p>@T("An interviewer may ask you to justify the DTO, the 201 status, early validation, persistence, tests, and why an LLM suggestion must cross a validated server boundary before a person uses it.", "Un entrevistador puede pedirte justificar el DTO, el código 201, la validación previa, persistencia, pruebas y por qué una sugerencia de un LLM debe cruzar una frontera validada en el servidor antes de que una persona la use.")</p>
         </section>
     </div>
 }
 else
 {
-    <section class="empty-state"><span class="eyebrow">@T("Laboratory", "Laboratorio") @Level</span><h1>@T("This exercise is in preparation.", "Este ejercicio está en preparación.")</h1><p>@T("We will finish the Junior experience first; then we will evolve the same API.", "Primero terminaremos la experiencia Junior; después evolucionaremos la misma API.")</p><a class="button button-primary" href="laboratorio">@T("Return to laboratories", "Volver a laboratorios")</a></section>
+    <section class="empty-state"><span class="eyebrow">@T("Laboratory", "Laboratorio") @Level</span><h1>@T("This exercise is in preparation.", "Este ejercicio está en preparación.")</h1><p>@T("We will finish the Junior experience first; then we will evolve the same API.", "Primero terminaremos la experiencia Junior; después evolucionaremos la misma API.")</p><a class="button button-primary" href="@AppRoutes.Labs">@T("Return to laboratories", "Volver a laboratorios")</a></section>
 }
 
 @code {

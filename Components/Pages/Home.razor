@@ -9,8 +9,8 @@
         <h1>@T("Learn .NET through visual code and real decisions.", "Aprende .NET con código visual y decisiones reales.")</h1>
         <p class="lead">@T("Master .NET through visual comparisons, executable examples, and real engineering decisions. Progress from C# fundamentals to architecture, operations, and scalability.", "Domina .NET con comparaciones visuales, ejemplos ejecutables y decisiones reales. Avanza desde los fundamentos de C# hasta arquitectura, operación y escalabilidad.")</p>
         <div class="button-row">
-            <a class="button button-primary" href="ruta">@T("Start learning", "Empezar a aprender") <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="laboratorio">@T("Practice in laboratories", "Practicar en laboratorios")</a>
+            <a class="button button-primary" href="@AppRoutes.Roadmap">@T("Start learning", "Empezar a aprender") <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="@AppRoutes.Labs">@T("Practice in laboratories", "Practicar en laboratorios")</a>
         </div>
         <div class="hero-meta">
             <span><strong>3</strong> @T("maturity levels", "niveles de madurez")</span><span><strong>1</strong> @T("evolving API", "API que evoluciona")</span><span><strong>0</strong> @T("registration required", "registro requerido")</span>
@@ -46,7 +46,7 @@
 </section>
 
 <section class="path-preview page-section reveal-section">
-    <div class="section-heading compact"><div><span class="eyebrow">@T("Learning path", "Ruta de aprendizaje")</span><h2>@T("Learn .NET visually, from fundamentals to production.", "Aprende .NET visualmente, desde los fundamentos hasta producción.")</h2></div><a class="text-link" href="ruta">@T("Explore the roadmap", "Explorar la ruta") →</a></div>
+    <div class="section-heading compact"><div><span class="eyebrow">@T("Learning path", "Ruta de aprendizaje")</span><h2>@T("Learn .NET visually, from fundamentals to production.", "Aprende .NET visualmente, desde los fundamentos hasta producción.")</h2></div><a class="text-link" href="@AppRoutes.Roadmap">@T("Explore the roadmap", "Explorar la ruta") →</a></div>
     <div class="path-scroll" aria-label="@T("Path from Junior to Senior", "Ruta de Junior a Senior")">
         <div class="path-line">
             <div class="maturity-rail rail-junior-middle" aria-hidden="true"><span></span></div>

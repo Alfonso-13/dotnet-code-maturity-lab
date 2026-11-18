@@ -4,12 +4,17 @@
     <meta charset="utf-8" />
     <title>.NET Code Maturity Lab</title>
     <script>
-        const pathSegmentsToKeep = 1;
-        const location = window.location;
-        const repositoryRoot = location.pathname.split("/").slice(0, 1 + pathSegmentsToKeep).join("/");
-        const route = location.pathname.split("/").slice(1 + pathSegmentsToKeep).join("/").replace(/&/g, "~and~");
-        const query = location.search ? "&" + location.search.slice(1).replace(/&/g, "~and~") : "";
-        location.replace(location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "") + repositoryRoot + "/?/" + route + query + location.hash);
+        (() => {
+            // GitHub Pages returns this file before Blazor can handle a deep link. Keep
+            // the repository segment and encode the application route in the query so
+            // index.html can restore it before the client router starts.
+            const pathSegmentsToKeep = 1;
+            const currentLocation = window.location;
+            const repositoryRoot = currentLocation.pathname.split("/").slice(0, 1 + pathSegmentsToKeep).join("/");
+            const route = currentLocation.pathname.split("/").slice(1 + pathSegmentsToKeep).join("/").replace(/&/g, "~and~");
+            const query = currentLocation.search ? "&" + currentLocation.search.slice(1).replace(/&/g, "~and~") : "";
+            currentLocation.replace(currentLocation.protocol + "//" + currentLocation.hostname + (currentLocation.port ? ":" + currentLocation.port : "") + repositoryRoot + "/?/" + route + query + currentLocation.hash);
+        })();
     </script>
 </head>
 <body></body>
