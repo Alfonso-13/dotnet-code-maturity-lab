@@ -200,6 +200,12 @@ Check for orphaned `dotnet`, `testhost`, or `vstest.console` processes from an e
 
 Repository settings must use **Settings → Pages → Source: GitHub Actions**. Editable source remains in `main`; generated deployment output is not a development branch.
 
+### SEO and social preview contract
+
+`Features/Seo/SiteSeo.cs` is the semantic source of truth for the public title, description, canonical URL, and social image used by the server host. The static Pages document repeats those literal values because crawlers and link unfurlers do not execute Blazor; automated contract tests keep both hosts aligned.
+
+The public preview is `wwwroot/images/dotnet-code-maturity-lab-social.jpg` at 1200 × 630 pixels. `robots.txt`, `sitemap.xml`, and `site.webmanifest` are shared assets and must be linked into the static host project. `build-github-pages.ps1` rejects an artifact if any required discovery file or large social-card metadata is missing.
+
 ## Code documentation standard
 
 Comments are required when code contains behavior a reviewer cannot safely infer from syntax alone. Prefer comments that explain intent, constraints, compatibility, or a non-obvious state transition.
@@ -218,6 +224,7 @@ Features/Navigation/     Canonical route generation and compatibility mapping
 Features/Orders/         Domain, service, stores, EF Core, and Minimal API endpoints
 GitHubPages/             Thin static WebAssembly host and deep-link fallback
 tests/                   Unit, content, route, persistence, AI, and HTTP integration tests
+docs/references/         Owner-supplied planning references; not implementation authority
 wwwroot/                 Shared styles, scripts, images, and browser storage adapters
 ```
 

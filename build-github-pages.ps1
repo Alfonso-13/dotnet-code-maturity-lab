@@ -34,7 +34,16 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $webRoot = Join-Path $stagingPath "wwwroot"
-$requiredFiles = @("index.html", "404.html", ".nojekyll", "_framework/blazor.webassembly.js")
+$requiredFiles = @(
+    "index.html",
+    "404.html",
+    ".nojekyll",
+    "_framework/blazor.webassembly.js",
+    "robots.txt",
+    "sitemap.xml",
+    "site.webmanifest",
+    "images/dotnet-code-maturity-lab-social.jpg"
+)
 
 foreach ($relativePath in $requiredFiles) {
     $requiredPath = Join-Path $webRoot $relativePath
@@ -65,6 +74,27 @@ if (-not $index.Contains($defaultBase, [System.StringComparison]::Ordinal)) {
 
 $index = $index.Replace($defaultBase, $pagesBase)
 Set-Content -LiteralPath $indexPath -Value $index -NoNewline
+
+# Search engines and link unfurlers do not execute Blazor. The published HTML must
+# therefore carry complete canonical and social metadata before the artifact ships.
+$seoContracts = @(
+    'rel="canonical" href="https://alfonso-13.github.io/dotnet-code-maturity-lab/"',
+    'name="twitter:card" content="summary_large_image"',
+    'property="og:image" content="https://alfonso-13.github.io/dotnet-code-maturity-lab/images/dotnet-code-maturity-lab-social.jpg"',
+    'property="og:image:width" content="1200"',
+    'property="og:image:height" content="630"'
+)
+
+foreach ($contract in $seoContracts) {
+    if (-not $index.Contains($contract, [System.StringComparison]::Ordinal)) {
+        throw "index.html no cumple el contrato SEO requerido: $contract"
+    }
+}
+
+$socialImagePath = Join-Path $webRoot "images/dotnet-code-maturity-lab-social.jpg"
+if ((Get-Item -LiteralPath $socialImagePath).Length -lt 50000) {
+    throw "La imagen social parece incompleta o excesivamente comprimida."
+}
 
 # Only a validated staging build is allowed to replace the last usable artifact.
 if (Test-Path -LiteralPath $publishPath) {

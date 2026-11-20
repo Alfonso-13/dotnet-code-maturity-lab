@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alfonso-13.github.io/dotnet-code-maturity-lab/sitemap.xml
