@@ -5,15 +5,48 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <meta name="description" content="A visual laboratory for exploring code, architecture, and infrastructure maturity in .NET." />
-    <meta name="application-name" content=".NET Code Maturity Lab" />
+    <title>@SiteSeo.Title</title>
+    <meta name="description" content="@SiteSeo.Description" />
+    <meta name="author" content="@SiteSeo.Author" />
+    <meta name="application-name" content="@SiteSeo.SiteName" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="@SiteSeo.PublicUrl" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content=".NET Code Maturity Lab" />
-    <meta property="og:description" content="Learn .NET visually through code, tests, and real engineering decisions." />
-    <meta property="og:image" content="/images/dotnet-code-maturity-lab-icon.png" />
-    <meta name="theme-color" content="#e53935" />
+    <meta property="og:site_name" content="@SiteSeo.SiteName" />
+    <meta property="og:locale" content="@SiteSeo.Locale" />
+    <meta property="og:url" content="@SiteSeo.PublicUrl" />
+    <meta property="og:title" content="@SiteSeo.Title" />
+    <meta property="og:description" content="@SiteSeo.Description" />
+    <meta property="og:image" content="@SiteSeo.SocialImageUrl" />
+    <meta property="og:image:secure_url" content="@SiteSeo.SocialImageUrl" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="@SiteSeo.SocialImageWidth" />
+    <meta property="og:image:height" content="@SiteSeo.SocialImageHeight" />
+    <meta property="og:image:alt" content="@SiteSeo.SocialImageAlt" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@SiteSeo.Title" />
+    <meta name="twitter:description" content="@SiteSeo.Description" />
+    <meta name="twitter:image" content="@SiteSeo.SocialImageUrl" />
+    <meta name="twitter:image:alt" content="@SiteSeo.SocialImageAlt" />
+    <meta name="theme-color" content="@SiteSeo.ThemeColor" />
     <link rel="icon" type="image/png" href="images/dotnet-code-maturity-lab-icon.png" />
     <link rel="apple-touch-icon" href="images/dotnet-code-maturity-lab-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "WebSite",
+          "name": ".NET Code Maturity Lab",
+          "url": "https://alfonso-13.github.io/dotnet-code-maturity-lab/",
+          "description": "Learn .NET visually through code comparisons, tests, interview practice, and real engineering decisions from Junior to Senior.",
+          "inLanguage": ["en", "es"],
+          "author": {
+            "@@type": "Person",
+            "name": "Alfonso-13",
+            "url": "https://github.com/Alfonso-13"
+          }
+        }
+    </script>
     <script>
         try {
             if (window.sessionStorage.getItem("dotnet-code-maturity-intro-seen") === "true") {

@@ -40,6 +40,9 @@
     <Content Include="..\wwwroot\lab-progress.js" Link="wwwroot\lab-progress.js" />
     <Content Include="..\wwwroot\section-reveal.js" Link="wwwroot\section-reveal.js" />
     <Content Include="..\wwwroot\history-timeline.js" Link="wwwroot\history-timeline.js" />
+    <Content Include="..\wwwroot\robots.txt" Link="wwwroot\robots.txt" />
+    <Content Include="..\wwwroot\site.webmanifest" Link="wwwroot\site.webmanifest" />
+    <Content Include="..\wwwroot\sitemap.xml" Link="wwwroot\sitemap.xml" />
     <Content Include="..\wwwroot\images\**\*" Link="wwwroot\images\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 

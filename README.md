@@ -12,6 +12,8 @@
 
 ---
 
+[![.NET Code Maturity Lab social preview](wwwroot/images/dotnet-code-maturity-lab-social.jpg)](https://alfonso-13.github.io/dotnet-code-maturity-lab/)
+
 ## About the project
 
 .NET Code Maturity Lab shows how one order-processing solution grows from C# fundamentals into a complete Junior application. Instead of presenting isolated syntax, it connects language features, design intent, tests, persistence, HTTP, and safe LLM boundaries through one domain.
@@ -106,7 +108,7 @@ dotnet test tests/DotnetCodeMaturityLab.Tests/DotnetCodeMaturityLab.Tests.csproj
 ./build-github-pages.ps1
 ```
 
-Architecture, configuration, route behavior, verification, troubleshooting, and deployment are documented in [DEV.md](DEV.md).
+Architecture, configuration, route behavior, verification, troubleshooting, and deployment are documented in [DEV.md](DEV.md). Future Middle, Senior, architecture, and AI curriculum candidates are kept separately in [TODO.md](TODO.md) so planned work is not confused with available functionality.
 
 ## Scope and reuse
 
