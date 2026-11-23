@@ -1259,56 +1259,56 @@ body:has(.course-player) .main-content { height: 100%; min-height: 0; padding: c
 }
 
 /* Ajuste compacto: navegación rectangular unida y editor sin scroll vertical */
-.junior-module-one .course-perspectives { gap: 0; padding: .65rem 1rem; }
-.junior-module-one .course-perspectives button { flex: 1 1 0; min-width: 0; min-height: 40px; margin: 0 0 0 -1px; padding: .52rem .45rem; border-radius: 0; font-size: .64rem; }
-.junior-module-one .course-perspectives button:first-child { margin-left: 0; }
-.junior-module-one .course-perspectives button.active { position: relative; z-index: 1; box-shadow: inset 0 -3px 0 rgba(0,0,0,.14); }
-.junior-module-one .code-protagonist { grid-template-rows: auto auto; align-self: start; width: 100%; }
-.junior-module-one .csharp-code-card pre,
-.junior-module-one .code-protagonist pre { min-height: 0; padding: .8rem 1rem; overflow-x: auto; overflow-y: hidden; }
-.junior-module-one .csharp-code-card code,
-.junior-module-one .code-protagonist code { font-size: clamp(.67rem,.78vw,.78rem); line-height: 1.48; }
-.junior-module-one .code-first-panel { align-content: start; }
+.learning-module-shell .course-perspectives { gap: 0; padding: .65rem 1rem; }
+.learning-module-shell .course-perspectives button { flex: 1 1 0; min-width: 0; min-height: 40px; margin: 0 0 0 -1px; padding: .52rem .45rem; border-radius: 0; font-size: .64rem; }
+.learning-module-shell .course-perspectives button:first-child { margin-left: 0; }
+.learning-module-shell .course-perspectives button.active { position: relative; z-index: 1; box-shadow: inset 0 -3px 0 rgba(0,0,0,.14); }
+.learning-module-shell .code-protagonist { grid-template-rows: auto auto; align-self: start; width: 100%; }
+.learning-module-shell .csharp-code-card pre,
+.learning-module-shell .code-protagonist pre { min-height: 0; padding: .8rem 1rem; overflow-x: auto; overflow-y: hidden; }
+.learning-module-shell .csharp-code-card code,
+.learning-module-shell .code-protagonist code { font-size: clamp(.67rem,.78vw,.78rem); line-height: 1.48; }
+.learning-module-shell .code-first-panel { align-content: start; }
 
 @media (max-width: 1180px) and (min-width: 761px) {
-    .junior-module-one .course-perspectives { padding: .55rem .7rem; }
-    .junior-module-one .course-perspectives button { min-height: 36px; padding: .42rem .3rem; font-size: .58rem; }
-    .junior-module-one .code-protagonist code { font-size: .68rem; line-height: 1.45; }
-    .junior-module-one .code-protagonist pre { padding: .7rem .8rem; }
+    .learning-module-shell .course-perspectives { padding: .55rem .7rem; }
+    .learning-module-shell .course-perspectives button { min-height: 36px; padding: .42rem .3rem; font-size: .58rem; }
+    .learning-module-shell .code-protagonist code { font-size: .68rem; line-height: 1.45; }
+    .learning-module-shell .code-protagonist pre { padding: .7rem .8rem; }
 }
 
 @media (max-height: 800px) and (min-width: 761px) {
-    .junior-module-one .course-perspectives { padding-top: .4rem; padding-bottom: .4rem; }
-    .junior-module-one .course-perspectives button { min-height: 33px; }
-    .junior-module-one .code-protagonist code { font-size: .64rem; line-height: 1.4; }
-    .junior-module-one .code-protagonist pre { padding-top: .6rem; padding-bottom: .6rem; }
+    .learning-module-shell .course-perspectives { padding-top: .4rem; padding-bottom: .4rem; }
+    .learning-module-shell .course-perspectives button { min-height: 33px; }
+    .learning-module-shell .code-protagonist code { font-size: .64rem; line-height: 1.4; }
+    .learning-module-shell .code-protagonist pre { padding-top: .6rem; padding-bottom: .6rem; }
 }
 
 @media (max-width: 760px) {
-    .junior-module-one .course-perspectives { gap: 0; padding: .55rem .7rem; scroll-padding-left: .7rem; }
-    .junior-module-one .course-perspectives button { flex: 0 0 112px; min-width: 112px; min-height: 38px; margin-left: -1px; padding: .45rem .35rem; font-size: .58rem; }
-    .junior-module-one .course-perspectives button:first-child { margin-left: 0; }
-    .junior-module-one .code-first-panel { min-height: 0; }
-    .junior-module-one .code-protagonist,
-    .junior-module-one .code-compare-grid .code-protagonist { min-height: 0; }
-    .junior-module-one .code-protagonist code { font-size: .67rem; line-height: 1.5; }
-    .junior-module-one .code-protagonist pre { padding: .75rem; }
+    .learning-module-shell .course-perspectives { gap: 0; padding: .55rem .7rem; scroll-padding-left: .7rem; }
+    .learning-module-shell .course-perspectives button { flex: 0 0 112px; min-width: 112px; min-height: 38px; margin-left: -1px; padding: .45rem .35rem; font-size: .58rem; }
+    .learning-module-shell .course-perspectives button:first-child { margin-left: 0; }
+    .learning-module-shell .code-first-panel { min-height: 0; }
+    .learning-module-shell .code-protagonist,
+    .learning-module-shell .code-compare-grid .code-protagonist { min-height: 0; }
+    .learning-module-shell .code-protagonist code { font-size: .67rem; line-height: 1.5; }
+    .learning-module-shell .code-protagonist pre { padding: .75rem; }
 }
 
 /* Módulo 1 V3: cinco conceptos, navegación equilibrada y cierre comparativo */
-.junior-module-one .course-header > div { width: 100%; }
-.junior-module-one .course-header h1 { width: 100%; max-width: none; }
-.junior-module-one .course-navigation > button { width: 280px; max-width: 280px; }
-.junior-module-one .course-navigation > button:first-child { justify-self: start; }
-.junior-module-one .course-navigation > button.next { justify-self: end; }
+.learning-module-shell .course-header > div { width: 100%; }
+.learning-module-shell .course-header h1 { width: 100%; max-width: none; }
+.learning-module-shell .course-navigation > button { width: 280px; max-width: 280px; }
+.learning-module-shell .course-navigation > button:first-child { justify-self: start; }
+.learning-module-shell .course-navigation > button.next { justify-self: end; }
 .lesson-dual-code { height: 100%; }
 .lesson-dual-code .code-protagonist { height: 100%; }
 .final-code-review { min-height: 0; }
 .final-code-review .review-code { min-height: 0; height: 100%; }
-.junior-module-one .final-code-review .review-code pre { max-height: clamp(220px,36vh,340px); overflow-x: auto; overflow-y: auto; scrollbar-color: #6c747a #252526; scrollbar-width: thin; }
-.junior-module-one .final-code-review .review-code pre::-webkit-scrollbar { width: 8px; height: 8px; }
-.junior-module-one .final-code-review .review-code pre::-webkit-scrollbar-track { background: #252526; }
-.junior-module-one .final-code-review .review-code pre::-webkit-scrollbar-thumb { background: #6c747a; border: 2px solid #252526; border-radius: 8px; }
+.learning-module-shell .final-code-review .review-code pre { max-height: clamp(220px,36vh,340px); overflow-x: auto; overflow-y: auto; scrollbar-color: #6c747a #252526; scrollbar-width: thin; }
+.learning-module-shell .final-code-review .review-code pre::-webkit-scrollbar { width: 8px; height: 8px; }
+.learning-module-shell .final-code-review .review-code pre::-webkit-scrollbar-track { background: #252526; }
+.learning-module-shell .final-code-review .review-code pre::-webkit-scrollbar-thumb { background: #6c747a; border: 2px solid #252526; border-radius: 8px; }
 
 .hint-modal-backdrop { background: rgba(4,9,13,.58); backdrop-filter: blur(10px) saturate(120%); }
 .hint-modal { color: white; background: linear-gradient(145deg,rgba(25,34,41,.88),rgba(10,16,21,.76)); border: 1px solid rgba(255,255,255,.2); box-shadow: 0 30px 90px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(18px) saturate(135%); }
@@ -1319,56 +1319,56 @@ body:has(.course-player) .main-content { height: 100%; min-height: 0; padding: c
 .hint-modal > code { background: rgba(0,0,0,.38); border: 1px solid rgba(255,255,255,.12); }
 
 @media (max-width: 1180px) and (min-width: 761px) {
-    .junior-module-one .course-navigation > button { width: 220px; max-width: 220px; }
-    .junior-module-one .course-header h1 { font-size: clamp(1.55rem,3.4vw,2.4rem); }
+    .learning-module-shell .course-navigation > button { width: 220px; max-width: 220px; }
+    .learning-module-shell .course-header h1 { font-size: clamp(1.55rem,3.4vw,2.4rem); }
 }
 
 @media (max-width: 900px) {
     .lesson-dual-code, .final-code-review { grid-template-columns: 1fr; height: auto; }
     .lesson-dual-code .code-protagonist { min-height: 240px; }
-    .junior-module-one .final-code-review .review-code pre { max-height: 260px; }
+    .learning-module-shell .final-code-review .review-code pre { max-height: 260px; }
 }
 
 @media (max-width: 760px) {
-    .junior-module-one .course-header h1 { font-size: clamp(1.45rem,7.2vw,2rem); }
-    .junior-module-one .course-navigation > button,
-    .junior-module-one .course-navigation > button.next { width: 104px; max-width: 104px; min-height: 44px; }
-    .junior-module-one .course-navigation > button span { max-width: 76px; }
+    .learning-module-shell .course-header h1 { font-size: clamp(1.45rem,7.2vw,2rem); }
+    .learning-module-shell .course-navigation > button,
+    .learning-module-shell .course-navigation > button.next { width: 104px; max-width: 104px; min-height: 44px; }
+    .learning-module-shell .course-navigation > button span { max-width: 76px; }
     .lesson-dual-code .code-protagonist { min-height: 220px; }
 }
 
 /* Consola: barra superior uniforme y acción de copiar mediante icono */
 .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
-.junior-module-one .csharp-code-card > header,
-.junior-module-one .code-protagonist > header { box-sizing: border-box; flex: 0 0 46px; width: 100%; height: 46px; min-height: 46px; max-height: 46px; padding: 0 .55rem 0 .7rem; }
-.junior-module-one .csharp-code-card > header > div { flex: 1 1 auto; min-width: 0; height: 100%; overflow: hidden; }
-.junior-module-one .csharp-code-card > header strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.junior-module-one .code-window-label { flex: 0 0 auto; white-space: nowrap; }
-.junior-module-one .csharp-code-card > header .code-copy-icon { display: grid; flex: 0 0 30px; place-items: center; width: 30px; min-width: 30px; height: 30px; min-height: 30px; margin-left: .55rem; padding: 0; color: #d8d8d8; background: #333337; border: 1px solid #55555b; border-radius: 4px; cursor: pointer; }
-.junior-module-one .code-copy-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.junior-module-one .code-copy-icon:hover { color: white; background: #414147; border-color: #7c7c84; }
-.junior-module-one .code-copy-icon:focus-visible { outline: 2px solid #ff5a55; outline-offset: 2px; }
+.learning-module-shell .csharp-code-card > header,
+.learning-module-shell .code-protagonist > header { box-sizing: border-box; flex: 0 0 46px; width: 100%; height: 46px; min-height: 46px; max-height: 46px; padding: 0 .55rem 0 .7rem; }
+.learning-module-shell .csharp-code-card > header > div { flex: 1 1 auto; min-width: 0; height: 100%; overflow: hidden; }
+.learning-module-shell .csharp-code-card > header strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.learning-module-shell .code-window-label { flex: 0 0 auto; white-space: nowrap; }
+.learning-module-shell .csharp-code-card > header .code-copy-icon { display: grid; flex: 0 0 30px; place-items: center; width: 30px; min-width: 30px; height: 30px; min-height: 30px; margin-left: .55rem; padding: 0; color: #d8d8d8; background: #333337; border: 1px solid #55555b; border-radius: 4px; cursor: pointer; }
+.learning-module-shell .code-copy-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.learning-module-shell .code-copy-icon:hover { color: white; background: #414147; border-color: #7c7c84; }
+.learning-module-shell .code-copy-icon:focus-visible { outline: 2px solid #ff5a55; outline-offset: 2px; }
 
 @media (max-width: 760px) {
-    .junior-module-one .csharp-code-card > header,
-    .junior-module-one .code-protagonist > header { flex-basis: 42px; height: 42px; min-height: 42px; max-height: 42px; padding-right: .4rem; padding-left: .55rem; }
-    .junior-module-one .csharp-code-card > header .code-copy-icon { flex-basis: 28px; width: 28px; min-width: 28px; height: 28px; min-height: 28px; }
+    .learning-module-shell .csharp-code-card > header,
+    .learning-module-shell .code-protagonist > header { flex-basis: 42px; height: 42px; min-height: 42px; max-height: 42px; padding-right: .4rem; padding-left: .55rem; }
+    .learning-module-shell .csharp-code-card > header .code-copy-icon { flex-basis: 28px; width: 28px; min-width: 28px; height: 28px; min-height: 28px; }
 }
 
 /* El código siempre comienza en la esquina superior izquierda */
-.junior-module-one .csharp-code-card pre,
-.junior-module-one .code-protagonist pre { display: block; align-self: start; justify-self: stretch; width: 100%; margin: 0; text-align: left; }
-.junior-module-one .csharp-code-card code,
-.junior-module-one .code-protagonist code { display: block; width: max-content; min-width: 100%; margin: 0; padding: 0; text-align: left; }
+.learning-module-shell .csharp-code-card pre,
+.learning-module-shell .code-protagonist pre { display: block; align-self: start; justify-self: stretch; width: 100%; margin: 0; text-align: left; }
+.learning-module-shell .csharp-code-card code,
+.learning-module-shell .code-protagonist code { display: block; width: max-content; min-width: 100%; margin: 0; padding: 0; text-align: left; }
 
 /* Corrección: el grid distribuía el espacio libre y desplazaba verticalmente el código */
-.junior-module-one .csharp-code-card.code-protagonist { display: flex; flex-direction: column; align-content: initial; align-items: stretch; justify-content: flex-start; }
-.junior-module-one .csharp-code-card.code-protagonist > header { flex: 0 0 46px; }
-.junior-module-one .csharp-code-card.code-protagonist > pre { flex: 0 0 auto; align-self: stretch; height: auto; min-height: 0; }
-.junior-module-one .final-code-review .csharp-code-card.code-protagonist > pre { flex: 1 1 auto; align-self: stretch; }
+.learning-module-shell .csharp-code-card.code-protagonist { display: flex; flex-direction: column; align-content: initial; align-items: stretch; justify-content: flex-start; }
+.learning-module-shell .csharp-code-card.code-protagonist > header { flex: 0 0 46px; }
+.learning-module-shell .csharp-code-card.code-protagonist > pre { flex: 0 0 auto; align-self: stretch; height: auto; min-height: 0; }
+.learning-module-shell .final-code-review .csharp-code-card.code-protagonist > pre { flex: 1 1 auto; align-self: stretch; }
 
 @media (max-width: 760px) {
-    .junior-module-one .csharp-code-card.code-protagonist > header { flex-basis: 42px; }
+    .learning-module-shell .csharp-code-card.code-protagonist > header { flex-basis: 42px; }
 }
 
 /* Modal de pista: vidrio traslúcido que conserva visible el contexto */
@@ -1544,30 +1544,30 @@ body:has(.course-player) .main-content { height: 100%; min-height: 0; padding: c
 }
 
 /* Reproductor Junior completo: el desplazamiento vertical pertenece al editor */
-.junior-course-player .course-perspective {
+.learning-course-player .course-perspective {
     align-content: stretch;
     overflow: hidden;
 }
 
-.junior-course-player .code-first-panel {
+.learning-course-player .code-first-panel {
     grid-template-rows: auto minmax(0,1fr);
     min-height: 0;
 }
 
-.junior-course-player .csharp-code-card.code-protagonist,
-.junior-course-player .code-compare-grid,
-.junior-course-player .lesson-dual-code,
-.junior-course-player .final-code-review {
+.learning-course-player .csharp-code-card.code-protagonist,
+.learning-course-player .code-compare-grid,
+.learning-course-player .lesson-dual-code,
+.learning-course-player .final-code-review {
     min-height: 0;
     height: 100%;
 }
 
-.junior-course-player .csharp-code-card.code-protagonist {
+.learning-course-player .csharp-code-card.code-protagonist {
     align-self: stretch;
 }
 
-.junior-course-player .csharp-code-card.code-protagonist > pre,
-.junior-course-player .final-code-review .csharp-code-card.code-protagonist > pre {
+.learning-course-player .csharp-code-card.code-protagonist > pre,
+.learning-course-player .final-code-review .csharp-code-card.code-protagonist > pre {
     flex: 1 1 auto;
     align-self: stretch;
     height: 0;
@@ -1579,29 +1579,29 @@ body:has(.course-player) .main-content { height: 100%; min-height: 0; padding: c
     scrollbar-width: thin;
 }
 
-.junior-course-player .csharp-code-card pre::-webkit-scrollbar {
+.learning-course-player .csharp-code-card pre::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
-.junior-course-player .csharp-code-card pre::-webkit-scrollbar-track {
+.learning-course-player .csharp-code-card pre::-webkit-scrollbar-track {
     background: #252526;
 }
 
-.junior-course-player .csharp-code-card pre::-webkit-scrollbar-thumb {
+.learning-course-player .csharp-code-card pre::-webkit-scrollbar-thumb {
     background: #6c747a;
     border: 2px solid #252526;
     border-radius: 8px;
 }
 
 @media (max-width: 900px) {
-    .junior-course-player .code-compare-grid,
-    .junior-course-player .lesson-dual-code,
-    .junior-course-player .final-code-review {
+    .learning-course-player .code-compare-grid,
+    .learning-course-player .lesson-dual-code,
+    .learning-course-player .final-code-review {
         height: auto;
     }
 
-    .junior-course-player .csharp-code-card.code-protagonist {
+    .learning-course-player .csharp-code-card.code-protagonist {
         height: clamp(240px,42vh,360px);
     }
 }
@@ -2317,15 +2317,15 @@ body:has(.course-player) .main-content { height: 100%; min-height: 0; padding: c
 }
 
 @media (max-width: 760px) {
-    .junior-course-player .course-perspective {
+    .learning-course-player .course-perspective {
         overflow: hidden;
     }
 
-    .junior-course-player .code-first-panel {
+    .learning-course-player .code-first-panel {
         min-height: 530px;
     }
 
-    .junior-course-player .csharp-code-card.code-protagonist {
+    .learning-course-player .csharp-code-card.code-protagonist {
         min-height: 0;
         height: clamp(250px,55vh,410px);
     }

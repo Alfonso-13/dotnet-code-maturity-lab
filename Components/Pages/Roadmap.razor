@@ -13,8 +13,8 @@
 
 <section class="maturity-map" aria-label="@T("Learning map by level", "Mapa de aprendizaje por niveles")">
     <header class="maturity-map-header">
-        <div><span>@T("Your journey", "Tu recorrido")</span><strong>29 @T("modules", "módulos") · 3 @T("capstone laboratories", "laboratorios integradores")</strong></div>
-        <span class="maturity-current">@ActiveLevel.Label · @ActiveLevel.Stage</span>
+        <div><span>@T("Your journey", "Tu recorrido")</span><strong>@LearningLevelCatalog.TotalModuleCount @T("modules", "módulos") · @Levels.Count @T("capstone laboratories", "laboratorios integradores")</strong></div>
+        <span class="maturity-current">@ActiveLevel.Label · @ActiveLevel.Stage.Get(Language.Current)</span>
     </header>
 
     <div class="maturity-level-selector" role="group" aria-label="@T("Select a level", "Selecciona un nivel")">
@@ -24,14 +24,14 @@
             var progress = Progress(level);
             <button type="button" class="maturity-level-card @level.Key @(level.Key == SelectedLevel ? "active" : null)" aria-pressed="@(level.Key == SelectedLevel ? "true" : "false")" @onclick="() => SelectLevel(level.Key)">
                 <span class="maturity-level-badge" aria-hidden="true"></span>
-                <span class="maturity-level-copy"><small>@level.Stage</small><strong>@level.Label</strong><span>@level.Verb</span></span>
+                <span class="maturity-level-copy"><small>@level.Stage.Get(Language.Current)</small><strong>@level.Label</strong><span>@level.Verb.Get(Language.Current)</span></span>
                 <span class="maturity-level-progress"><i><b style="width:@(progress)%"></b></i><small>@completed @T("of", "de") @level.Modules.Count @T("modules", "módulos")</small></span>
             </button>
         }
     </div>
 
     <div class="maturity-module-heading">
-        <div><small>@ActiveLevel.Label</small><h2>@ActiveLevel.Goal</h2></div>
+        <div><small>@ActiveLevel.Label</small><h2>@ActiveLevel.Goal.Get(Language.Current)</h2></div>
         <span>@CompletedModules(ActiveLevel) / @ActiveLevel.Modules.Count @T("completed", "completados")</span>
     </div>
 
@@ -41,7 +41,7 @@
             var state = ModuleState(ActiveLevel, module);
             <a class="maturity-module @StateClass(state)" href="@ModuleRoute(ActiveLevel, module)">
                 <span class="maturity-module-icon" aria-hidden="true">@module.Icon</span>
-                <span><strong>@module.Title</strong><small>@StateLabel(state)</small></span>
+                <span><strong>@module.Title.Get(Language.Current)</strong><small>@StateLabel(state)</small></span>
                 <span class="maturity-module-arrow" aria-hidden="true">→</span>
             </a>
         }
@@ -49,7 +49,7 @@
 
     <a class="maturity-lab-card" href="@ActiveLevel.LabRoute">
         <img src="images/dotnet-code-maturity-lab-icon.png" alt="" />
-        <span><small>@T("Laboratory", "Laboratorio") @ActiveLevel.Label</small><strong>@ActiveLevel.LabTitle</strong><span>@ActiveLevel.LabDescription</span></span>
+        <span><small>@T("Laboratory", "Laboratorio") @ActiveLevel.Label</small><strong>@ActiveLevel.LabTitle.Get(Language.Current)</strong><span>@ActiveLevel.LabDescription.Get(Language.Current)</span></span>
         <b>@LabStateLabel</b>
     </a>
 </section>
@@ -60,141 +60,42 @@
     private HashSet<string> Reviewed { get; } = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> Completed { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-    private RoadmapLevel ActiveLevel => Levels.First(level => level.Key == SelectedLevel);
+    private LearningLevelDefinition ActiveLevel => Levels.First(level => level.Key == SelectedLevel);
 
-    private IReadOnlyList<RoadmapLevel> Levels => Language.Current == AppLanguage.Spanish ? SpanishLevels : EnglishLevels;
-
-    private static IReadOnlyList<RoadmapLevel> EnglishLevels { get; } =
-    [
-        new("junior", "Junior", "Fundamentals", "Build", "Build a correct API",
-            "Create an order correctly", "Integrate language, domain, persistence, tests, and the HTTP contract.", AppRoutes.Lab("junior"),
-            [
-                new("C# fundamentals", "</>", ["fundamentos-csharp"]),
-                new("Methods and classes", "ƒ", ["metodos-y-clases"]),
-                new("Models and memory", "◫", ["modelos-y-memoria"]),
-                new("Object-oriented programming", "◎", ["poo"]),
-                new("Errors and validation", "!", ["errores-y-validacion"]),
-                new("Collections and complexity", "▤", ["colecciones-y-genericos"]),
-                new("Lambdas and LINQ", "λ", ["linq"]),
-                new("Task and async", "⇢", ["task-async-await"]),
-                new("Tests and AAA", "△", ["pruebas-aaa"]),
-                new("REST and HTTP", "↗", ["rest-http"]),
-                new("SQL and EF Core", "▱", ["persistencia-ef-core"]),
-                new("ASP.NET Core", "⌘", ["aspnet-core"]),
-                new("AI and LLMs", "✦", ["ia-llm"])
-            ]),
-        // TODO(AI-Middle): Add the bilingual AI integration module after the Middle learning path is implemented.
-        new("middle", "Middle", "Design", "Design", "Make the API maintainable and testable",
-            "Refactor the order flow", "Apply design, persistence, and integration tests to the same case.", AppRoutes.ComingSoon("middle-lab"),
-            [
-                new("Applied SOLID", "◇", ["solid"]),
-                new("Dependency injection", "⌘", ["inyeccion-dependencias"]),
-                new("Strategy and patterns", "⇄", ["strategy-patrones"]),
-                new("Safe refactoring", "↻", ["refactorizacion"]),
-                new("Persistence with EF Core", "▱", ["ef-core"]),
-                new("Errors and ProblemDetails", "!", ["problem-details"]),
-                new("Integration tests", "⛓", ["pruebas-integracion"]),
-                new("Architecture boundaries", "▦", ["limites-arquitectura"])
-            ]),
-        // TODO(AI-Senior): Add the bilingual AI integration module after the Senior learning path is implemented.
-        new("senior", "Senior", "Production", "Operate", "Prepare the API for real conditions",
-            "Operate under pressure", "Withstand duplicates, concurrency, external failures, and Azure growth.", AppRoutes.ComingSoon("senior-lab"),
-            [
-                new("Idempotency", "↺", ["idempotencia"]),
-                new("Concurrency and consistency", "≋", ["concurrencia"]),
-                new("Resilience", "⚡", ["resiliencia"]),
-                new("Messaging and Outbox", "⇢", ["mensajeria-outbox"]),
-                new("Observability", "◉", ["observabilidad"]),
-                new("API security", "◆", ["seguridad-api"]),
-                new("Architecture decisions", "⌁", ["decisiones-arquitectura"]),
-                new("Azure and scalability", "☁", ["azure-escalabilidad"])
-            ])
-    ];
-
-    private static IReadOnlyList<RoadmapLevel> SpanishLevels { get; } =
-    [
-        new("junior", "Junior", "Fundamentos", "Construir", "Construye una API correcta",
-            "Crear una orden correctamente", "Integra lenguaje, dominio, persistencia, pruebas y contrato HTTP.", AppRoutes.Lab("junior"),
-            [
-                new("Fundamentos de C#", "</>", ["fundamentos-csharp"]),
-                new("Métodos y clases", "ƒ", ["metodos-y-clases"]),
-                new("Modelos y memoria", "◫", ["modelos-y-memoria"]),
-                new("Programación orientada a objetos", "◎", ["poo"]),
-                new("Errores y validación", "!", ["errores-y-validacion"]),
-                new("Colecciones y complejidad", "▤", ["colecciones-y-genericos"]),
-                new("Lambdas y LINQ", "λ", ["linq"]),
-                new("Task y async", "⇢", ["task-async-await"]),
-                new("Pruebas y AAA", "△", ["pruebas-aaa"]),
-                new("REST y HTTP", "↗", ["rest-http"]),
-                new("SQL y EF Core", "▱", ["persistencia-ef-core"]),
-                new("ASP.NET Core", "⌘", ["aspnet-core"]),
-                new("IA y LLM", "✦", ["ia-llm"])
-            ]),
-        new("middle", "Middle", "Diseño", "Diseñar", "Haz que la API sea mantenible y comprobable",
-            "Refactorizar el flujo de órdenes", "Aplica diseño, persistencia y pruebas de integración sobre el mismo caso.", AppRoutes.ComingSoon("middle-lab"),
-            [
-                new("SOLID aplicado", "◇", ["solid"]),
-                new("Inyección de dependencias", "⌘", ["inyeccion-dependencias"]),
-                new("Strategy y patrones", "⇄", ["strategy-patrones"]),
-                new("Refactorización segura", "↻", ["refactorizacion"]),
-                new("Persistencia con EF Core", "▱", ["ef-core"]),
-                new("Errores y ProblemDetails", "!", ["problem-details"]),
-                new("Pruebas de integración", "⛓", ["pruebas-integracion"]),
-                new("Límites de arquitectura", "▦", ["limites-arquitectura"])
-            ]),
-        new("senior", "Senior", "Producción", "Operar", "Prepara la API para condiciones reales",
-            "Operar bajo presión", "Resiste duplicados, concurrencia, fallos externos y crecimiento en Azure.", AppRoutes.ComingSoon("senior-lab"),
-            [
-                new("Idempotencia", "↺", ["idempotencia"]),
-                new("Concurrencia y consistencia", "≋", ["concurrencia"]),
-                new("Resiliencia", "⚡", ["resiliencia"]),
-                new("Mensajería y Outbox", "⇢", ["mensajeria-outbox"]),
-                new("Observabilidad", "◉", ["observabilidad"]),
-                new("Seguridad de API", "◆", ["seguridad-api"]),
-                new("Decisiones de arquitectura", "⌁", ["decisiones-arquitectura"]),
-                new("Azure y escalabilidad", "☁", ["azure-escalabilidad"])
-            ])
-    ];
+    private static IReadOnlyList<LearningLevelDefinition> Levels => LearningLevelCatalog.Levels;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", "dotnet-code-maturity-lab-progress-v2");
-        foreach (var slug in progress?.Viewed ?? []) Viewed.Add(slug);
-        var juniorSlugs = Levels.First(level => level.Key == "junior").Modules
-            .SelectMany(module => module.Slugs)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        if ((progress?.Version ?? 0) < ProgressVersion)
+        var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
+        var progress = LearningProgress.Migrate(stored);
+        Viewed.UnionWith(progress.Viewed ?? []);
+        Reviewed.UnionWith(progress.Reviewed ?? []);
+        Completed.UnionWith(progress.Completed ?? []);
+        if ((stored?.Version ?? 0) < LearningProgress.CurrentVersion)
         {
-            foreach (var slug in progress?.Completed ?? [])
-            {
-                if (juniorSlugs.Contains(slug)) Reviewed.Add(slug);
-                else Completed.Add(slug);
-            }
-        }
-        else
-        {
-            foreach (var slug in progress?.Reviewed ?? []) Reviewed.Add(slug);
-            foreach (var slug in progress?.Completed ?? []) Completed.Add(slug);
+            await JS.InvokeVoidAsync("labProgress.set", LearningProgress.StorageKey, progress);
         }
 
         StateHasChanged();
     }
 
     private void SelectLevel(string level) => SelectedLevel = level;
-    private int CompletedModules(RoadmapLevel level) => level.Modules.Count(module => module.Slugs.All(Completed.Contains));
-    private int Progress(RoadmapLevel level) => (int)Math.Round(CompletedModules(level) * 100d / level.Modules.Count);
-    private string LabStateLabel => ActiveLevel.Key == "junior"
-        ? Completed.Contains("crear-orden") ? T("Completed ✓", "Completado ✓") : T("Capstone →", "Integrador →")
+    private int CompletedModules(LearningLevelDefinition level) => level.Modules.Count(module => module.Slugs.All(slug => Completed.Contains(LearningProgress.Entry(level.Key, slug))));
+    private int Progress(LearningLevelDefinition level) => (int)Math.Round(CompletedModules(level) * 100d / level.Modules.Count);
+    private string LabStateLabel => ActiveLevel.IsAvailable
+        ? Completed.Contains(LearningProgress.Entry(ActiveLevel.Key, "crear-orden")) ? T("Completed ✓", "Completado ✓") : T("Capstone →", "Integrador →")
         : T("Coming soon →", "Próximamente →");
 
-    private ModuleStatus ModuleState(RoadmapLevel level, RoadmapModule module)
+    private ModuleStatus ModuleState(LearningLevelDefinition level, LearningModuleDefinition module)
     {
-        if (module.Slugs.All(Completed.Contains)) return ModuleStatus.Completed;
-        if (level.Key == "junior" && module.Slugs.All(Reviewed.Contains)) return ModuleStatus.Reviewed;
-        if (level.Key == "junior" && module.Slugs.Any(slug => Viewed.Contains(slug) || Reviewed.Contains(slug) || Completed.Contains(slug))) return ModuleStatus.InProgress;
-        return level.Key == "junior" ? ModuleStatus.Pending : ModuleStatus.Upcoming;
+        if (module.Slugs.All(slug => Completed.Contains(LearningProgress.Entry(level.Key, slug)))) return ModuleStatus.Completed;
+        if (level.IsAvailable && module.Slugs.All(slug => Reviewed.Contains(LearningProgress.Entry(level.Key, slug)))) return ModuleStatus.Reviewed;
+        if (level.IsAvailable && module.Slugs.Any(slug =>
+            Viewed.Contains(LearningProgress.Entry(level.Key, slug))
+            || Reviewed.Contains(LearningProgress.Entry(level.Key, slug))
+            || Completed.Contains(LearningProgress.Entry(level.Key, slug)))) return ModuleStatus.InProgress;
+        return level.IsAvailable ? ModuleStatus.Pending : ModuleStatus.Upcoming;
     }
 
     private static string StateClass(ModuleStatus state) => state switch
@@ -215,13 +116,8 @@
         _ => T("Pending", "Pendiente")
     };
 
-    private static string ModuleRoute(RoadmapLevel level, RoadmapModule module) => level.Key == "junior"
-        ? AppRoutes.LearnJunior(module.Slugs[0])
+    private static string ModuleRoute(LearningLevelDefinition level, LearningModuleDefinition module) => level.IsAvailable
+        ? AppRoutes.LearnModule(level.Key, module.Slugs[0])
         : AppRoutes.ComingSoon(level.Key);
-
-    private sealed record RoadmapModule(string Title, string Icon, string[] Slugs);
-    private sealed record RoadmapLevel(string Key, string Label, string Stage, string Verb, string Goal, string LabTitle, string LabDescription, string LabRoute, IReadOnlyList<RoadmapModule> Modules);
     private enum ModuleStatus { Pending, InProgress, Reviewed, Completed, Upcoming }
-    private const int ProgressVersion = 3;
-    private sealed record StoredProgress(string[]? Viewed, string[]? Reviewed, string[]? Completed, int? Version);
 }

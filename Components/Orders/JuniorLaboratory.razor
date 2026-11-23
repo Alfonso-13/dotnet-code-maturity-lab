@@ -1,0 +1,119 @@
+@using DotnetCodeMaturityLab.Components.Learning
+@inherits LocalizedComponentBase
+
+<div class="level-lab-page">
+    <header class="level-lab-header">
+        <div>
+            <a class="course-back" href="@AppRoutes.Labs">← @T("Laboratories", "Laboratorios")</a>
+            <span class="eyebrow">@T("Junior laboratory · capstone", "Laboratorio Junior · integrador")</span>
+            <h1>@T("Create an order that protects its contract.", "Crea una orden que proteja su contrato.")</h1>
+            <p>@T("Start from a request, apply domain rules, persist the order in SQLite through EF Core, and observe a verifiable HTTP response.", "Partes de una solicitud, aplicas reglas de dominio, conservas la orden en SQLite mediante EF Core y observas una respuesta HTTP verificable.")</p>
+        </div>
+        <aside class="lab-mission">
+            <small>@T("Mission", "Misión")</small>
+            <strong>@T("Get a 201 and trigger a controlled 400.", "Obtén un 201 y provoca un 400 controlado.")</strong>
+            <span>@T("Complete both paths to record the evidence in this browser.", "Completa ambos caminos para registrar la evidencia en este navegador.")</span>
+        </aside>
+    </header>
+
+    <section class="lab-brief" aria-label="@T("Laboratory objectives", "Objetivos del laboratorio")">
+        <article><span>01</span><div><strong>@T("Protect the domain", "Protege el dominio")</strong><p>@T("The server generates the Id and subtotal; the client only chooses product, quantity, and price.", "El servidor genera Id y subtotal; el cliente solo decide producto, cantidad y precio.")</p></div></article>
+        <article><span>02</span><div><strong>@T("Persist intentionally", "Persiste con intención")</strong><p>@T("The DTO, service, and EF Core repository collaborate without mixing HTTP, rules, and SQLite.", "DTO, servicio y un repositorio EF Core colaboran sin mezclar HTTP, reglas y SQLite.")</p></div></article>
+        <article><span>03</span><div><strong>@T("Verify and assist", "Comprueba y asiste")</strong><p>@T("Verify the HTTP result, then let a simulated LLM suggest without changing the order automatically.", "Comprueba el resultado HTTP y después permite que un LLM simulado sugiera sin cambiar la orden automáticamente.")</p></div></article>
+    </section>
+
+    <section class="lab-code-section" aria-labelledby="lab-code-title">
+        <header><span class="eyebrow">@T("Before and after", "Antes y después")</span><h2 id="lab-code-title">@T("From a fragile endpoint to a verifiable flow.", "Del endpoint frágil a un flujo comprobable.")</h2></header>
+        <div class="code-compare-grid lesson-dual-code final-code-review">
+            <CSharpCodeWindow FileName="OrderEndpoint.Before.cs" Label="@T("Deficient code", "Código deficiente")" CssClass="bad-practice review-code" PlainCode="@BeforeCode" />
+            <CSharpCodeWindow FileName="OrderEndpoint.After.cs" Label="@T("Correct code", "Código correcto")" CssClass="good-practice review-code" PlainCode="@AfterCode" />
+        </div>
+    </section>
+
+    <CreateOrderPlayground />
+    <AiOrderAssistantPlayground />
+
+    <section class="lab-takeaway">
+        <div><span class="eyebrow">@T("What a Junior should be able to defend", "Qué debe defender un Junior")</span><h2>@T("Returning JSON is not enough: explain who controls each value and how the rule is verified.", "No basta con devolver JSON: explica quién controla cada dato y cómo compruebas la regla.")</h2></div>
+        <p>@T("An interviewer may ask you to justify the DTO, the 201 status, early validation, persistence, tests, and why an LLM suggestion must cross a validated server boundary before a person uses it.", "Un entrevistador puede pedirte justificar el DTO, el código 201, la validación previa, persistencia, pruebas y por qué una sugerencia de un LLM debe cruzar una frontera validada en el servidor antes de que una persona la use.")</p>
+    </section>
+</div>
+
+@code {
+    private string BeforeCode => T(BeforeCodeEn, BeforeCodeEs);
+    private string AfterCode => T(AfterCodeEn, AfterCodeEs);
+
+    private const string BeforeCodeEn = """
+        app.MapPost("/createOrder", (Order order) =>
+        {
+            // The client can submit manipulated Id and Subtotal values.
+            database.Orders.Add(order);
+            database.SaveChanges();
+
+            // Always returns 200, even when the data is invalid.
+            return Results.Ok(order);
+        });
+        """;
+
+    private const string BeforeCodeEs = """
+        app.MapPost("/createOrder", (Order order) =>
+        {
+            // El cliente puede enviar Id y Subtotal manipulados.
+            database.Orders.Add(order);
+            database.SaveChanges();
+
+            // Siempre responde 200, incluso si los datos son inválidos.
+            return Results.Ok(order);
+        });
+        """;
+
+    private const string AfterCodeEn = """
+        app.MapPost("/api/orders", async (
+            CreateOrderRequest request,
+            CreateOrderService service,
+            CancellationToken cancellationToken) =>
+        {
+            // The service validates, generates the Id, and calculates Subtotal.
+            CreateOrderResult result = await service.CreateAsync(
+                request,
+                cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                return Results.ValidationProblem(result.Errors);
+            }
+
+            CreateOrderResponse response =
+                CreateOrderResponse.FromOrder(result.Order!);
+
+            return Results.Created(
+                $"/api/orders/{response.Id}",
+                response);
+        });
+        """;
+
+    private const string AfterCodeEs = """
+        app.MapPost("/api/orders", async (
+            CreateOrderRequest request,
+            CreateOrderService service,
+            CancellationToken cancellationToken) =>
+        {
+            // El servicio valida, genera Id y calcula Subtotal.
+            CreateOrderResult result = await service.CreateAsync(
+                request,
+                cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                return Results.ValidationProblem(result.Errors);
+            }
+
+            CreateOrderResponse response =
+                CreateOrderResponse.FromOrder(result.Order!);
+
+            return Results.Created(
+                $"/api/orders/{response.Id}",
+                response);
+        });
+        """;
+}
