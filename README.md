@@ -67,11 +67,12 @@ Every module uses five perspectives with copyable C# examples, contextual hints,
 ## Engineering highlights
 
 - One shared bilingual component model with English-first canonical routes.
+- One visual course, interview, and laboratory shell for every seniority level; catalogs change the content without duplicating the design.
 - Thin server and static hosts that select persistence and runtime capabilities through dependency injection.
 - EF Core and SQLite persistence behind an `IOrderStore` contract.
 - Real Minimal API endpoints with unit, persistence, route-contract, and HTTP integration coverage.
 - Deterministic LLM simulation that demonstrates validation, fallback, prompt-boundary protection, and human review without sending data externally.
-- Browser-local learning progress with an explicit versioned migration.
+- Browser-local learning progress namespaced by level, with an explicit migration that preserves existing Junior history.
 - GitHub Pages deep-link recovery and repository base-path handling.
 - Automated Pages workflow that tests, builds, validates, and deploys only from `main`.
 

@@ -117,7 +117,7 @@ public sealed class JuniorLearningContentTests
         Assert.DoesNotContain(closingCode, code => code.Contains("UseSqlServer", StringComparison.Ordinal));
     }
 
-    private static void AssertCodePane(JuniorCodePane pane)
+    private static void AssertCodePane(LessonCodePane pane)
     {
         Assert.True(
             pane.FileName.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)

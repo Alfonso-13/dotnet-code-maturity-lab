@@ -248,8 +248,13 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", ProgressKey);
-        LabCompleted = progress?.Completed?.Contains("crear-orden", StringComparer.OrdinalIgnoreCase) == true;
+        var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
+        var progress = LearningProgress.Migrate(stored);
+        LabCompleted = progress.Completed?.Contains(LearningProgress.Entry("junior", "crear-orden"), StringComparer.OrdinalIgnoreCase) == true;
+        if ((stored?.Version ?? 0) < LearningProgress.CurrentVersion)
+        {
+            await JS.InvokeVoidAsync("labProgress.set", LearningProgress.StorageKey, progress);
+        }
         PersistedOrderCount = await OrderStore.CountAsync();
         StateHasChanged();
     }
@@ -291,30 +296,15 @@
     {
         if (!HasSuccessfulCase || !HasValidationCase) return;
 
-        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", ProgressKey)
-            ?? new StoredProgress([], [], [], ProgressVersion);
-        var viewed = (progress.Viewed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var reviewed = (progress.Reviewed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var completed = (progress.Completed ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        // Version 3 separated "reviewed" from evidence-based completion. Older data
-        // marked a module complete merely for reaching its last panel, so preserve the
-        // visit while downgrading those module entries to the honest reviewed state.
-        if ((progress.Version ?? 0) < ProgressVersion)
-        {
-            var moduleSlugs = JuniorCurriculum.Topics.Take(13)
-                .Select(topic => topic.Slug)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            foreach (var slug in completed.Where(moduleSlugs.Contains).ToArray())
-            {
-                completed.Remove(slug);
-                reviewed.Add(slug);
-            }
-        }
-
+        var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
+        var progress = LearningProgress.Migrate(stored);
+        var viewed = LearningProgress.ForLevel(progress.Viewed, "junior");
+        var reviewed = LearningProgress.ForLevel(progress.Reviewed, "junior");
+        var completed = LearningProgress.ForLevel(progress.Completed, "junior");
         viewed.Add("crear-orden");
         completed.Add("crear-orden");
-        await JS.InvokeVoidAsync("labProgress.set", ProgressKey, new StoredProgress(viewed.ToArray(), reviewed.ToArray(), completed.ToArray(), ProgressVersion));
+        progress = LearningProgress.WithLevel(progress, "junior", viewed, reviewed, completed);
+        await JS.InvokeVoidAsync("labProgress.set", LearningProgress.StorageKey, progress);
         LabCompleted = true;
     }
 
@@ -334,7 +324,4 @@
         public decimal UnitPrice { get; set; }
     }
 
-    private const string ProgressKey = "dotnet-code-maturity-lab-progress-v2";
-    private const int ProgressVersion = 3;
-    private sealed record StoredProgress(string[]? Viewed, string[]? Reviewed, string[]? Completed, int? Version);
 }

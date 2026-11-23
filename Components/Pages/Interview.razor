@@ -49,7 +49,7 @@
         </article>
     </section>
 }
-else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
+else if (InterviewContentCatalog.TryGet(Level, Language.Current, out _))
 {
     @if (!Started)
     {
@@ -57,13 +57,13 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
         <header class="interview-hero">
             <div>
                 <span class="eyebrow">@T("Interview simulator", "Simulador de entrevista")</span>
-                <h1>@T("Defend the Junior fundamentals, not only the syntax.", "Defiende los fundamentos Junior, no solo la sintaxis.")</h1>
-                <p>@T("Fourteen questions connect the learning path with the decisions a .NET interviewer may ask you to explain, including safe LLM integration.", "Catorce preguntas conectan la ruta de aprendizaje con las decisiones que un entrevistador .NET puede pedirte explicar, incluida una integración segura con LLM.")</p>
+                <h1>@InterviewContent.HeroTitle.Get(Language.Current)</h1>
+                <p>@InterviewContent.HeroDescription.Get(Language.Current)</p>
             </div>
             <aside>
                 <span>@T("Format", "Formato")</span>
-                <strong>14 @T("questions", "preguntas")</strong>
-                <small>@T("All Junior modules · two AI questions", "Todos los módulos Junior · dos preguntas de IA")</small>
+                <strong>@Questions.Count @T("questions", "preguntas")</strong>
+                <small>@InterviewContent.FormatDescription.Get(Language.Current)</small>
             </aside>
         </header>
 
@@ -88,7 +88,7 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
                 <header>
                     <a class="course-back" href="@AppRoutes.Interview">← @T("All tests", "Todas las pruebas")</a>
                     <span class="eyebrow">@T("Interview simulator", "Simulador de entrevista")</span>
-                    <h2>Junior</h2>
+                    <h2>@InterviewContent.Definition.Label</h2>
                     <p>@T("Question", "Pregunta") @(CurrentIndex + 1) @T("of", "de") @Questions.Count · @PositionPercent%</p>
                 </header>
 
@@ -124,7 +124,7 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
 
                 <section class="interview-question-card" @key="CurrentIndex">
                     <header>
-                        <span class="interview-module">Junior · @Current.ModuleTitle</span>
+                        <span class="interview-module">@InterviewContent.Definition.Label · @Current.ModuleTitle</span>
                         <span>@T("Select the best answer", "Selecciona la mejor respuesta")</span>
                     </header>
                     <h2>@Current.Prompt</h2>
@@ -169,7 +169,7 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
     {
         <div class="interview-session-toolbar">
             <a class="course-back" href="@AppRoutes.Interview">← @T("All tests", "Todas las pruebas")</a>
-            <span><b>@T("Interview completed", "Entrevista completada")</b> · Junior</span>
+            <span><b>@T("Interview completed", "Entrevista completada")</b> · @InterviewContent.Definition.Label</span>
         </div>
         <section class="interview-result">
             <span class="eyebrow">@T("Interview result", "Resultado de la entrevista")</span>
@@ -178,7 +178,7 @@ else if (Level.Equals("junior", StringComparison.OrdinalIgnoreCase))
             <p>@ResultDescription</p>
             <div class="button-row">
                 <button type="button" class="button button-primary" @onclick="Restart">@T("Try again", "Intentar de nuevo")</button>
-                <a class="button button-secondary" href="@AppRoutes.Learn("junior")">@T("Review Junior modules", "Repasar módulos Junior")</a>
+                <a class="button button-secondary" href="@AppRoutes.Learn(InterviewContent.Definition.Key)">@T("Review level modules", "Repasar módulos del nivel")</a>
             </div>
         </section>
     }
@@ -198,8 +198,9 @@ else
 @code {
     [Parameter] public string? Level { get; set; }
 
-    private IReadOnlyList<JuniorInterviewQuestion> Questions => JuniorInterviewCatalog.Get(Language.Current);
-    private JuniorInterviewQuestion Current => Questions[CurrentIndex];
+    private InterviewLevelContent InterviewContent => InterviewContentCatalog.Get(Level!, Language.Current);
+    private IReadOnlyList<InterviewQuestion> Questions => InterviewContent.Questions;
+    private InterviewQuestion Current => Questions[CurrentIndex];
     private bool Started { get; set; }
     private bool Finished { get; set; }
     private bool Answered { get; set; }
@@ -211,11 +212,11 @@ else
     private int PositionPercent => (int)Math.Round((CurrentIndex + 1d) * 100 / Questions.Count);
     private string InterviewPageClass => Started
         ? "interview-session-active"
-        : Level?.Equals("junior", StringComparison.OrdinalIgnoreCase) == true
+        : InterviewContentCatalog.TryGet(Level, Language.Current, out _)
             ? "interview-intro-active"
             : string.Empty;
     private string ResultTitle => Score >= 10
-        ? T("Strong Junior foundation", "Base Junior sólida")
+        ? InterviewContent.StrongResult.Get(Language.Current)
         : Score >= 7
             ? T("Ready, with a few topics to reinforce", "Listo, con algunos temas por reforzar")
             : T("Return to the modules and try again", "Vuelve a los módulos e inténtalo de nuevo");
@@ -276,7 +277,7 @@ else
         ScrollToSessionTop = true;
     }
 
-    private string OptionClass(int index, JuniorInterviewOption option)
+    private string OptionClass(int index, InterviewOption option)
     {
         if (!Answered) return string.Empty;
         if (option.IsCorrect) return "correct has-explanation";
@@ -318,3 +319,4 @@ else
         _ => "○"
     };
 }
+

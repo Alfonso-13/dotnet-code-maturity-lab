@@ -2,8 +2,8 @@ namespace DotnetCodeMaturityLab.Features.Learning;
 
 public static partial class JuniorLessonCatalog
 {
-    public static IReadOnlyDictionary<string, JuniorModuleLesson> EnglishModules { get; } =
-        new Dictionary<string, JuniorModuleLesson>(StringComparer.OrdinalIgnoreCase)
+    public static IReadOnlyDictionary<string, ModuleLesson> EnglishModules { get; } =
+        new Dictionary<string, ModuleLesson>(StringComparer.OrdinalIgnoreCase)
         {
             ["fundamentos-csharp"] = Module("fundamentos-csharp",
                 Step("Understand", "Understand", "Basic types inside an order",

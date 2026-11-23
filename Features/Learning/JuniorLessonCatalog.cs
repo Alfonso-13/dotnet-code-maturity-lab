@@ -2,24 +2,10 @@ using DotnetCodeMaturityLab.Features.Localization;
 
 namespace DotnetCodeMaturityLab.Features.Learning;
 
-public sealed record JuniorCodePane(string FileName, string Label, string Code, string CssClass = "");
-
-public sealed record JuniorLessonStep(
-    string Name,
-    string Label,
-    string Caption,
-    JuniorCodePane Left,
-    JuniorCodePane? Right,
-    string HintTitle,
-    string HintBody,
-    string HintExample);
-
-public sealed record JuniorModuleLesson(string Slug, JuniorLessonStep[] Steps);
-
 public static partial class JuniorLessonCatalog
 {
-    public static IReadOnlyDictionary<string, JuniorModuleLesson> Modules { get; } =
-        new Dictionary<string, JuniorModuleLesson>(StringComparer.OrdinalIgnoreCase)
+    public static IReadOnlyDictionary<string, ModuleLesson> Modules { get; } =
+        new Dictionary<string, ModuleLesson>(StringComparer.OrdinalIgnoreCase)
         {
             ["fundamentos-csharp"] = Module("fundamentos-csharp",
                 Step("Entiende", "Entiende", "Tipos básicos dentro de una orden",
@@ -1434,19 +1420,19 @@ public static partial class JuniorLessonCatalog
                     "Integra mediante un contrato reemplazable", "Las pruebas usan un fake determinista. El laboratorio simula el proveedor y demuestra la frontera; una integración real se conecta desde configuración del servidor.", "LLM sugiere → código valida → persona revisa"))
         };
 
-    public static JuniorModuleLesson Get(string slug) => Modules[slug];
+    public static ModuleLesson Get(string slug) => Modules[slug];
 
-    public static JuniorModuleLesson Get(string slug, AppLanguage language) =>
+    public static ModuleLesson Get(string slug, AppLanguage language) =>
         language == AppLanguage.English && EnglishModules.TryGetValue(slug, out var module)
             ? module
             : Modules[slug];
 
-    private static JuniorModuleLesson Module(string slug, params JuniorLessonStep[] steps) => new(slug, steps);
+    private static ModuleLesson Module(string slug, params LessonPerspective[] steps) => new(slug, steps);
 
-    private static JuniorLessonStep Step(string name, string label, string caption, JuniorCodePane left, JuniorCodePane? right, string hintTitle, string hintBody, string hintExample) =>
+    private static LessonPerspective Step(string name, string label, string caption, LessonCodePane left, LessonCodePane? right, string hintTitle, string hintBody, string hintExample) =>
         new(name, label, caption, left, right, hintTitle, hintBody, hintExample);
 
-    private static JuniorCodePane Pane(string fileName, string label, string code) => new(fileName, label, code);
-    private static JuniorCodePane Bad(string fileName, string label, string code) => new(fileName, label, code, "bad-practice");
-    private static JuniorCodePane Good(string fileName, string label, string code) => new(fileName, label, code, "good-practice");
+    private static LessonCodePane Pane(string fileName, string label, string code) => new(fileName, label, code);
+    private static LessonCodePane Bad(string fileName, string label, string code) => new(fileName, label, code, "bad-practice");
+    private static LessonCodePane Good(string fileName, string label, string code) => new(fileName, label, code, "good-practice");
 }

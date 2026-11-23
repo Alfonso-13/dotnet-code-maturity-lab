@@ -133,18 +133,32 @@ The browser stores the language under `dotnet-code-maturity-lab-language`. `wwwr
 
 ## Learning content and progress
 
-- `JuniorCurriculum` defines the thirteen module contracts.
-- `JuniorLessonCatalog` and `JuniorLessonCatalog.English` provide five perspectives per module.
-- `JuniorModuleMetadataCatalog` supplies bilingual presentation metadata.
-- `JuniorInterviewCatalog` connects fourteen interview questions to implemented Junior content.
+- `LearningContracts` contains neutral records such as `LessonCodePane`, `LessonPerspective`, `ModuleLesson`, and `InterviewQuestion`. Shared rendering must depend on these contracts, never on types named after a seniority level.
+- `LearningLevelCatalog` is the bilingual source of truth for level order, availability, module maps, goals, and laboratory metadata.
+- `LearningContentCatalog`, `InterviewContentCatalog`, and `LaboratoryContentCatalog` resolve a level-specific provider behind the shared course, interview, and laboratory pages.
+- `JuniorCurriculum`, `JuniorLessonCatalog`, `JuniorModuleMetadataCatalog`, and `JuniorInterviewCatalog` remain intentionally level-specific because they own Junior content rather than reusable presentation.
+- `JuniorLaboratory` is the executable Junior capstone selected by the neutral laboratory catalog.
 
-Progress is stored in browser `localStorage` under a versioned contract. The current model distinguishes:
+Progress is stored in browser `localStorage` under the `LearningProgress` versioned contract. Entries are namespaced by level (`junior:fundamentos-csharp`, later `middle:solid`) so catalogs cannot overwrite one another. Version 4 migrates existing unqualified Junior entries in place while retaining the original storage key. The current model distinguishes:
 
 - `viewed`: the learner opened the content;
 - `reviewed`: the learner reached the final perspective;
-- `completed`: the learner explicitly completed required evidence.
+- `completed`: the learner explicitly confirmed the module after reviewing its fifth perspective.
+
+Capstone completion is separate: the Junior laboratory records completion only after one successful request and one controlled validation failure provide observable evidence.
 
 When the progress contract changes, preserve user history and document why a migration upgrades or downgrades a state.
+
+### Adding a maturity level
+
+1. Register its bilingual module map in `LearningLevelCatalog` while leaving `IsAvailable` false.
+2. Add its curriculum, lesson, metadata, and interview catalogs using the neutral contracts.
+3. Register providers in `LearningContentCatalog`, `InterviewContentCatalog`, and `LaboratoryContentCatalog`.
+4. Add its internal-to-canonical module slugs to `AppRoutes` and use `LearnModule(level, slug)` from UI code.
+5. Run shared content, route, progress migration, responsive, server-host, and GitHub Pages checks.
+6. Mark the level available only after its learning path, interview, and capstone are complete.
+
+The approved visual hierarchy is invariant across Junior, Middle, and Senior. Seniority is communicated by module content, engineering decisions, interview depth, and laboratory behavior—not by duplicating or redesigning the player.
 
 ## Order API and persistence
 
@@ -218,7 +232,7 @@ Document public safety boundaries, progress migrations, compatibility mappings, 
 Components/              Shared layout, learning pages, interview, and laboratory UI
 Features/AI/             Replaceable AI contract and deterministic Junior provider
 Features/Configuration/  Public site identity and links
-Features/Learning/       Junior curriculum, bilingual content, metadata, and interview catalog
+Features/Learning/       Shared contracts and registries plus level-specific bilingual catalogs
 Features/Localization/   Language state and localized values
 Features/Navigation/     Canonical route generation and compatibility mapping
 Features/Orders/         Domain, service, stores, EF Core, and Minimal API endpoints

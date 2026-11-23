@@ -17,7 +17,7 @@ public sealed class ApplicationRouteTests
             AppRoutes.InterviewFor("junior"),
             AppRoutes.Lab("junior"),
             AppRoutes.ComingSoon("architecture")
-        }.Concat(AppRoutes.JuniorModuleSlugs.Keys.Select(AppRoutes.LearnJunior));
+        }.Concat(AppRoutes.JuniorModuleSlugs.Keys.Select(slug => AppRoutes.LearnModule("junior", slug)));
 
         Assert.All(routes, route =>
         {

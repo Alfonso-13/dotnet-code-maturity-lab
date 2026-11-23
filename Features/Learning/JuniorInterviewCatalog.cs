@@ -2,19 +2,9 @@ using DotnetCodeMaturityLab.Features.Localization;
 
 namespace DotnetCodeMaturityLab.Features.Learning;
 
-public sealed record JuniorInterviewOption(string Text, bool IsCorrect, string Feedback);
-
-public sealed record JuniorInterviewQuestion(
-    string ModuleSlug,
-    string ModuleTitle,
-    string Prompt,
-    JuniorInterviewOption[] Options,
-    string DefenseQuestion,
-    string ExpectedAnswer);
-
 public static class JuniorInterviewCatalog
 {
-    public static IReadOnlyList<JuniorInterviewQuestion> Get(AppLanguage language)
+    public static IReadOnlyList<InterviewQuestion> Get(AppLanguage language)
     {
         var topics = JuniorCurriculum.Topics.Take(13);
         var moduleQuestions = language == AppLanguage.Spanish
@@ -24,20 +14,20 @@ public static class JuniorInterviewCatalog
         return moduleQuestions.Append(AdditionalAiQuestion(language)).ToArray();
     }
 
-    private static JuniorInterviewQuestion FromSpanishTopic(LabTopic topic) => new(
+    private static InterviewQuestion FromSpanishTopic(LabTopic topic) => new(
         topic.Slug,
         JuniorModuleMetadataCatalog.Get(topic, AppLanguage.Spanish).ShortTitle,
         topic.ChallengeQuestion,
         topic.ChallengeOptions
-            .Select(option => new JuniorInterviewOption(option.Text, option.IsCorrect, option.Feedback))
+            .Select(option => new InterviewOption(option.Text, option.IsCorrect, option.Feedback))
             .ToArray(),
         topic.InterviewQuestion,
         topic.InterviewAnswer);
 
-    private static JuniorInterviewQuestion FromEnglishTopic(LabTopic topic)
+    private static InterviewQuestion FromEnglishTopic(LabTopic topic)
     {
         var content = English[topic.Slug];
-        return new JuniorInterviewQuestion(
+        return new InterviewQuestion(
             topic.Slug,
             JuniorModuleMetadataCatalog.Get(topic, AppLanguage.English).ShortTitle,
             content.Prompt,
@@ -180,9 +170,9 @@ public static class JuniorInterviewCatalog
                 "A business rule must be deterministic and verifiable. An LLM suggestion is probabilistic, can vary, and must be validated before it influences the system.")
         };
 
-    private static JuniorInterviewQuestion AdditionalAiQuestion(AppLanguage language) =>
+    private static InterviewQuestion AdditionalAiQuestion(AppLanguage language) =>
         language == AppLanguage.Spanish
-            ? new JuniorInterviewQuestion(
+            ? new InterviewQuestion(
                 "ia-llm",
                 "IA y LLM",
                 "¿Dónde debe realizarse la llamada a un proveedor de IA que requiere una clave secreta?",
@@ -193,7 +183,7 @@ public static class JuniorInterviewCatalog
                 ],
                 "¿Qué controles mínimos aplicarías a una integración con un LLM?",
                 "Proteger credenciales en el servidor, minimizar datos, definir formato, validar la salida, controlar errores y tiempos de espera, registrar evidencia sin secretos y ofrecer un fallback seguro.")
-            : new JuniorInterviewQuestion(
+            : new InterviewQuestion(
                 "ia-llm",
                 "AI and LLMs",
                 "Where should a call to an AI provider that requires a secret key be made?",
@@ -207,16 +197,16 @@ public static class JuniorInterviewCatalog
 
     private static EnglishInterviewContent Question(
         string prompt,
-        JuniorInterviewOption[] options,
+        InterviewOption[] options,
         string defenseQuestion,
         string expectedAnswer) => new(prompt, options, defenseQuestion, expectedAnswer);
 
-    private static JuniorInterviewOption Correct(string text, string feedback) => new(text, true, feedback);
-    private static JuniorInterviewOption Wrong(string text, string feedback) => new(text, false, feedback);
+    private static InterviewOption Correct(string text, string feedback) => new(text, true, feedback);
+    private static InterviewOption Wrong(string text, string feedback) => new(text, false, feedback);
 
     private sealed record EnglishInterviewContent(
         string Prompt,
-        JuniorInterviewOption[] Options,
+        InterviewOption[] Options,
         string DefenseQuestion,
         string ExpectedAnswer);
 }

@@ -2,8 +2,6 @@ using DotnetCodeMaturityLab.Features.Localization;
 
 namespace DotnetCodeMaturityLab.Features.Learning;
 
-public sealed record JuniorModuleMetadata(string ShortTitle, string Title, string Block);
-
 /// <summary>
 /// Keeps route-independent module labels in one place so the curriculum and
 /// the lesson catalog always switch language together.
@@ -12,8 +10,8 @@ public static class JuniorModuleMetadataCatalog
 {
     private const string EnglishBlock = "C# FUNDAMENTALS";
 
-    private static readonly IReadOnlyDictionary<string, JuniorModuleMetadata> English =
-        new Dictionary<string, JuniorModuleMetadata>(StringComparer.OrdinalIgnoreCase)
+    private static readonly IReadOnlyDictionary<string, ModuleMetadata> English =
+        new Dictionary<string, ModuleMetadata>(StringComparer.OrdinalIgnoreCase)
         {
             ["fundamentos-csharp"] = new("C# fundamentals", "C# fundamentals: data, decisions, and repetition", EnglishBlock),
             ["metodos-y-clases"] = new("Methods and classes", "Methods, constructors, and properties", EnglishBlock),
@@ -30,13 +28,13 @@ public static class JuniorModuleMetadataCatalog
             ["ia-llm"] = new("AI and LLMs", "Generative AI and LLM fundamentals", "APPLIED AI")
         };
 
-    public static JuniorModuleMetadata Get(LabTopic topic, AppLanguage language)
+    public static ModuleMetadata Get(LabTopic topic, AppLanguage language)
     {
         if (language == AppLanguage.English && English.TryGetValue(topic.Slug, out var metadata))
         {
             return metadata;
         }
 
-        return new JuniorModuleMetadata(topic.ShortTitle, topic.Title, topic.Block);
+        return new ModuleMetadata(topic.ShortTitle, topic.Title, topic.Block);
     }
 }

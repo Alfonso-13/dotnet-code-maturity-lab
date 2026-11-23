@@ -6,15 +6,15 @@
 @inject IJSRuntime JS
 @inherits LocalizedComponentBase
 
-<PageTitle>@CurrentMetadata.Title | @T("Junior path", "Ruta Junior")</PageTitle>
+<PageTitle>@CurrentMetadata.Title | @LevelContent.Definition.Label</PageTitle>
 
-<div class="course-player junior-module-one junior-course-player">
+<div class="course-player learning-module-shell learning-course-player">
     <aside class="course-curriculum @(CurriculumOpen ? "open" : null)" aria-label="@T("Level content", "Contenido del nivel")">
         <header>
             <div>
                 <span class="eyebrow">@T("Learning path", "Ruta de aprendizaje")</span>
-                <h2>Junior</h2>
-                <p>@T("Thirteen modules connected through the same visual experience.", "Trece módulos conectados con la misma experiencia visual.")</p>
+                <h2>@LevelContent.Definition.Label</h2>
+                <p>@LevelContent.Description.Get(Language.Current)</p>
             </div>
             <button type="button" class="curriculum-toggle" @onclick="ToggleCurriculum" aria-expanded="@CurriculumOpen" aria-label="@T("Show or hide modules", "Mostrar u ocultar módulos")">
                 <span>@(CurriculumOpen ? T("Hide", "Ocultar") : T("View modules", "Ver módulos"))</span><b aria-hidden="true">⌄</b>
@@ -55,14 +55,14 @@
                 </button>
             }
         </nav>
-        <a class="course-lab-link" href="@AppRoutes.Lab("junior")"><span>@T("Level laboratory", "Laboratorio del nivel")</span><strong>@T("Create an order", "Crear una orden") →</strong></a>
+        <a class="course-lab-link" href="@LevelContent.Definition.LabRoute"><span>@T("Level laboratory", "Laboratorio del nivel")</span><strong>@LevelContent.Definition.LabTitle.Get(Language.Current) →</strong></a>
     </aside>
 
     <main class="course-stage @(IsMaintenance ? "maintenance" : null)" aria-labelledby="lesson-title">
         <header class="course-header">
             <div>
                 <a class="course-back" href="@AppRoutes.Roadmap">← @T("Maturity roadmap", "Ruta de madurez")</a>
-                <span class="eyebrow">Junior · @T("Module", "Módulo") @((ActiveTopicIndex + 1).ToString("00"))</span>
+                <span class="eyebrow">@LevelContent.Definition.Label · @T("Module", "Módulo") @((ActiveTopicIndex + 1).ToString("00"))</span>
                 <h1 id="lesson-title">@CurrentMetadata.Title</h1>
             </div>
         </header>
@@ -145,9 +145,6 @@
 </div>
 
 @code {
-    private const string ProgressKey = "dotnet-code-maturity-lab-progress-v2";
-    private static IReadOnlyList<LabTopic> Topics => JuniorCurriculum.Topics.Take(JuniorCurriculum.Topics.Count - 1).ToArray();
-
     [Parameter] public string Level { get; set; } = "junior";
     [Parameter] public string? TopicSlug { get; set; }
 
@@ -155,15 +152,25 @@
     private int ActivePerspective { get; set; }
     private bool CurriculumOpen { get; set; }
     private bool ProgressLoaded { get; set; }
+    private LearningProgressState ProgressSnapshot { get; set; } = LearningProgress.Empty;
     private bool HintOpen { get; set; }
     private HashSet<string> Viewed { get; } = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> Reviewed { get; } = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> Completed { get; } = new(StringComparer.OrdinalIgnoreCase);
-    private LabTopic CurrentTopic => Topics[ActiveTopicIndex];
-    private JuniorModuleMetadata CurrentMetadata => JuniorModuleMetadataCatalog.Get(CurrentTopic, Language.Current);
+    // Navigation to a coming-soon route can complete after one final render.
+    // The fallback prevents an unavailable level from throwing during that transition.
+    private LearningLevelContent LevelContent =>
+        LearningContentCatalog.TryGet(Level, Language.Current, out var content)
+            ? content
+            : LearningContentCatalog.Get("junior", Language.Current);
+    private IReadOnlyList<LearningModuleContent> Modules => LevelContent.Modules;
+    private IReadOnlyList<LabTopic> Topics => Modules.Select(module => module.Topic).ToArray();
+    private LearningModuleContent CurrentModule => Modules[ActiveTopicIndex];
+    private LabTopic CurrentTopic => CurrentModule.Topic;
+    private ModuleMetadata CurrentMetadata => CurrentModule.Metadata;
     private int AvailableTopicCount => Topics.Count;
-    private JuniorModuleLesson CurrentCatalogModule => JuniorLessonCatalog.Get(CurrentTopic.Slug, Language.Current);
-    private JuniorLessonStep CurrentCatalogStep => CurrentCatalogModule.Steps[ActivePerspective];
+    private ModuleLesson CurrentCatalogModule => CurrentModule.Lesson;
+    private LessonPerspective CurrentCatalogStep => CurrentCatalogModule.Steps[ActivePerspective];
     private string[] PerspectiveNames => CurrentCatalogModule.Steps.Select(step => step.Name).ToArray();
     private bool IsMaintenance => ActiveTopicIndex >= AvailableTopicCount;
     private int AvailableCompleted => Topics.Take(AvailableTopicCount).Count(topic => Completed.Contains(topic.Slug));
@@ -180,16 +187,17 @@
     private string HintTitle => CurrentCatalogStep.HintTitle;
     private string HintBody => CurrentCatalogStep.HintBody;
     private string HintExample => CurrentCatalogStep.HintExample;
-    private string TopicShortTitle(LabTopic topic) => JuniorModuleMetadataCatalog.Get(topic, Language.Current).ShortTitle;
-    private string TopicBlock(LabTopic topic) => JuniorModuleMetadataCatalog.Get(topic, Language.Current).Block;
+    private ModuleMetadata MetadataFor(LabTopic topic) => Modules.First(module => module.Topic.Slug.Equals(topic.Slug, StringComparison.OrdinalIgnoreCase)).Metadata;
+    private string TopicShortTitle(LabTopic topic) => MetadataFor(topic).ShortTitle;
+    private string TopicBlock(LabTopic topic) => MetadataFor(topic).Block;
 
     protected override void OnParametersSet()
     {
-        if (!Level.Equals("junior", StringComparison.OrdinalIgnoreCase)) { Navigation.NavigateTo(AppRoutes.ComingSoon(Level)); return; }
+        if (!LearningContentCatalog.TryGet(Level, Language.Current, out _)) { Navigation.NavigateTo(AppRoutes.ComingSoon(Level)); return; }
 
         var internalSlug = string.IsNullOrWhiteSpace(TopicSlug)
             ? Topics[0].Slug
-            : AppRoutes.InternalModuleSlug(TopicSlug);
+            : AppRoutes.InternalModuleSlug(Level, TopicSlug);
         ActiveTopicIndex = IndexOf(internalSlug);
         if (ActiveTopicIndex < 0) ActiveTopicIndex = 0;
 
@@ -202,25 +210,11 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        var progress = await JS.InvokeAsync<StoredProgress?>("labProgress.get", ProgressKey);
-        var availableSlugs = Topics.Take(AvailableTopicCount).Select(topic => topic.Slug).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        foreach (var slug in progress?.Viewed ?? []) Viewed.Add(slug);
-
-        if ((progress?.Version ?? 0) < ProgressVersion)
-        {
-            // En la versión anterior, abrir el quinto panel marcaba el módulo como completado.
-            // Se migra a "revisado" para reservar "completado" a una confirmación explícita.
-            foreach (var slug in progress?.Completed ?? [])
-            {
-                if (availableSlugs.Contains(slug)) Reviewed.Add(slug);
-                else Completed.Add(slug);
-            }
-        }
-        else
-        {
-            foreach (var slug in progress?.Reviewed ?? []) Reviewed.Add(slug);
-            foreach (var slug in progress?.Completed ?? []) Completed.Add(slug);
-        }
+        var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
+        ProgressSnapshot = LearningProgress.Migrate(stored);
+        Viewed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Viewed, Level));
+        Reviewed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Reviewed, Level));
+        Completed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Completed, Level));
 
         ProgressLoaded = true;
         if (!IsMaintenance) MarkViewed();
@@ -229,7 +223,7 @@
     }
 
     private int IndexOf(string slug) { for (var index = 0; index < Topics.Count; index++) if (Topics[index].Slug.Equals(slug, StringComparison.OrdinalIgnoreCase)) return index; return -1; }
-    private void SelectTopic(int index) => Navigation.NavigateTo(AppRoutes.LearnJunior(Topics[index].Slug));
+    private void SelectTopic(int index) => Navigation.NavigateTo(AppRoutes.LearnModule(Level, Topics[index].Slug));
     private void OpenFirstModule() => SelectTopic(0);
     private void SelectPerspective(int index) { ActivePerspective = index; HintOpen = false; if (index == PerspectiveNames.Length - 1) MarkReviewed(); }
     private void ToggleCurriculum() => CurriculumOpen = !CurriculumOpen;
@@ -275,7 +269,10 @@
         : Viewed.Contains(topic.Slug) ? "◌"
         : "○";
     private void MarkViewed() { if (!IsMaintenance && Viewed.Add(CurrentTopic.Slug)) _ = PersistProgress(); }
-    private async Task PersistProgress() { if (ProgressLoaded) await JS.InvokeVoidAsync("labProgress.set", ProgressKey, new StoredProgress(Viewed.ToArray(), Reviewed.ToArray(), Completed.ToArray(), ProgressVersion)); }
-    private const int ProgressVersion = 3;
-    private sealed record StoredProgress(string[]? Viewed, string[]? Reviewed, string[]? Completed, int? Version);
+    private async Task PersistProgress()
+    {
+        if (!ProgressLoaded) return;
+        ProgressSnapshot = LearningProgress.WithLevel(ProgressSnapshot, Level, Viewed, Reviewed, Completed);
+        await JS.InvokeVoidAsync("labProgress.set", LearningProgress.StorageKey, ProgressSnapshot);
+    }
 }
