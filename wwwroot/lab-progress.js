@@ -53,3 +53,23 @@ window.uiLanguage = {
         document.documentElement.lang = languageCode === "es" ? "es" : "en";
     }
 };
+
+window.learningCourse = {
+    ensureModuleVisible(elementId) {
+        const module = document.getElementById(elementId);
+        const curriculum = module?.closest(".course-curriculum nav");
+        if (!module || !curriculum) return;
+
+        // Center the active module inside the curriculum without moving the page itself.
+        const moduleRect = module.getBoundingClientRect();
+        const curriculumRect = curriculum.getBoundingClientRect();
+        const targetTop = curriculum.scrollTop
+            + moduleRect.top
+            - curriculumRect.top
+            - ((curriculum.clientHeight - moduleRect.height) / 2);
+        curriculum.scrollTo({
+            top: Math.max(0, targetTop),
+            behavior: "smooth"
+        });
+    }
+};

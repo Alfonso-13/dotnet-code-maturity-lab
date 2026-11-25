@@ -83,6 +83,24 @@ public sealed class CreateOrderServiceTests
         Assert.Contains(nameof(CreateOrderRequest.UnitPrice), result.Errors.Keys);
     }
 
+    [Fact]
+    public async Task ProductCodeLongerThanDatabaseColumn_ReturnsValidationInsteadOfWriteFailure()
+    {
+        var result = await CreateService().CreateAsync(new CreateOrderRequest(new string('A', 81), 1, 1m));
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains(nameof(CreateOrderRequest.ProductCode), result.Errors.Keys);
+    }
+
+    [Fact]
+    public async Task SubtotalOverflow_ReturnsValidationInsteadOfException()
+    {
+        var result = await CreateService().CreateAsync(new CreateOrderRequest("MONITOR-24", 2, decimal.MaxValue));
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains(nameof(CreateOrderRequest.UnitPrice), result.Errors.Keys);
+    }
+
     private static CreateOrderService CreateService() =>
         new(new InMemoryOrderStore());
 }

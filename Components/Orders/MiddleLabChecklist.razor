@@ -1,0 +1,30 @@
+@inherits LocalizedComponentBase
+@using DotnetCodeMaturityLab.Features.Orders
+@inject LabHostingProfile HostingProfile
+
+<section class="lab-checks" aria-labelledby="middle-lab-checks-title">
+    <div><span class="eyebrow">@T("Verification", "Comprobación")</span><h3 id="middle-lab-checks-title">@T("Capstone evidence", "Evidencia integradora")</h3></div>
+    <ul>
+        <li class="@(HasArchitectureEvidence ? "passed" : null)"><span>@(HasArchitectureEvidence ? "✓" : "○")</span> @T("Application-owned ports make dependencies explicit.", "Puertos propios de aplicación vuelven explícitas las dependencias.")</li>
+        <li class="@(HasIntegrationEvidence ? "passed" : null)"><span>@(HasIntegrationEvidence ? "✓" : "○")</span> @(HostingProfile.IsStaticDemo
+            ? T("The browser simulation validates, creates, and reads back an in-memory order.", "La simulación en navegador valida, crea y recupera una orden en memoria.")
+            : T("The local order API validates, creates, and reads back a SQLite order.", "La API local valida, crea y recupera una orden de SQLite."))</li>
+        <li class="@(HasAiEvidence ? "passed" : null)"><span>@(HasAiEvidence ? "✓" : "○")</span> @T("AI suggestions require human review; the stored order remains independent.", "Las sugerencias IA requieren revisión humana; la orden guardada permanece independiente.")</li>
+        <li class="@(LabCompleted ? "passed" : null)"><span>@(LabCompleted ? "✓" : "○")</span> @T("Laboratory recorded in Middle progress.", "Laboratorio registrado en el progreso Middle.")</li>
+    </ul>
+    <div class="middle-lab-complete-action">
+        <MiddleLabActionCue Visible="@(CanComplete && !LabCompleted)" Message="@T("All checks passed. Complete the laboratory here.", "Todas las comprobaciones pasaron. Completa el laboratorio aquí.")" />
+        <button type="button" class="button button-primary @(CanComplete && !LabCompleted ? "next-action" : null)" disabled="@(!CanComplete || LabCompleted)" @onclick="OnComplete">
+            @(LabCompleted ? T("Laboratory completed ✓", "Laboratorio completado ✓") : T("Complete Middle laboratory", "Completar laboratorio Middle"))
+        </button>
+    </div>
+</section>
+
+@code {
+    [Parameter] public bool HasArchitectureEvidence { get; set; }
+    [Parameter] public bool HasIntegrationEvidence { get; set; }
+    [Parameter] public bool HasAiEvidence { get; set; }
+    [Parameter] public bool LabCompleted { get; set; }
+    [Parameter] public bool CanComplete { get; set; }
+    [Parameter] public EventCallback OnComplete { get; set; }
+}

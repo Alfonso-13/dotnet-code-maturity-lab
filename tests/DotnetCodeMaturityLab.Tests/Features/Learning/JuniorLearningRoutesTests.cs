@@ -85,7 +85,7 @@ public sealed class JuniorLearningRoutesTests : IClassFixture<WebApplicationFact
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Fourteen questions connect the learning path", html, StringComparison.Ordinal);
+        Assert.Contains("Sixteen questions connect the learning path", html, StringComparison.Ordinal);
         Assert.Contains("Start interview", html, StringComparison.Ordinal);
         Assert.Contains("two AI questions", html, StringComparison.Ordinal);
     }
@@ -109,7 +109,7 @@ public sealed class JuniorLearningRoutesTests : IClassFixture<WebApplicationFact
     [InlineData("/laboratorio", "Three laboratories. One API that matures.")]
     [InlineData("/laboratorio/junior", "Create an order that protects its contract.")]
     [InlineData("/entrevista", "Practice the decisions expected at each .NET level.")]
-    [InlineData("/entrevista/junior", "Fourteen questions connect the learning path")]
+    [InlineData("/entrevista/junior", "Sixteen questions connect the learning path")]
     [InlineData("/historia-dotnet", "A platform that changed to reach more places.")]
     [InlineData("/ecosistema-dotnet", "Choose the tool according to what you need to build.")]
     [InlineData("/aprender/junior/ia-llm", "Generative AI and LLM fundamentals")]

@@ -3,7 +3,7 @@ using DotnetCodeMaturityLab.Features.Localization;
 namespace DotnetCodeMaturityLab.Features.Learning;
 
 public sealed record LearningModuleContent(
-    LabTopic Topic,
+    string Slug,
     ModuleMetadata Metadata,
     ModuleLesson Lesson);
 
@@ -25,7 +25,7 @@ public static class LearningContentCatalog
             var definition = LearningLevelCatalog.Get("junior");
             var modules = JuniorCurriculum.Topics.Take(13)
                 .Select(topic => new LearningModuleContent(
-                    topic,
+                    topic.Slug,
                     JuniorModuleMetadataCatalog.Get(topic, language),
                     JuniorLessonCatalog.Get(topic.Slug, language)))
                 .ToArray();
@@ -35,6 +35,25 @@ public static class LearningContentCatalog
                 new(
                     "Thirteen modules connected through the same visual experience.",
                     "Trece módulos conectados con la misma experiencia visual."),
+                modules);
+            return true;
+        }
+
+        if (level?.Equals("middle", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            var definition = LearningLevelCatalog.Get("middle");
+            var modules = MiddleCurriculum.Modules
+                .Select(module => new LearningModuleContent(
+                    module.Slug,
+                    MiddleModuleMetadataCatalog.Get(module.Slug, language),
+                    MiddleLessonCatalog.Get(module.Slug, language)))
+                .ToArray();
+
+            content = new(
+                definition,
+                new(
+                    "Ten modules refactor the same order flow into a maintainable, authorized, and testable design.",
+                    "Diez módulos refactorizan el mismo flujo de órdenes en un diseño mantenible, autorizado y comprobable."),
                 modules);
             return true;
         }

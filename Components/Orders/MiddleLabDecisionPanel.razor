@@ -1,0 +1,28 @@
+@inherits LocalizedComponentBase
+
+<article>
+    <span class="eyebrow">01 · @T("Architecture decision · educational scenario", "Decisión de arquitectura · escenario educativo")</span>
+    <h3>@T("Which refactoring protects the use case?", "¿Qué refactorización protege el caso de uso?")</h3>
+    <MiddleLabActionCue Visible="@(SelectedDecision is null && !IsRunning)" Message="@T("Start here: select one of these decisions.", "Empieza aquí: selecciona una de estas decisiones.")" />
+    <button type="button" class="@(SelectedDecision == "locator" ? "selected incorrect" : null)" aria-pressed="@(SelectedDecision == "locator")" disabled="@IsRunning" @onclick='() => OnSelect.InvokeAsync("locator")'>
+        <strong>@T("Inject IServiceProvider and resolve dependencies inside the service", "Inyectar IServiceProvider y resolver dependencias dentro del servicio")</strong>
+        <span>@T("Dependencies remain hidden and runtime-owned.", "Las dependencias permanecen ocultas y controladas en ejecución.")</span>
+    </button>
+    <MiddleLabActionCue Visible="@(SelectedDecision == "locator" && !IsRunning)" Message="@T("Try the other decision to unlock the next check.", "Prueba la otra decisión para desbloquear la siguiente comprobación.")" />
+    <button type="button" class="@(SelectedDecision == "ports" ? "selected correct" : SelectedDecision == "locator" ? "next-action" : null)" aria-pressed="@(SelectedDecision == "ports")" disabled="@IsRunning" @onclick='() => OnSelect.InvokeAsync("ports")'>
+        <strong>@T("Inject application-owned ports through the constructor", "Inyectar puertos propios de aplicación mediante el constructor")</strong>
+        <span>@T("The use case owns stable contracts; adapters remain replaceable.", "El caso posee contratos estables; los adaptadores permanecen reemplazables.")</span>
+    </button>
+    @if (!string.IsNullOrWhiteSpace(DecisionFeedback))
+    {
+        <p class="middle-decision-feedback @(HasArchitectureEvidence ? "passed" : "failed")">@DecisionFeedback</p>
+    }
+</article>
+
+@code {
+    [Parameter] public string? SelectedDecision { get; set; }
+    [Parameter] public bool HasArchitectureEvidence { get; set; }
+    [Parameter] public bool IsRunning { get; set; }
+    [Parameter] public string DecisionFeedback { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> OnSelect { get; set; }
+}

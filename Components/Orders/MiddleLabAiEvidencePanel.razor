@@ -1,0 +1,31 @@
+@inherits LocalizedComponentBase
+
+<article>
+    <span class="eyebrow">03 · @T("AI boundary", "Límite IA")</span>
+    <h3>@T("Check the configured provider without changing the saved order.", "Comprueba el proveedor configurado sin modificar la orden guardada.")</h3>
+    <pre class="middle-evidence-console"><code>@AiOutput</code></pre>
+    <MiddleLabActionCue Visible="@(HasIntegrationEvidence && !HasAiEvidence && !IsRunning)" Message="@T("Next: check the AI review boundary.", "Siguiente: comprueba el límite de revisión IA.")" />
+    <button type="button" class="button button-secondary @(HasIntegrationEvidence && !HasAiEvidence && !IsRunning ? "next-action" : null)" disabled="@(!HasIntegrationEvidence || IsRunning)" @onclick="OnCheck">
+        @(HasAiEvidence ? T("Check AI again ↻", "Comprobar IA de nuevo ↻") : T("Check AI boundary", "Comprobar límite IA"))
+    </button>
+    @if (HasIntegrationEvidence)
+    {
+        <button type="button" class="button button-secondary" disabled="@IsRunning" @onclick="OnSimulateTimeout">
+            @T("Simulate provider timeout", "Simular tiempo de espera del proveedor")
+        </button>
+    }
+    @if (!string.IsNullOrWhiteSpace(FailureOutput))
+    {
+        <p class="middle-ai-failure-evidence" role="status">@FailureOutput</p>
+    }
+</article>
+
+@code {
+    [Parameter] public bool HasIntegrationEvidence { get; set; }
+    [Parameter] public bool HasAiEvidence { get; set; }
+    [Parameter] public bool IsRunning { get; set; }
+    [Parameter] public string AiOutput { get; set; } = string.Empty;
+    [Parameter] public string FailureOutput { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnCheck { get; set; }
+    [Parameter] public EventCallback OnSimulateTimeout { get; set; }
+}

@@ -16,6 +16,7 @@ public sealed record LearningLevelDefinition(
     LocalizedText Goal,
     LocalizedText LabTitle,
     LocalizedText LabDescription,
+    string LabCompletionSlug,
     bool IsAvailable,
     IReadOnlyList<LearningModuleDefinition> Modules)
 {
@@ -40,6 +41,7 @@ public static class LearningLevelCatalog
             Text(
                 "Integrate language, domain, persistence, tests, and the HTTP contract.",
                 "Integra lenguaje, dominio, persistencia, pruebas y contrato HTTP."),
+            "crear-orden",
             true,
             [
                 Module("C# fundamentals", "Fundamentos de C#", "</>", "fundamentos-csharp"),
@@ -66,7 +68,8 @@ public static class LearningLevelCatalog
             Text(
                 "Apply design, persistence, and integration tests to the same case.",
                 "Aplica diseño, persistencia y pruebas de integración sobre el mismo caso."),
-            false,
+            "refactor-order-flow",
+            true,
             [
                 Module("Applied SOLID", "SOLID aplicado", "◇", "solid"),
                 Module("Dependency injection", "Inyección de dependencias", "⌘", "inyeccion-dependencias"),
@@ -74,9 +77,10 @@ public static class LearningLevelCatalog
                 Module("Safe refactoring", "Refactorización segura", "↻", "refactorizacion"),
                 Module("Persistence with EF Core", "Persistencia con EF Core", "▱", "ef-core"),
                 Module("Errors and ProblemDetails", "Errores y ProblemDetails", "!", "problem-details"),
+                Module("JWT and authorization", "JWT y autorización", "◆", "seguridad-jwt"),
                 Module("Integration tests", "Pruebas de integración", "⛓", "pruebas-integracion"),
-                Module("Architecture boundaries", "Límites de arquitectura", "▦", "limites-arquitectura")
-                // TODO(AI-Middle): Add the bilingual AI integration module with the Middle learning path.
+                Module("Architecture boundaries", "Límites de arquitectura", "▦", "limites-arquitectura"),
+                Module("Maintainable AI integration", "Integración de IA mantenible", "✦", "ia-integracion")
             ]),
         new(
             "senior",
@@ -88,6 +92,7 @@ public static class LearningLevelCatalog
             Text(
                 "Withstand duplicates, concurrency, external failures, and Azure growth.",
                 "Resiste duplicados, concurrencia, fallos externos y crecimiento en Azure."),
+            "operate-under-pressure",
             false,
             [
                 Module("Idempotency", "Idempotencia", "↺", "idempotencia"),

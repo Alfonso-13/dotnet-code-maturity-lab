@@ -15,8 +15,10 @@
     </header>
 
     <aside class="ai-simulation-notice" role="note">
-        <strong>@T("Learning simulation", "Simulación educativa")</strong>
-        <span>@T("No text is sent to an external AI provider. The deterministic local response makes validation and fallback behavior repeatable.", "Ningún texto se envía a un proveedor externo de IA. La respuesta local determinista permite repetir la validación y el fallback.")</span>
+        <strong>@(HostingProfile.HasRealAiProvider ? T("Real provider · local server", "Proveedor real · servidor local") : T("Learning simulation", "Simulación educativa"))</strong>
+        <span>@(HostingProfile.HasRealAiProvider
+            ? T("The note is sent to the configured provider from the server. The key stays server-side; output is validated and requires human review.", "La nota se envía al proveedor configurado desde el servidor. La key permanece en el servidor; la salida se valida y requiere revisión humana.")
+            : T("No text is sent to an external AI provider. The response is deterministic and simulated.", "Ningún texto se envía a un proveedor externo de IA. La respuesta es determinista y simulada."))</span>
     </aside>
 
     <div class="ai-scenarios" aria-label="@T("AI scenarios", "Escenarios de IA")">
@@ -58,7 +60,7 @@
             <header><span>@T("Validated suggestion", "Sugerencia validada")</span><strong>@ResultStatus</strong></header>
             @if (Result is null)
             {
-                <p class="ai-result-empty">// @T("Run the case to inspect the simulated model output.", "Ejecuta el caso para inspeccionar la salida simulada del modelo.")</p>
+                <p class="ai-result-empty">// @T("Run the case to inspect the suggestion.", "Ejecuta el caso para inspeccionar la sugerencia.")</p>
             }
             else
             {
@@ -92,7 +94,7 @@
         Result = null;
         ResultStatus = T("Processing", "Procesando");
 
-        // Animate the four safety boundaries before invoking the deterministic provider.
+        // Animate the four safety boundaries before invoking the configured provider.
         // This delay is educational UI feedback and must not be interpreted as model latency.
         for (var step = 1; step <= 4; step++)
         {

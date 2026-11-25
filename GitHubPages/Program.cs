@@ -17,5 +17,7 @@ builder.Services.AddSingleton<IOrderStore, InMemoryOrderStore>();
 builder.Services.AddScoped<CreateOrderService>();
 builder.Services.AddSingleton<IAiOrderSuggestionService, SimulatedAiOrderSuggestionService>();
 builder.Services.AddSingleton(LabHostingProfile.GitHubPages);
+builder.Services.AddScoped<IOrderLabTransport, StaticOrderLabTransport>();
+builder.Services.AddScoped<IMiddleLabEvidenceService, StaticMiddleLabEvidenceService>();
 
 await builder.Build().RunAsync();

@@ -2,7 +2,7 @@ using DotnetCodeMaturityLab.Features.Localization;
 
 namespace DotnetCodeMaturityLab.Features.Learning;
 
-public static class JuniorInterviewCatalog
+public static partial class JuniorInterviewCatalog
 {
     public static IReadOnlyList<InterviewQuestion> Get(AppLanguage language)
     {
@@ -11,7 +11,8 @@ public static class JuniorInterviewCatalog
             ? topics.Select(FromSpanishTopic)
             : topics.Select(FromEnglishTopic);
 
-        return moduleQuestions.Append(AdditionalAiQuestion(language)).ToArray();
+        return moduleQuestions.Append(AdditionalAiQuestion(language))
+            .Concat(AdditionalRuntimeQuestions(language)).ToArray();
     }
 
     private static InterviewQuestion FromSpanishTopic(LabTopic topic) => new(

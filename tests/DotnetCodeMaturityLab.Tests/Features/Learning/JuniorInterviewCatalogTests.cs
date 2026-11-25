@@ -12,7 +12,7 @@ public sealed class JuniorInterviewCatalogTests
     {
         var questions = JuniorInterviewCatalog.Get(language);
 
-        Assert.Equal(14, questions.Count);
+        Assert.Equal(16, questions.Count);
         Assert.Equal(13, questions.Select(question => question.ModuleSlug).Distinct(StringComparer.OrdinalIgnoreCase).Count());
         Assert.Equal(2, questions.Count(question => question.ModuleSlug == "ia-llm"));
 

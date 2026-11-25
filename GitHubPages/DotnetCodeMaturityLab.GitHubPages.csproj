@@ -22,7 +22,7 @@
     <Content Include="..\Components\Pages\*.razor" Exclude="..\Components\Pages\Error.razor" Link="Components\Pages\%(Filename)%(Extension)" />
 
     <Compile Include="..\Features\Learning\*.cs" Link="Features\Learning\%(Filename)%(Extension)" />
-    <Compile Include="..\Features\AI\*.cs" Link="Features\AI\%(Filename)%(Extension)" />
+    <Compile Include="..\Features\AI\*.cs" Exclude="..\Features\AI\GeminiAiOrderSuggestionService.cs" Link="Features\AI\%(Filename)%(Extension)" />
     <Compile Include="..\Features\Configuration\*.cs" Link="Features\Configuration\%(Filename)%(Extension)" />
     <Compile Include="..\Features\Localization\*.cs" Link="Features\Localization\%(Filename)%(Extension)" />
     <Compile Include="..\Features\Navigation\*.cs" Link="Features\Navigation\%(Filename)%(Extension)" />
@@ -31,8 +31,13 @@
     <Compile Include="..\Features\Orders\CreateOrderResult.cs" Link="Features\Orders\CreateOrderResult.cs" />
     <Compile Include="..\Features\Orders\CreateOrderService.cs" Link="Features\Orders\CreateOrderService.cs" />
     <Compile Include="..\Features\Orders\IOrderStore.cs" Link="Features\Orders\IOrderStore.cs" />
+    <Compile Include="..\Features\Orders\IOrderLabTransport.cs" Link="Features\Orders\IOrderLabTransport.cs" />
     <Compile Include="..\Features\Orders\InMemoryOrderStore.cs" Link="Features\Orders\InMemoryOrderStore.cs" />
+    <Compile Include="..\Features\Orders\StaticOrderLabTransport.cs" Link="Features\Orders\StaticOrderLabTransport.cs" />
     <Compile Include="..\Features\Orders\LabHostingProfile.cs" Link="Features\Orders\LabHostingProfile.cs" />
+    <Compile Include="..\Features\Orders\MiddleLabCodeExamples.cs" Link="Features\Orders\MiddleLabCodeExamples.cs" />
+    <Compile Include="..\Features\Orders\IMiddleLabEvidenceService.cs" Link="Features\Orders\IMiddleLabEvidenceService.cs" />
+    <Compile Include="..\Features\Orders\StaticMiddleLabEvidenceService.cs" Link="Features\Orders\StaticMiddleLabEvidenceService.cs" />
     <Compile Include="..\Features\Orders\Order.cs" Link="Features\Orders\Order.cs" />
 
     <Content Include="..\wwwroot\app.css" Link="wwwroot\app.css" />

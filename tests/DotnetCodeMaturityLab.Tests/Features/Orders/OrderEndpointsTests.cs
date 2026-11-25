@@ -70,6 +70,32 @@ public sealed class OrderEndpointsTests
     }
 
     [Fact]
+    public async Task PostOrder_SpanishAcceptLanguage_LocalizesValidation()
+    {
+        var (factory, databasePath) = CreateFactory();
+        try
+        {
+            using var client = factory.CreateClient();
+            using var message = new HttpRequestMessage(HttpMethod.Post, "/api/orders")
+            {
+                Content = JsonContent.Create(new CreateOrderRequest("", 0, 0m))
+            };
+            message.Headers.AcceptLanguage.ParseAdd("es");
+
+            using var response = await client.SendAsync(message);
+            var body = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains("El código del producto es obligatorio.", body);
+        }
+        finally
+        {
+            await factory.DisposeAsync();
+            DeleteDatabase(databasePath);
+        }
+    }
+
+    [Fact]
     public async Task GetOrder_UnknownId_ReturnsNotFound()
     {
         var (factory, databasePath) = CreateFactory();

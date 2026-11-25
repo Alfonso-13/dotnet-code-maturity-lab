@@ -47,7 +47,7 @@
         }
     </div>
 
-    <a class="maturity-lab-card" href="@ActiveLevel.LabRoute">
+    <a class="maturity-lab-card @(IsLabCompleted ? "completed" : null)" href="@ActiveLevel.LabRoute">
         <img src="images/dotnet-code-maturity-lab-icon.png" alt="" />
         <span><small>@T("Laboratory", "Laboratorio") @ActiveLevel.Label</small><strong>@ActiveLevel.LabTitle.Get(Language.Current)</strong><span>@ActiveLevel.LabDescription.Get(Language.Current)</span></span>
         <b>@LabStateLabel</b>
@@ -83,8 +83,10 @@
     private void SelectLevel(string level) => SelectedLevel = level;
     private int CompletedModules(LearningLevelDefinition level) => level.Modules.Count(module => module.Slugs.All(slug => Completed.Contains(LearningProgress.Entry(level.Key, slug))));
     private int Progress(LearningLevelDefinition level) => (int)Math.Round(CompletedModules(level) * 100d / level.Modules.Count);
+    private bool IsLabCompleted => ActiveLevel.IsAvailable
+        && Completed.Contains(LearningProgress.Entry(ActiveLevel.Key, ActiveLevel.LabCompletionSlug));
     private string LabStateLabel => ActiveLevel.IsAvailable
-        ? Completed.Contains(LearningProgress.Entry(ActiveLevel.Key, "crear-orden")) ? T("Completed ✓", "Completado ✓") : T("Capstone →", "Integrador →")
+        ? IsLabCompleted ? T("Completed ✓", "Completado ✓") : T("Capstone →", "Integrador →")
         : T("Coming soon →", "Próximamente →");
 
     private ModuleStatus ModuleState(LearningLevelDefinition level, LearningModuleDefinition module)

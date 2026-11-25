@@ -28,16 +28,16 @@
             <small>@T("Fundamentals · available", "Fundamentos · disponible")</small>
             <h2>Junior</h2>
             <p>@T("C#, OOP, collections, async, testing, HTTP, persistence, ASP.NET Core, and safe LLM integration.", "C#, POO, colecciones, async, pruebas, HTTP, persistencia, ASP.NET Core e integración segura con LLM.")</p>
-            <strong>14 @T("questions", "preguntas")</strong>
+            <strong>@JuniorQuestionCount @T("questions", "preguntas")</strong>
             <a class="button button-primary" href="@AppRoutes.InterviewFor("junior")">@T("Open Junior test", "Abrir prueba Junior") →</a>
         </article>
-        <article class="interview-level-card">
+        <article class="interview-level-card available">
             <span class="interview-level-index">02</span>
-            <small>@T("Design · coming soon", "Diseño · próximamente")</small>
+            <small>@T("Design · available", "Diseño · disponible")</small>
             <h2>Middle</h2>
             <p>@T("SOLID, dependency injection, design patterns, refactoring, and integration boundaries.", "SOLID, inyección de dependencias, patrones de diseño, refactorización y fronteras de integración.")</p>
-            <strong>@T("Test in preparation", "Prueba en preparación")</strong>
-            <a class="button button-secondary" href="@AppRoutes.InterviewFor("middle")">@T("View test status", "Ver estado de la prueba") →</a>
+            <strong>@MiddleQuestionCount @T("questions", "preguntas")</strong>
+            <a class="button button-primary" href="@AppRoutes.InterviewFor("middle")">@T("Open Middle test", "Abrir prueba Middle") →</a>
         </article>
         <article class="interview-level-card dark">
             <span class="interview-level-index">03</span>
@@ -49,7 +49,7 @@
         </article>
     </section>
 }
-else if (InterviewContentCatalog.TryGet(Level, Language.Current, out _))
+else if (IsInterviewAvailable)
 {
     @if (!Started)
     {
@@ -130,10 +130,10 @@ else if (InterviewContentCatalog.TryGet(Level, Language.Current, out _))
                     <h2>@Current.Prompt</h2>
 
                     <div class="interview-options">
-                        @for (var index = 0; index < Current.Options.Length; index++)
+                        @for (var index = 0; index < CurrentOptions.Length; index++)
                         {
                             var optionIndex = index;
-                            var option = Current.Options[index];
+                            var option = CurrentOptions[index];
                             <button type="button" class="@OptionClass(optionIndex, option)" disabled="@Answered" @onclick="() => SelectOption(optionIndex)">
                                 <span>@((char)('A' + index))</span>
                                 <strong>@option.Text</strong>
@@ -200,6 +200,8 @@ else
 
     private InterviewLevelContent InterviewContent => InterviewContentCatalog.Get(Level!, Language.Current);
     private IReadOnlyList<InterviewQuestion> Questions => InterviewContent.Questions;
+    private int JuniorQuestionCount => InterviewContentCatalog.Get("junior", Language.Current).Questions.Count;
+    private int MiddleQuestionCount => InterviewContentCatalog.Get("middle", Language.Current).Questions.Count;
     private InterviewQuestion Current => Questions[CurrentIndex];
     private bool Started { get; set; }
     private bool Finished { get; set; }
@@ -207,24 +209,47 @@ else
     private int CurrentIndex { get; set; }
     private int SelectedOption { get; set; } = -1;
     private int Score { get; set; }
-    private bool?[] AnswerResults { get; } = new bool?[14];
+    private bool?[] AnswerResults { get; set; } = [];
+    private int[][] OptionOrder { get; set; } = [];
     private bool ScrollToSessionTop { get; set; }
     private int PositionPercent => (int)Math.Round((CurrentIndex + 1d) * 100 / Questions.Count);
+    private int ScorePercent => Questions.Count == 0 ? 0 : (int)Math.Round(Score * 100d / Questions.Count);
+    private InterviewOption[] CurrentOptions => OptionOrder.Length == Questions.Count
+        ? OptionOrder[CurrentIndex].Select(index => Current.Options[index]).ToArray()
+        : Current.Options;
+    private bool IsInterviewAvailable =>
+        InterviewContentCatalog.TryGet(Level, Language.Current, out var content)
+        && content.Definition.IsAvailable;
     private string InterviewPageClass => Started
         ? "interview-session-active"
-        : InterviewContentCatalog.TryGet(Level, Language.Current, out _)
+        : IsInterviewAvailable
             ? "interview-intro-active"
             : string.Empty;
-    private string ResultTitle => Score >= 10
+    private string ResultTitle => ScorePercent >= 70
         ? InterviewContent.StrongResult.Get(Language.Current)
-        : Score >= 7
+        : ScorePercent >= 50
             ? T("Ready, with a few topics to reinforce", "Listo, con algunos temas por reforzar")
             : T("Return to the modules and try again", "Vuelve a los módulos e inténtalo de nuevo");
-    private string ResultDescription => Score >= 10
+    private string ResultDescription => ScorePercent >= 70
         ? T("You can identify the correct decisions. Practice saying the defense answers in your own words.", "Identificas las decisiones correctas. Practica explicar las respuestas de defensa con tus propias palabras.")
-        : Score >= 7
+        : ScorePercent >= 50
             ? T("Review the modules where the decision was unclear, then repeat the interview.", "Repasa los módulos donde la decisión no fue clara y después repite la entrevista.")
             : T("Use the learning path to reconnect syntax, design intent, tests, persistence, and HTTP.", "Usa la ruta para volver a conectar sintaxis, intención de diseño, pruebas, persistencia y HTTP.");
+
+    protected override void OnParametersSet()
+    {
+        if (!InterviewContentCatalog.TryGet(Level, Language.Current, out var content)) return;
+        if (AnswerResults.Length != content.Questions.Count)
+        {
+            AnswerResults = new bool?[content.Questions.Count];
+            CurrentIndex = 0;
+            SelectedOption = -1;
+            Score = 0;
+            Answered = false;
+            Finished = false;
+            OptionOrder = [];
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -236,6 +261,7 @@ else
 
     private void Start()
     {
+        PrepareOptionOrder();
         Started = true;
         ScrollToSessionTop = true;
     }
@@ -245,7 +271,7 @@ else
         if (Answered) return;
         SelectedOption = index;
         Answered = true;
-        AnswerResults[CurrentIndex] = Current.Options[index].IsCorrect;
+        AnswerResults[CurrentIndex] = CurrentOptions[index].IsCorrect;
         if (AnswerResults[CurrentIndex] == true) Score++;
     }
 
@@ -273,8 +299,14 @@ else
         Array.Clear(AnswerResults);
         Answered = false;
         Finished = false;
+        PrepareOptionOrder();
         Started = true;
         ScrollToSessionTop = true;
+    }
+
+    private void PrepareOptionOrder()
+    {
+        OptionOrder = InterviewOptionOrder.Create(Questions, Random.Shared);
     }
 
     private string OptionClass(int index, InterviewOption option)

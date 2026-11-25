@@ -24,11 +24,29 @@ public static class InterviewContentCatalog
                 LearningLevelCatalog.Get("junior"),
                 new("Defend the Junior fundamentals, not only the syntax.", "Defiende los fundamentos Junior, no solo la sintaxis."),
                 new(
-                    "Fourteen questions connect the learning path with the decisions a .NET interviewer may ask you to explain, including safe LLM integration.",
-                    "Catorce preguntas conectan la ruta de aprendizaje con las decisiones que un entrevistador .NET puede pedirte explicar, incluida una integración segura con LLM."),
-                new("All Junior modules · two AI questions", "Todos los módulos Junior · dos preguntas de IA"),
+                    "Sixteen questions connect the learning path with the decisions a .NET interviewer may ask you to explain, including runtime behavior and safe LLM integration.",
+                    "Dieciséis preguntas conectan la ruta de aprendizaje con las decisiones que un entrevistador .NET puede pedirte explicar, incluido el comportamiento del runtime y una integración segura con LLM."),
+                new("All Junior modules · two runtime questions · two AI questions", "Todos los módulos Junior · dos preguntas de runtime · dos de IA"),
                 new("Strong Junior foundation", "Base Junior sólida"),
                 JuniorInterviewCatalog.Get(language));
+            return true;
+        }
+
+        if (level?.Equals("middle", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            content = new(
+                LearningLevelCatalog.Get("middle"),
+                new(
+                    "Defend design decisions through change, collaboration, and evidence.",
+                    "Defiende decisiones de diseño mediante cambio, colaboración y evidencia."),
+                new(
+                    "Fourteen scenarios connect SOLID, dependency injection, persistence, JWT authorization, HTTP integration, architecture boundaries, and maintainable AI.",
+                    "Catorce escenarios conectan SOLID, inyección de dependencias, persistencia, autorización JWT, integración HTTP, límites de arquitectura e IA mantenible."),
+                new(
+                    "All Middle modules · four cross-module scenarios",
+                    "Todos los módulos Middle · cuatro escenarios transversales"),
+                new("Strong Middle design reasoning", "Razonamiento de diseño Middle sólido"),
+                MiddleInterviewCatalog.Get(language));
             return true;
         }
 

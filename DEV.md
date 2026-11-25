@@ -38,7 +38,8 @@ The two project files exist because ASP.NET Core interactive server rendering an
 - `GitHubPages/DotnetCodeMaturityLab.GitHubPages.csproj` is a thin static host. It links the shared components, learning content, styles, images, domain service, and contracts from the repository root.
 - `LabHostingProfile` describes visible runtime capabilities.
 - `IOrderStore` selects durable SQLite persistence or browser-session memory through dependency injection.
-- `IAiOrderSuggestionService` keeps the AI boundary replaceable; the published Junior stage registers the deterministic local provider.
+- `IOrderLabTransport` sends a real loopback HTTP request from the server laboratory or runs the shared domain service in the clearly labeled Pages simulation. `LoopbackOrderHttpClient` rejects nonlocal origins and automatic redirects.
+- `IAiOrderSuggestionService` keeps the AI boundary replaceable; the server selects deterministic simulation or Gemini from configuration. Pages always registers simulation.
 
 Do not add runtime checks throughout the UI when a difference can be represented by one profile or dependency registration.
 
@@ -46,7 +47,7 @@ Do not add runtime checks throughout the UI when a difference can be represented
 
 ### ASP.NET Core profile
 
-`Program.cs` registers interactive server components, `SqliteOrderStore`, `CreateOrderService`, the deterministic AI service, `LabHostingProfile.Server`, and the Minimal API endpoints.
+`Program.cs` registers interactive server components, `SqliteOrderStore`, `CreateOrderService`, the configured AI adapter, `LabHostingProfile.Server`, and the Minimal API endpoints.
 
 `appsettings.json` contains the local connection string:
 
@@ -59,6 +60,8 @@ Do not add runtime checks throughout the UI when a difference can be represented
 ```
 
 The startup code resolves a relative SQLite data source against the application content root, stores data-protection keys under `App_Data/keys`, and creates the educational database when it does not exist.
+
+AI defaults to `AI:Provider=Simulated`. To use Gemini locally, set `AI__Provider=Gemini` and `AI__ApiKey` in the server process environment, then start the local host. `AI__Model` is optional and defaults to `gemini-2.5-flash`. Never add a key to `appsettings.json`, a URL, the Pages project, or source control. The adapter sends only the customer note, accepts a constrained JSON category and short summary, times out after ten seconds, and returns a reviewed fallback on provider failure. The UI labels the active mode. A visitor cannot enter a key in Pages because Pages has no server-side secret boundary.
 
 ### GitHub Pages profile
 
@@ -79,6 +82,8 @@ Equivalent SDK command:
 ```powershell
 dotnet run --project DotnetCodeMaturityLab.csproj
 ```
+
+The local HTTP-only launcher does not enable HTTPS redirection because it has no HTTPS endpoint. The `https` launch profile opts in to redirection, and non-Development environments enable it by default. Set `HttpsRedirection__Enabled=true` only when the host also exposes an HTTPS endpoint.
 
 Run the static host locally:
 
@@ -136,8 +141,8 @@ The browser stores the language under `dotnet-code-maturity-lab-language`. `wwwr
 - `LearningContracts` contains neutral records such as `LessonCodePane`, `LessonPerspective`, `ModuleLesson`, and `InterviewQuestion`. Shared rendering must depend on these contracts, never on types named after a seniority level.
 - `LearningLevelCatalog` is the bilingual source of truth for level order, availability, module maps, goals, and laboratory metadata.
 - `LearningContentCatalog`, `InterviewContentCatalog`, and `LaboratoryContentCatalog` resolve a level-specific provider behind the shared course, interview, and laboratory pages.
-- `JuniorCurriculum`, `JuniorLessonCatalog`, `JuniorModuleMetadataCatalog`, and `JuniorInterviewCatalog` remain intentionally level-specific because they own Junior content rather than reusable presentation.
-- `JuniorLaboratory` is the executable Junior capstone selected by the neutral laboratory catalog.
+- `JuniorCurriculum`, `JuniorLessonCatalog`, `JuniorModuleMetadataCatalog`, and `JuniorInterviewCatalog` remain intentionally level-specific because they own Junior content rather than reusable presentation. `JuniorLessonCatalog` registers each bilingual pair once; `JuniorLessonCatalog.<Topic>.cs` keeps both languages and their code examples together per module.
+- `JuniorLaboratory` is the executable Junior capstone selected by the neutral laboratory catalog. `MiddleLaboratory` composes focused code, decision, evidence, journey, and checklist components; its HTTP and AI work remains in services, and `MiddleLabCodeExamples` owns only illustrative snippets.
 
 Progress is stored in browser `localStorage` under the `LearningProgress` versioned contract. Entries are namespaced by level (`junior:fundamentos-csharp`, later `middle:solid`) so catalogs cannot overwrite one another. Version 4 migrates existing unqualified Junior entries in place while retaining the original storage key. The current model distinguishes:
 
@@ -157,6 +162,8 @@ When the progress contract changes, preserve user history and document why a mig
 4. Add its internal-to-canonical module slugs to `AppRoutes` and use `LearnModule(level, slug)` from UI code.
 5. Run shared content, route, progress migration, responsive, server-host, and GitHub Pages checks.
 6. Mark the level available only after its learning path, interview, and capstone are complete.
+
+Middle is registered as an available level with ten bilingual modules, 50 lesson perspectives per language, fourteen interview decisions, and one capstone laboratory. The local capstone calls the running order API and reads a saved SQLite order back through HTTP; it then exercises the configured AI adapter. An additional, explicitly simulated timeout demonstrates the reviewed fallback without calling the provider or changing a saved order. Pages runs the same order-domain rules against browser memory and labels that path as simulation. JWT policy, 409 conflict handling, and migrations appear as design examples; the current API does not implement them.
 
 The approved visual hierarchy is invariant across Junior, Middle, and Senior. Seniority is communicated by module content, engineering decisions, interview depth, and laboratory behavior—not by duplicating or redesigning the player.
 
@@ -180,15 +187,35 @@ The laboratory verifies observable behavior rather than private methods:
 
 ## AI boundary
 
-The Junior AI module demonstrates a replaceable integration boundary, not a live model call.
+The Junior AI module demonstrates a replaceable integration boundary. It calls a live provider only when the local server is configured for Gemini.
 
 `SimulatedAiOrderSuggestionService` is deterministic so tests and the Pages demo can reproduce minimum-context input, a constrained category allowlist, validation and fallback, rejection of instructions that attempt to override the application contract, and mandatory human review.
 
-No secret, customer note, or prompt is sent outside the process. A real provider must be implemented behind `IAiOrderSuggestionService`, configured only in a server host, and protected with secret management, timeouts, budget controls, logging rules, and output validation.
+In simulated mode, no note is sent outside the process. With Gemini configured, the note is sent from the server to the provider. The key stays server-side; output is validated, fallback is deterministic, and review remains mandatory. This educational adapter is not a production AI gateway: operational budgets, rate limits, privacy rules, and managed secret storage remain future work.
+
+### Tooling decision for the current learning outcome
+
+The current use case makes one constrained classification/suggestion call. It already has an application-owned `IAiOrderSuggestionService`, an allowlisted result contract, a Gemini adapter, and a deterministic Pages adapter. Based on the current [.NET AI ecosystem guidance](https://learn.microsoft.com/dotnet/ai/dotnet-ai-ecosystem), adding an orchestration framework would not improve this observable contract. No new AI package is required for the Junior or Middle release.
+
+| Candidate | Fit now | Revisit when |
+| --- | --- | --- |
+| `Microsoft.Extensions.AI` | Useful provider-neutral `IChatClient` and embedding abstractions, but this single adapter already has a narrow application contract. | A second real provider or reusable AI middleware makes an adapter migration valuable. |
+| Semantic Kernel / Microsoft Agent Framework | No multistep agent or tool workflow exists here. The current Microsoft guidance positions Agent Framework for multistep orchestration. | A measurable workflow needs planning, tools, or handoffs. |
+| Microsoft Foundry | Managed model selection, evaluation, and governance are outside this local/Pages exercise. | A hosted operational profile needs managed controls. |
+| OpenAI-compatible or local model | Plausible additional adapters behind the same interface; neither is configured or claimed today. | A concrete provider portability or offline requirement is defined and tested. |
+| Embeddings, vector search, RAG | The order note is short and no document corpus needs retrieval. RAG would add ingestion, indexing, access-control, evaluation, and cost decisions without improving this case. | A sourced knowledge-base task needs retrieval; see the [Microsoft RAG overview](https://learn.microsoft.com/dotnet/ai/conceptual/rag). |
+
+The Middle laboratory's fault button is an explicitly simulated provider timeout. It shows the fallback and review requirement without contacting Gemini or changing the SQLite order. Unit tests separately exercise a fake provider, adapter timeout, and caller cancellation. This distinction prevents a demo from being mistaken for a live outage test.
+
+### Educational versus running API boundaries
+
+JWT validation, claims, authorization policies, 401/403, 409 conflict mapping, and EF Core migrations are lesson and interview examples. The open local order API does not advertise those behaviors. Adding JWT to its public creation endpoint would require an issuer, credential issuance, and a separate authorization policy/verification flow; attaching a token gate to the current open laboratory would make its client contract unusable. A future authenticated API scenario should be a distinct tested feature rather than an implicit change to this exercise.
+
+The local SQLite database uses `EnsureCreated`, including for existing learner data. [EF Core documents](https://learn.microsoft.com/ef/core/managing-schemas/ensure-created) that this creation API and migrations do not work well together. Replacing it with `MigrateAsync` on a previously created database requires a planned baseline or database reset and data-preservation path. The Middle lesson explains migrations but the current startup deliberately does not execute them.
 
 ## Automated verification
 
-The test project covers thirteen lesson routes, sixty-five bilingual perspectives, fourteen bilingual interview questions, code formatting and curriculum contracts, order rules, SQLite persistence, HTTP integration behavior, AI fallback, and Pages routing contracts.
+The test project covers the available Junior and Middle catalogs: twenty-three lesson routes, 115 perspectives per language, thirty bilingual interview decisions, both laboratory contracts, code formatting and curriculum contracts, order rules, SQLite persistence, JWT lesson evidence, HTTP integration behavior, AI output/fallback, cancellation, and Pages routing contracts. JWT enforcement is not part of the running API.
 
 Run:
 
@@ -246,4 +273,4 @@ wwwroot/                 Shared styles, scripts, images, and browser storage ada
 
 This is an educational portfolio repository. The local server is not presented as a production deployment. Before exposing equivalent functionality publicly, add authentication and authorization, migrations, managed secrets, structured observability, abuse and budget controls, a privacy policy, and operational ownership.
 
-Middle and Senior remain intentionally unavailable until their code, laboratories, interview content, responsive QA, and automated verification exist.
+Junior and Middle are available. Senior remains intentionally unavailable until its code, laboratory, interview content, responsive QA, and automated verification exist.
