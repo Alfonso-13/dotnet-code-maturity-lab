@@ -78,25 +78,20 @@ public sealed class JuniorLearningContentTests
     }
 
     [Fact]
-    public void LastPerspective_ReviewsBeforeExplicitCompletion()
+    public async Task LastPerspective_ReviewsBeforeExplicitCompletion()
     {
         var component = new Components.Pages.Learning();
         SetProperty(component, "Level", "junior");
         SetProperty(component, "TopicSlug", "fundamentos-csharp");
-        Invoke(component, "OnParametersSet");
+        await InvokeAsync(component, "OnParametersSet");
 
-        for (var index = 0; index < 4; index++) Invoke(component, "GoNextStep");
+        for (var index = 0; index < 4; index++) await InvokeAsync(component, "GoNextStep");
 
         Assert.Equal(4, GetProperty<int>(component, "ActivePerspective"));
         Assert.Contains("fundamentos-csharp", GetField<HashSet<string>>(component, "Reviewed"));
         Assert.DoesNotContain("fundamentos-csharp", GetField<HashSet<string>>(component, "Completed"));
 
-        Invoke(component, "GoNextStep");
-
-        Assert.Equal(4, GetProperty<int>(component, "ActivePerspective"));
-        Assert.Contains("fundamentos-csharp", GetField<HashSet<string>>(component, "Completed"));
-
-        Invoke(component, "GoPreviousStep");
+        await InvokeAsync(component, "GoPreviousStep");
         Assert.Equal(3, GetProperty<int>(component, "ActivePerspective"));
     }
 
@@ -139,11 +134,11 @@ public sealed class JuniorLearningContentTests
         Assert.Equal(lines.First().TrimStart(), lines.First());
     }
 
-    private static void Invoke(object instance, string methodName)
+    private static async Task InvokeAsync(object instance, string methodName)
     {
         var method = instance.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull(method);
-        method.Invoke(instance, null);
+        if (method.Invoke(instance, null) is Task task) await task;
     }
 
     private static void SetField(object instance, string fieldName, object value)

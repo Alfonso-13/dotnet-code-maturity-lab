@@ -33,19 +33,19 @@
         </div>
 
         <nav>
-            @for (var index = 0; index < Topics.Count; index++)
+            @for (var index = 0; index < Modules.Count; index++)
             {
                 var topicIndex = index;
-                var topic = Topics[index];
-                @if (index == 0 || !TopicBlock(Topics[index - 1]).Equals(TopicBlock(topic), StringComparison.Ordinal))
+                var module = Modules[index];
+                @if (index == 0 || !Modules[index - 1].Metadata.Block.Equals(module.Metadata.Block, StringComparison.Ordinal))
                 {
-                    <span class="curriculum-group">@TopicBlock(topic)</span>
+                    <span class="curriculum-group">@module.Metadata.Block</span>
                 }
-                <button type="button" class="@TopicClass(topic, index)" @onclick="() => SelectTopic(topicIndex)" aria-current="@(index == ActiveTopicIndex ? "page" : null)">
-                    <span class="curriculum-state">@TopicStateIcon(topic, index)</span>
+                <button id="@TopicElementId(index)" type="button" class="@TopicClass(module, index)" @onclick="() => SelectTopic(topicIndex)" aria-current="@(index == ActiveTopicIndex ? "page" : null)" disabled="@IsCompletingModule">
+                    <span class="curriculum-state">@TopicStateIcon(module, index)</span>
                     <span>
                         <small>@T("Module", "Módulo") @(index + 1)</small>
-                        @TopicShortTitle(topic)
+                        @module.Metadata.ShortTitle
                         @if (index >= AvailableTopicCount)
                         {
                             <em>@T("Under maintenance", "En mantenimiento")</em>
@@ -72,8 +72,8 @@
             <section class="course-maintenance-panel">
                 <div class="maintenance-symbol" aria-hidden="true">⌁</div>
                 <span class="step-label">@T("Protected content", "Contenido protegido")</span>
-                <h2>@T("This module will resume after validating the first two.", "Este módulo se retomará después de validar los dos primeros.")</h2>
-                <p>@T("Its content remains saved. We are refining the Fundamentals and Methods and classes experiences before replicating the format.", "Su contenido permanece guardado. Por ahora estamos afinando la experiencia de Fundamentos y Métodos y clases antes de replicar el formato.")</p>
+                <h2>@T("This module is being prepared.", "Este módulo está en preparación.")</h2>
+                <p>@T("Its content will become available after review. You can continue with the published modules.", "Su contenido estará disponible después de la revisión. Puedes continuar con los módulos publicados.")</p>
                 <button type="button" class="button button-primary" @onclick="OpenFirstModule">@T("Open module 1", "Abrir módulo 1") →</button>
             </section>
         }
@@ -83,28 +83,42 @@
                 @for (var index = 0; index < PerspectiveNames.Length; index++)
                 {
                     var perspectiveIndex = index;
-                    <button type="button" role="tab" class="@(ActivePerspective == index ? "active" : null)" aria-selected="@(ActivePerspective == index ? "true" : "false")" @onclick="() => SelectPerspective(perspectiveIndex)">
+                    <button type="button" role="tab" class="@(ActivePerspective == index ? "active" : null)" aria-selected="@(ActivePerspective == index ? "true" : "false")" @onclick="() => SelectPerspective(perspectiveIndex)" disabled="@IsCompletingModule">
                         <span>@(index + 1).</span> @PerspectiveNames[index]
                     </button>
                 }
             </nav>
 
-            <section class="course-perspective module-one-perspective code-first-panel" role="tabpanel" @key="ActivePerspective">
-                <button type="button" class="hint-lamp" @onclick="OpenHint" aria-label="@T("Open hint for", "Abrir pista de") @PerspectiveNames[ActivePerspective]">
+            <section class="course-perspective module-one-perspective code-first-panel @(HasCodeVariants ? "has-code-variants" : null)" role="tabpanel" @key="(ActivePerspective, ActiveCodeVariant)">
+                <button type="button" class="hint-lamp" @onclick="OpenHint" aria-label="@T("Open hint for", "Abrir pista de") @PerspectiveNames[ActivePerspective]" disabled="@IsCompletingModule">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21h6m-5-3h4m-7-7a5 5 0 1 1 10 0c0 2-1.1 3.2-2.2 4.3-.5.5-.8 1.1-.8 1.7h-4c0-.6-.3-1.2-.8-1.7C8.1 14.2 7 13 7 11Z"/></svg>
                 </button>
 
                 <header class="code-scene-header"><span class="step-label">@CurrentCatalogStep.Label</span><p>@CurrentCatalogStep.Caption</p></header>
 
-                @if (CurrentCatalogStep.Right is null)
+                @if (HasCodeVariants)
                 {
-                    <CSharpCodeWindow FileName="@CurrentCatalogStep.Left.FileName" Label="@CurrentCatalogStep.Left.Label" CssClass="@CurrentCatalogStep.Left.CssClass" PlainCode="@CurrentCatalogStep.Left.Code" />
+                    <nav class="code-context-tabs" role="tablist" aria-label="@T("Code example context", "Contexto del ejemplo de código")">
+                        @for (var index = 0; index < CurrentCatalogStep.CodeVariants!.Length; index++)
+                        {
+                            var variantIndex = index;
+                            var variant = CurrentCatalogStep.CodeVariants[index];
+                            <button type="button" role="tab" class="@(ActiveCodeVariant == index ? "active" : null)" aria-selected="@(ActiveCodeVariant == index ? "true" : "false")" @onclick="() => SelectCodeVariant(variantIndex)" disabled="@IsCompletingModule">
+                                @variant.Label
+                            </button>
+                        }
+                    </nav>
+                }
+
+                @if (CurrentRightPane is null)
+                {
+                    <CSharpCodeWindow FileName="@CurrentLeftPane.FileName" Label="@CurrentLeftPane.Label" CssClass="@CurrentLeftPane.CssClass" PlainCode="@CurrentLeftPane.Code" />
                 }
                 else
                 {
                     <div class="code-compare-grid lesson-dual-code @(ActivePerspective == PerspectiveNames.Length - 1 ? "final-code-review" : null)">
-                        <CSharpCodeWindow FileName="@CurrentCatalogStep.Left.FileName" Label="@CurrentCatalogStep.Left.Label" CssClass="@($"{CurrentCatalogStep.Left.CssClass} review-code")" PlainCode="@CurrentCatalogStep.Left.Code" />
-                        <CSharpCodeWindow FileName="@CurrentCatalogStep.Right.FileName" Label="@CurrentCatalogStep.Right.Label" CssClass="@($"{CurrentCatalogStep.Right.CssClass} review-code")" PlainCode="@CurrentCatalogStep.Right.Code" />
+                        <CSharpCodeWindow FileName="@CurrentLeftPane.FileName" Label="@CurrentLeftPane.Label" CssClass="@($"{CurrentLeftPane.CssClass} review-code")" PlainCode="@CurrentLeftPane.Code" />
+                        <CSharpCodeWindow FileName="@CurrentRightPane.FileName" Label="@CurrentRightPane.Label" CssClass="@($"{CurrentRightPane.CssClass} review-code")" PlainCode="@CurrentRightPane.Code" />
                     </div>
                 }
             </section>
@@ -130,15 +144,34 @@
             }
 
             <footer class="course-navigation">
-                <button type="button" @onclick="GoPreviousStep" disabled="@(ActivePerspective == 0)">← <span><small>@T("Previous", "Anterior")</small>@PreviousStepLabel</span></button>
+                <button type="button" @onclick="GoPreviousStep" disabled="@(ActivePerspective == 0 || IsCompletingModule)">← <span><small>@T("Previous", "Anterior")</small>@PreviousStepLabel</span></button>
                 <div class="course-position" aria-label="@T("Progress within the module", "Progreso dentro del módulo")">
                     @for (var index = 0; index < PerspectiveNames.Length; index++)
                     {
                         var perspectiveIndex = index;
-                        <button type="button" class="@(ActivePerspective == index ? "active" : ActivePerspective > index ? "visited" : null)" @onclick="() => SelectPerspective(perspectiveIndex)" aria-label="@T("Go to", "Ir a") @PerspectiveNames[index]"></button>
+                        <button type="button" class="@(ActivePerspective == index ? "active" : ActivePerspective > index ? "visited" : null)" @onclick="() => SelectPerspective(perspectiveIndex)" aria-label="@T("Go to", "Ir a") @PerspectiveNames[index]" disabled="@IsCompletingModule"></button>
                     }
                 </div>
-                <button type="button" class="next" @onclick="GoNextStep"><span><small>@NextActionLabel</small>@NextStepLabel</span> →</button>
+                <button type="button" class="@NextButtonClass" @onclick="GoNextStep" disabled="@IsCompletingModule" aria-live="polite">
+                    @if (ShowConfirmationControl)
+                    {
+                        <span class="completion-check" aria-hidden="true"></span>
+                    }
+                    <span><small>@DisplayedNextActionLabel</small>@DisplayedNextStepLabel</span>
+                    @if (!ShowConfirmationControl)
+                    {
+                        <span aria-hidden="true">→</span>
+                    }
+                </button>
+                @if (ShowLevelCompletionCelebration)
+                {
+                    <div class="level-completion-confetti" aria-hidden="true">
+                        @for (var index = 0; index < 28; index++)
+                        {
+                            <i style="@ConfettiStyle(index)"></i>
+                        }
+                    </div>
+                }
             </footer>
         }
     </main>
@@ -150,10 +183,14 @@
 
     private int ActiveTopicIndex { get; set; }
     private int ActivePerspective { get; set; }
+    private int ActiveCodeVariant { get; set; }
     private bool CurriculumOpen { get; set; }
     private bool ProgressLoaded { get; set; }
     private LearningProgressState ProgressSnapshot { get; set; } = LearningProgress.Empty;
     private bool HintOpen { get; set; }
+    private bool IsCompletingModule { get; set; }
+    private bool CompletionChecked { get; set; }
+    private string? LastScrolledModuleKey { get; set; }
     private HashSet<string> Viewed { get; } = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> Reviewed { get; } = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> Completed { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -164,80 +201,121 @@
             ? content
             : LearningContentCatalog.Get("junior", Language.Current);
     private IReadOnlyList<LearningModuleContent> Modules => LevelContent.Modules;
-    private IReadOnlyList<LabTopic> Topics => Modules.Select(module => module.Topic).ToArray();
     private LearningModuleContent CurrentModule => Modules[ActiveTopicIndex];
-    private LabTopic CurrentTopic => CurrentModule.Topic;
     private ModuleMetadata CurrentMetadata => CurrentModule.Metadata;
-    private int AvailableTopicCount => Topics.Count;
+    private int AvailableTopicCount => Modules.Count;
     private ModuleLesson CurrentCatalogModule => CurrentModule.Lesson;
     private LessonPerspective CurrentCatalogStep => CurrentCatalogModule.Steps[ActivePerspective];
+    private bool HasCodeVariants => CurrentCatalogStep.CodeVariants is { Length: > 0 };
+    private LessonCodePane CurrentLeftPane => HasCodeVariants
+        ? CurrentCatalogStep.CodeVariants![ActiveCodeVariant].Left
+        : CurrentCatalogStep.Left;
+    private LessonCodePane? CurrentRightPane => HasCodeVariants
+        ? CurrentCatalogStep.CodeVariants![ActiveCodeVariant].Right
+        : CurrentCatalogStep.Right;
     private string[] PerspectiveNames => CurrentCatalogModule.Steps.Select(step => step.Name).ToArray();
     private bool IsMaintenance => ActiveTopicIndex >= AvailableTopicCount;
-    private int AvailableCompleted => Topics.Take(AvailableTopicCount).Count(topic => Completed.Contains(topic.Slug));
+    private int AvailableCompleted => Modules.Take(AvailableTopicCount).Count(module => Completed.Contains(module.Slug));
     private int AvailableProgressPercent => AvailableCompleted * 100 / AvailableTopicCount;
-    private bool IsCurrentModuleCompleted => Completed.Contains(CurrentTopic.Slug);
+    private bool IsCurrentModuleCompleted => Completed.Contains(CurrentModule.Slug);
     private string PreviousStepLabel => ActivePerspective > 0 ? PerspectiveNames[ActivePerspective - 1] : T("Roadmap", "Ruta");
     private string NextStepLabel => ActivePerspective < PerspectiveNames.Length - 1
         ? PerspectiveNames[ActivePerspective + 1]
         : !IsCurrentModuleCompleted ? T("Complete module", "Completar módulo")
-        : ActiveTopicIndex < AvailableTopicCount - 1 ? TopicShortTitle(Topics[ActiveTopicIndex + 1]) : T("Maturity roadmap", "Ruta de madurez");
+        : ActiveTopicIndex < AvailableTopicCount - 1 ? Modules[ActiveTopicIndex + 1].Metadata.ShortTitle : T("Maturity roadmap", "Ruta de madurez");
     private string NextActionLabel => ActivePerspective < PerspectiveNames.Length - 1
         ? T("Next", "Siguiente")
         : !IsCurrentModuleCompleted ? T("Confirm review", "Confirmar revisión") : T("Next", "Siguiente");
+    private bool IsConfirmationStep => ActivePerspective == PerspectiveNames.Length - 1 && !IsCurrentModuleCompleted;
+    private bool IsLastAvailableModule => ActiveTopicIndex == AvailableTopicCount - 1;
+    private bool ShowConfirmationControl => IsConfirmationStep || IsCompletingModule;
+    private bool ShowLevelCompletionCelebration => IsCompletingModule && CompletionChecked && IsLastAvailableModule;
+    private string NextButtonClass => $"next{(ShowConfirmationControl ? " confirm-review" : string.Empty)}{(IsCompletingModule ? " completing" : string.Empty)}{(CompletionChecked ? " checked" : string.Empty)}";
+    private string DisplayedNextActionLabel => IsCompletingModule
+        ? CompletionChecked
+            ? IsLastAvailableModule ? T("Level completed", "Nivel completado") : T("Review confirmed", "Revisión confirmada")
+            : T("Saving progress", "Guardando progreso")
+        : NextActionLabel;
+    private string DisplayedNextStepLabel => IsCompletingModule
+        ? CompletionChecked
+            ? IsLastAvailableModule ? T("Returning to maturity roadmap…", "Regresando a la ruta de madurez…") : T("Continuing…", "Continuando…")
+            : IsLastAvailableModule ? T("Finishing level…", "Finalizando nivel…") : T("Completing module…", "Completando módulo…")
+        : NextStepLabel;
     private string HintTitle => CurrentCatalogStep.HintTitle;
     private string HintBody => CurrentCatalogStep.HintBody;
     private string HintExample => CurrentCatalogStep.HintExample;
-    private ModuleMetadata MetadataFor(LabTopic topic) => Modules.First(module => module.Topic.Slug.Equals(topic.Slug, StringComparison.OrdinalIgnoreCase)).Metadata;
-    private string TopicShortTitle(LabTopic topic) => MetadataFor(topic).ShortTitle;
-    private string TopicBlock(LabTopic topic) => MetadataFor(topic).Block;
-
     protected override void OnParametersSet()
     {
-        if (!LearningContentCatalog.TryGet(Level, Language.Current, out _)) { Navigation.NavigateTo(AppRoutes.ComingSoon(Level)); return; }
+        if (!LearningContentCatalog.TryGet(Level, Language.Current, out var content)
+            || !content.Definition.IsAvailable)
+        {
+            Navigation.NavigateTo(AppRoutes.ComingSoon(Level));
+            return;
+        }
 
         var internalSlug = string.IsNullOrWhiteSpace(TopicSlug)
-            ? Topics[0].Slug
+            ? Modules[0].Slug
             : AppRoutes.InternalModuleSlug(Level, TopicSlug);
         ActiveTopicIndex = IndexOf(internalSlug);
         if (ActiveTopicIndex < 0) ActiveTopicIndex = 0;
 
         ActivePerspective = 0;
+        ResetCodeVariant();
         CurriculumOpen = false;
         HintOpen = false;
+        IsCompletingModule = false;
+        CompletionChecked = false;
+        LastScrolledModuleKey = null;
         if (ProgressLoaded && !IsMaintenance) MarkViewed();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender) return;
-        var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
-        ProgressSnapshot = LearningProgress.Migrate(stored);
-        Viewed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Viewed, Level));
-        Reviewed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Reviewed, Level));
-        Completed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Completed, Level));
+        if (firstRender)
+        {
+            var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
+            ProgressSnapshot = LearningProgress.Migrate(stored);
+            Viewed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Viewed, Level));
+            Reviewed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Reviewed, Level));
+            Completed.UnionWith(LearningProgress.ForLevel(ProgressSnapshot.Completed, Level));
 
-        ProgressLoaded = true;
-        if (!IsMaintenance) MarkViewed();
-        await PersistProgress();
-        StateHasChanged();
+            ProgressLoaded = true;
+            if (!IsMaintenance) MarkViewed();
+            await PersistProgress();
+            StateHasChanged();
+        }
+
+        var moduleKey = $"{Level}:{ActiveTopicIndex}";
+        if (!moduleKey.Equals(LastScrolledModuleKey, StringComparison.Ordinal))
+        {
+            // The curriculum owns its scroll position. Synchronizing only when the
+            // module changes keeps the active item visible without moving the page.
+            LastScrolledModuleKey = moduleKey;
+            await JS.InvokeVoidAsync("learningCourse.ensureModuleVisible", TopicElementId(ActiveTopicIndex));
+        }
     }
 
-    private int IndexOf(string slug) { for (var index = 0; index < Topics.Count; index++) if (Topics[index].Slug.Equals(slug, StringComparison.OrdinalIgnoreCase)) return index; return -1; }
-    private void SelectTopic(int index) => Navigation.NavigateTo(AppRoutes.LearnModule(Level, Topics[index].Slug));
+    private int IndexOf(string slug) { for (var index = 0; index < Modules.Count; index++) if (Modules[index].Slug.Equals(slug, StringComparison.OrdinalIgnoreCase)) return index; return -1; }
+    private void SelectTopic(int index) => Navigation.NavigateTo(AppRoutes.LearnModule(Level, Modules[index].Slug));
     private void OpenFirstModule() => SelectTopic(0);
-    private void SelectPerspective(int index) { ActivePerspective = index; HintOpen = false; if (index == PerspectiveNames.Length - 1) MarkReviewed(); }
+    private void SelectPerspective(int index) { ActivePerspective = index; ResetCodeVariant(); HintOpen = false; if (index == PerspectiveNames.Length - 1) MarkReviewed(); }
+    private void SelectCodeVariant(int index) { ActiveCodeVariant = index; HintOpen = false; }
     private void ToggleCurriculum() => CurriculumOpen = !CurriculumOpen;
-    private void GoPreviousStep() { if (ActivePerspective > 0) ActivePerspective--; HintOpen = false; }
-    private void GoNextStep()
+    private void GoPreviousStep() { if (ActivePerspective > 0) { ActivePerspective--; ResetCodeVariant(); } HintOpen = false; }
+    private async Task GoNextStep()
     {
+        if (IsCompletingModule) return;
+
         if (ActivePerspective < PerspectiveNames.Length - 1)
         {
             ActivePerspective++;
+            ResetCodeVariant();
             if (ActivePerspective == PerspectiveNames.Length - 1) MarkReviewed();
         }
         else if (!IsCurrentModuleCompleted)
         {
-            CompleteAvailableModule();
+            await ConfirmReviewAndAdvance();
+            return;
         }
         else if (ActiveTopicIndex < AvailableTopicCount - 1)
         {
@@ -253,22 +331,69 @@
     private void OpenHint() => HintOpen = true;
     private void CloseHint() => HintOpen = false;
     private void HandleHintKey(KeyboardEventArgs args) { if (args.Key == "Escape") CloseHint(); }
-    private void CompleteAvailableModule() { MarkViewed(); if (Completed.Add(CurrentTopic.Slug)) _ = PersistProgress(); }
-    private void MarkReviewed() { MarkViewed(); if (Reviewed.Add(CurrentTopic.Slug)) _ = PersistProgress(); }
-    private string TopicClass(LabTopic topic, int index) => index >= AvailableTopicCount
+    private async Task ConfirmReviewAndAdvance()
+    {
+        // Completion is intentionally staged so the learner sees persisted evidence
+        // before navigation replaces the module. The final module stays longer to
+        // communicate that the whole level—not only one lesson—has finished.
+        IsCompletingModule = true;
+        CompletionChecked = false;
+        HintOpen = false;
+        StateHasChanged();
+
+        // Keep the empty confirmation box visible before resolving it into a check.
+        await Task.Delay(IsLastAvailableModule ? 700 : 450);
+        Viewed.Add(CurrentModule.Slug);
+        Completed.Add(CurrentModule.Slug);
+        await PersistProgress();
+
+        CompletionChecked = true;
+        StateHasChanged();
+        await Task.Delay(IsLastAvailableModule ? 1800 : 550);
+
+        if (ActiveTopicIndex < AvailableTopicCount - 1)
+        {
+            SelectTopic(ActiveTopicIndex + 1);
+        }
+        else
+        {
+            Navigation.NavigateTo(AppRoutes.Roadmap);
+        }
+    }
+    private void MarkReviewed() { MarkViewed(); if (Reviewed.Add(CurrentModule.Slug)) _ = PersistProgress(); }
+    private string TopicClass(LearningModuleContent module, int index) => index >= AvailableTopicCount
         ? index == ActiveTopicIndex ? "maintenance active" : "maintenance"
-        : topic.Slug.Equals(CurrentTopic.Slug, StringComparison.OrdinalIgnoreCase) ? "active"
-        : Completed.Contains(topic.Slug) ? "completed"
-        : Reviewed.Contains(topic.Slug) ? "reviewed"
-        : Viewed.Contains(topic.Slug) ? "viewed"
+        : module.Slug.Equals(CurrentModule.Slug, StringComparison.OrdinalIgnoreCase) ? "active"
+        : Completed.Contains(module.Slug) ? "completed"
+        : Reviewed.Contains(module.Slug) ? "reviewed"
+        : Viewed.Contains(module.Slug) ? "viewed"
         : string.Empty;
-    private string TopicStateIcon(LabTopic topic, int index) => index >= AvailableTopicCount ? "–"
-        : topic.Slug.Equals(CurrentTopic.Slug, StringComparison.OrdinalIgnoreCase) ? "●"
-        : Completed.Contains(topic.Slug) ? "✓"
-        : Reviewed.Contains(topic.Slug) ? "◉"
-        : Viewed.Contains(topic.Slug) ? "◌"
+    private string TopicStateIcon(LearningModuleContent module, int index) => index >= AvailableTopicCount ? "–"
+        : module.Slug.Equals(CurrentModule.Slug, StringComparison.OrdinalIgnoreCase) ? "●"
+        : Completed.Contains(module.Slug) ? "✓"
+        : Reviewed.Contains(module.Slug) ? "◉"
+        : Viewed.Contains(module.Slug) ? "◌"
         : "○";
-    private void MarkViewed() { if (!IsMaintenance && Viewed.Add(CurrentTopic.Slug)) _ = PersistProgress(); }
+    private void MarkViewed() { if (!IsMaintenance && Viewed.Add(CurrentModule.Slug)) _ = PersistProgress(); }
+    private void ResetCodeVariant()
+    {
+        var variants = CurrentCatalogStep.CodeVariants;
+        ActiveCodeVariant = variants is { Length: > 0 }
+            ? Math.Clamp(CurrentCatalogStep.DefaultCodeVariantIndex, 0, variants.Length - 1)
+            : 0;
+    }
+    private string TopicElementId(int index) => $"learning-module-{Level}-{index}";
+    private static string ConfettiStyle(int index)
+    {
+        // Deterministic CSS variables create varied particles without JavaScript,
+        // random state, or a dependency that would behave differently on Pages.
+        string[] colors = ["#ef3b36", "#ffd23f", "#37c98b", "#ffffff", "#6d55e7"];
+        var left = 4 + ((index * 37) % 93);
+        var delay = (index * 47) % 420;
+        var duration = 1050 + ((index * 83) % 650);
+        var rotation = 180 + ((index * 71) % 540);
+        return $"--confetti-left:{left}%;--confetti-delay:{delay}ms;--confetti-duration:{duration}ms;--confetti-rotation:{rotation}deg;--confetti-color:{colors[index % colors.Length]}";
+    }
     private async Task PersistProgress()
     {
         if (!ProgressLoaded) return;

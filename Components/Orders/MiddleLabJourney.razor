@@ -1,0 +1,30 @@
+@inherits LocalizedComponentBase
+@using DotnetCodeMaturityLab.Features.Orders
+@inject LabHostingProfile HostingProfile
+
+<section class="request-journey" aria-label="@T("Refactoring journey", "Recorrido de refactorización")" aria-live="polite" aria-busy="@IsRunning">
+    <header>
+        <div><span class="eyebrow">@T("Observable evidence", "Evidencia observable")</span><strong>@CurrentPhase</strong></div>
+        <span class="database-counter">@EvidenceCount / 3 @T("evidence checks", "evidencias")</span>
+    </header>
+    <div class="request-journey-track">
+        <article class="@JourneyClass(1)"><span>01</span><strong>@T("Ports", "Puertos")</strong><small>SOLID + DI</small></article>
+        <i aria-hidden="true">→</i>
+        <article class="@JourneyClass(2)"><span>02</span><strong>@(HostingProfile.IsStaticDemo ? T("Demo", "Demo") : "HTTP")</strong><small>@(HostingProfile.IsStaticDemo ? T("Simulated flow", "Flujo simulado") : T("Integration check", "Comprobación de integración"))</small></article>
+        <i aria-hidden="true">→</i>
+        <article class="@JourneyClass(3)"><span>03</span><strong>@T("Persistence", "Persistencia")</strong><small>@(HostingProfile.IsStaticDemo ? T("Browser memory", "Memoria del navegador") : "SQLite + EF Core")</small></article>
+        <i aria-hidden="true">→</i>
+        <article class="@JourneyClass(4)"><span>04</span><strong>AI</strong><small>@T("Provider → review", "Proveedor → revisión")</small></article>
+        <i aria-hidden="true">→</i>
+        <article class="@JourneyClass(5)"><span>05</span><strong>@T("Evidence", "Evidencia")</strong><small>@T("Reviewable result", "Resultado revisable")</small></article>
+    </div>
+</section>
+
+@code {
+    [Parameter] public bool IsRunning { get; set; }
+    [Parameter] public string CurrentPhase { get; set; } = string.Empty;
+    [Parameter] public int EvidenceCount { get; set; }
+    [Parameter] public int JourneyStep { get; set; }
+
+    private string JourneyClass(int step) => JourneyStep > step ? "done" : JourneyStep == step ? "active" : string.Empty;
+}

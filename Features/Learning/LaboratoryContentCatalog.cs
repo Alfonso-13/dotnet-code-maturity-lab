@@ -13,7 +13,8 @@ public static class LaboratoryContentCatalog
     private static readonly IReadOnlyDictionary<string, LaboratoryDefinition> Laboratories =
         new Dictionary<string, LaboratoryDefinition>(StringComparer.OrdinalIgnoreCase)
         {
-            ["junior"] = new("junior", typeof(JuniorLaboratory))
+            ["junior"] = new("junior", typeof(JuniorLaboratory)),
+            ["middle"] = new("middle", typeof(MiddleLaboratory))
         };
 
     public static bool TryGet(string? level, out LaboratoryDefinition laboratory) =>

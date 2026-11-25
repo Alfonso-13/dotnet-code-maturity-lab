@@ -7,6 +7,16 @@ namespace DotnetCodeMaturityLab.Features.Learning;
 public sealed record LessonCodePane(string FileName, string Label, string Code, string CssClass = "");
 
 /// <summary>
+/// Optional code context for one perspective. A perspective can compare the
+/// same principle in a familiar teaching example and in the portfolio domain
+/// without mixing both narratives inside code comments.
+/// </summary>
+public sealed record LessonCodeVariant(
+    string Label,
+    LessonCodePane Left,
+    LessonCodePane? Right);
+
+/// <summary>
 /// One of the five perspectives used by every learning module.
 /// </summary>
 public sealed record LessonPerspective(
@@ -17,7 +27,9 @@ public sealed record LessonPerspective(
     LessonCodePane? Right,
     string HintTitle,
     string HintBody,
-    string HintExample);
+    string HintExample,
+    LessonCodeVariant[]? CodeVariants = null,
+    int DefaultCodeVariantIndex = 0);
 
 public sealed record ModuleLesson(string Slug, LessonPerspective[] Steps);
 

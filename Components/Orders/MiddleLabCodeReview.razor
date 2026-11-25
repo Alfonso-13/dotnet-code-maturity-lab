@@ -1,0 +1,15 @@
+@using DotnetCodeMaturityLab.Features.Orders
+@using DotnetCodeMaturityLab.Components.Learning
+@inherits LocalizedComponentBase
+
+<section class="lab-code-section" aria-labelledby="middle-lab-code-title">
+    <header>
+        <span class="eyebrow">@T("Refactoring target", "Objetivo de refactorización")</span>
+        <h2 id="middle-lab-code-title">@T("Move decisions behind explicit ports; keep the endpoint stable.", "Mueve decisiones detrás de puertos explícitos; conserva estable el endpoint.")</h2>
+        <p>@T("Illustrative design code: these proposed ports are not the implementation of the running local API.", "Código de diseño ilustrativo: estos puertos propuestos no son la implementación de la API local en ejecución.")</p>
+    </header>
+    <div class="code-compare-grid lesson-dual-code final-code-review">
+        <CSharpCodeWindow FileName="OrderService.Before.cs" Label="@T("Coupled flow", "Flujo acoplado")" CssClass="bad-practice review-code" PlainCode="@MiddleLabCodeExamples.Before(Language.Current)" />
+        <CSharpCodeWindow FileName="CreateOrderUseCase.After.cs" Label="@T("Explicit boundaries", "Límites explícitos")" CssClass="good-practice review-code" PlainCode="@MiddleLabCodeExamples.After(Language.Current)" />
+    </div>
+</section>

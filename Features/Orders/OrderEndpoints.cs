@@ -1,3 +1,5 @@
+using DotnetCodeMaturityLab.Features.Localization;
+
 namespace DotnetCodeMaturityLab.Features.Orders;
 
 public static class OrderEndpoints
@@ -27,9 +29,16 @@ public static class OrderEndpoints
     private static async Task<IResult> CreateOrder(
         CreateOrderRequest request,
         CreateOrderService service,
+        HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        var result = await service.CreateAsync(request, cancellationToken);
+        // The localized teaching UI passes Accept-Language, while API callers that
+        // omit it retain the existing English validation contract.
+        var language = httpContext.Request.Headers.AcceptLanguage.ToString()
+            .StartsWith("es", StringComparison.OrdinalIgnoreCase)
+            ? AppLanguage.Spanish
+            : AppLanguage.English;
+        var result = await service.CreateAsync(request, language, cancellationToken);
 
         if (!result.IsSuccess)
         {

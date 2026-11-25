@@ -1,4 +1,6 @@
 @using DotnetCodeMaturityLab.Components.Learning
+@using DotnetCodeMaturityLab.Features.Orders
+@inject LabHostingProfile HostingProfile
 @inherits LocalizedComponentBase
 
 <div class="level-lab-page">
@@ -7,7 +9,9 @@
             <a class="course-back" href="@AppRoutes.Labs">← @T("Laboratories", "Laboratorios")</a>
             <span class="eyebrow">@T("Junior laboratory · capstone", "Laboratorio Junior · integrador")</span>
             <h1>@T("Create an order that protects its contract.", "Crea una orden que proteja su contrato.")</h1>
-            <p>@T("Start from a request, apply domain rules, persist the order in SQLite through EF Core, and observe a verifiable HTTP response.", "Partes de una solicitud, aplicas reglas de dominio, conservas la orden en SQLite mediante EF Core y observas una respuesta HTTP verificable.")</p>
+            <p>@(HostingProfile.IsStaticDemo
+                ? T("GitHub Pages simulation: apply the same order rules in browser memory and inspect a simulated HTTP response.", "Simulación de GitHub Pages: aplica las mismas reglas de órdenes en memoria del navegador e inspecciona una respuesta HTTP simulada.")
+                : T("Send a real HTTP request to the local API, persist through EF Core and SQLite, and inspect the response.", "Envía una solicitud HTTP real a la API local, persiste mediante EF Core y SQLite e inspecciona la respuesta."))</p>
         </div>
         <aside class="lab-mission">
             <small>@T("Mission", "Misión")</small>
@@ -17,9 +21,13 @@
     </header>
 
     <section class="lab-brief" aria-label="@T("Laboratory objectives", "Objetivos del laboratorio")">
-        <article><span>01</span><div><strong>@T("Protect the domain", "Protege el dominio")</strong><p>@T("The server generates the Id and subtotal; the client only chooses product, quantity, and price.", "El servidor genera Id y subtotal; el cliente solo decide producto, cantidad y precio.")</p></div></article>
-        <article><span>02</span><div><strong>@T("Persist intentionally", "Persiste con intención")</strong><p>@T("The DTO, service, and EF Core repository collaborate without mixing HTTP, rules, and SQLite.", "DTO, servicio y un repositorio EF Core colaboran sin mezclar HTTP, reglas y SQLite.")</p></div></article>
-        <article><span>03</span><div><strong>@T("Verify and assist", "Comprueba y asiste")</strong><p>@T("Verify the HTTP result, then let a simulated LLM suggest without changing the order automatically.", "Comprueba el resultado HTTP y después permite que un LLM simulado sugiera sin cambiar la orden automáticamente.")</p></div></article>
+        <article><span>01</span><div><strong>@T("Protect the domain", "Protege el dominio")</strong><p>@(HostingProfile.IsStaticDemo
+            ? T("The in-browser service generates the Id and subtotal; the simulated response is labeled below.", "El servicio en el navegador genera Id y subtotal; la respuesta simulada se identifica abajo.")
+            : T("The server generates the Id and subtotal; the client only chooses product, quantity, and price.", "El servidor genera Id y subtotal; el cliente solo decide producto, cantidad y precio."))</p></div></article>
+        <article><span>02</span><div><strong>@T("Persist intentionally", "Persiste con intención")</strong><p>@(HostingProfile.IsStaticDemo
+            ? T("The Pages demo keeps orders only in browser memory; no EF Core or SQLite runs here.", "La demo de Pages conserva órdenes solo en memoria del navegador; aquí no se ejecuta EF Core ni SQLite.")
+            : T("The DTO, service, and EF Core repository collaborate without mixing HTTP, rules, and SQLite.", "DTO, servicio y repositorio EF Core colaboran sin mezclar HTTP, reglas y SQLite."))</p></div></article>
+        <article><span>03</span><div><strong>@T("Verify and assist", "Comprueba y asiste")</strong><p>@T("Verify the order result, then request an AI suggestion without changing the order automatically. The configured runtime identifies whether AI is real or simulated.", "Comprueba el resultado de la orden y después solicita una sugerencia IA sin modificar la orden automáticamente. El entorno configurado identifica si IA es real o simulada.")</p></div></article>
     </section>
 
     <section class="lab-code-section" aria-labelledby="lab-code-title">

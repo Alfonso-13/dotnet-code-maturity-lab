@@ -43,8 +43,10 @@ public static class AppRoutes
                 ["refactorizacion"] = "safe-refactoring",
                 ["ef-core"] = "ef-core-persistence",
                 ["problem-details"] = "problem-details",
+                ["seguridad-jwt"] = "jwt-claims-and-authorization",
                 ["pruebas-integracion"] = "integration-testing",
-                ["limites-arquitectura"] = "architecture-boundaries"
+                ["limites-arquitectura"] = "architecture-boundaries",
+                ["ia-integracion"] = "maintainable-ai-integration"
             },
             ["senior"] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {

@@ -42,6 +42,13 @@ public sealed class CreateOrderService(IOrderStore store)
                 ? "El código del producto es obligatorio."
                 : "The product code is required."];
         }
+        else if (request.ProductCode.Trim().Length > 80)
+        {
+            // Keep the public contract aligned with OrderDbContext's column limit.
+            errors[nameof(request.ProductCode)] = [language == AppLanguage.Spanish
+                ? "El código del producto no puede superar 80 caracteres."
+                : "The product code cannot exceed 80 characters."];
+        }
 
         if (request.Quantity <= 0)
         {
@@ -55,6 +62,12 @@ public sealed class CreateOrderService(IOrderStore store)
             errors[nameof(request.UnitPrice)] = [language == AppLanguage.Spanish
                 ? "El precio unitario debe ser mayor que cero."
                 : "The unit price must be greater than zero."];
+        }
+        else if (request.Quantity > 0 && request.UnitPrice > decimal.MaxValue / request.Quantity)
+        {
+            errors[nameof(request.UnitPrice)] = [language == AppLanguage.Spanish
+                ? "El subtotal supera el rango admitido."
+                : "The subtotal exceeds the supported range."];
         }
 
         return errors;

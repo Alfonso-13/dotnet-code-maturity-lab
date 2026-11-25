@@ -35,8 +35,27 @@ builder.Services.AddDbContextFactory<OrderDbContext>(options =>
     options.UseSqlite(sqliteConnectionBuilder.ConnectionString));
 builder.Services.AddScoped<IOrderStore, SqliteOrderStore>();
 builder.Services.AddScoped<CreateOrderService>();
-builder.Services.AddSingleton<IAiOrderSuggestionService, SimulatedAiOrderSuggestionService>();
-builder.Services.AddSingleton(LabHostingProfile.Server);
+var aiProvider = builder.Configuration["AI:Provider"] ?? "Simulated";
+if (!aiProvider.Equals("Simulated", StringComparison.OrdinalIgnoreCase)
+    && !aiProvider.Equals("Gemini", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("AI:Provider must be Simulated or Gemini.");
+var realAi = aiProvider.Equals("Gemini", StringComparison.OrdinalIgnoreCase);
+if (realAi && string.IsNullOrWhiteSpace(builder.Configuration["AI:ApiKey"]))
+    throw new InvalidOperationException("AI:ApiKey is required when AI:Provider is Gemini.");
+if (realAi)
+{
+    // The API key travels in a custom header, so redirects must never forward it
+    // to a different host chosen by a provider response.
+    builder.Services.AddHttpClient<IAiOrderSuggestionService, GeminiAiOrderSuggestionService>()
+        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+}
+else
+{
+    builder.Services.AddSingleton<IAiOrderSuggestionService, SimulatedAiOrderSuggestionService>();
+}
+builder.Services.AddSingleton(LabHostingProfile.Server with { HasRealAiProvider = realAi });
+builder.Services.AddScoped<IOrderLabTransport, ServerOrderLabTransport>();
+builder.Services.AddScoped<IMiddleLabEvidenceService, ServerMiddleLabEvidenceService>();
 
 var app = builder.Build();
 
@@ -57,7 +76,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
+// The local HTTP-only launcher has no HTTPS endpoint to redirect to. Keep
+// redirection on by default outside Development; the HTTPS launch profile opts in.
+if (app.Configuration.GetValue("HttpsRedirection:Enabled", !app.Environment.IsDevelopment()))
+    app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

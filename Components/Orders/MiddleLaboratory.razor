@@ -1,0 +1,251 @@
+@using DotnetCodeMaturityLab.Features.Learning
+@using DotnetCodeMaturityLab.Features.Orders
+@using DotnetCodeMaturityLab.Features.AI
+@inject IAiOrderSuggestionService AiSuggestionService
+@inject IJSRuntime JS
+@inject IMiddleLabEvidenceService EvidenceService
+@inject LabHostingProfile HostingProfile
+@inherits LocalizedComponentBase
+
+<div class="level-lab-page middle-laboratory">
+    <header class="level-lab-header">
+        <div>
+            <a class="course-back" href="@AppRoutes.Labs">← @T("Laboratories", "Laboratorios")</a>
+            <span class="eyebrow">@T("Middle laboratory · capstone", "Laboratorio Middle · integrador")</span>
+            <h1>@T("Refactor the order flow without breaking its contract.", "Refactoriza el flujo de órdenes sin romper su contrato.")</h1>
+            <p>@T("Choose justified boundaries, verify the available order flow, and keep AI suggestions under human review.", "Elige límites justificados, comprueba el flujo de órdenes disponible y mantén las sugerencias IA bajo revisión humana.")</p>
+        </div>
+        <aside class="lab-mission">
+            <small>@T("Mission", "Misión")</small>
+            <strong>@T("Preserve behavior while improving the dependency graph.", "Conserva la conducta mientras mejoras el grafo de dependencias.")</strong>
+            <span>@T("Complete architecture, order-flow, and AI review evidence.", "Completa evidencia de arquitectura, flujo de órdenes y revisión IA.")</span>
+        </aside>
+    </header>
+
+    <p class="ai-simulation-notice" role="note">@(HostingProfile.IsStaticDemo
+            ? T("GitHub Pages demo: HTTP, SQLite, and AI outcomes below are simulated in browser memory.", "Demo de GitHub Pages: HTTP, SQLite e IA se simulan en memoria del navegador.")
+            : HostingProfile.HasRealAiProvider
+                ? T("Local server: HTTP and SQLite checks call the running API; the AI check calls the configured provider.", "Servidor local: HTTP y SQLite consultan la API real; la comprobación IA llama al proveedor configurado.")
+                : T("Local server: HTTP and SQLite checks call the running API. AI uses a clearly identified deterministic simulation until a provider is configured.", "Servidor local: HTTP y SQLite consultan la API real. IA usa una simulación determinista identificada hasta configurar un proveedor."))</p>
+    <section class="lab-brief" aria-label="@T("Laboratory objectives", "Objetivos del laboratorio")">
+        <article><span>01</span><div><strong>@T("Choose boundaries", "Elige límites")</strong><p>@T("Separate policy from EF Core, HTTP, and provider details.", "Separa políticas de EF Core, HTTP y detalles del proveedor.")</p></div></article>
+        <article><span>02</span><div><strong>@T("Verify collaboration", "Comprueba colaboración")</strong><p>@T("Check the implemented HTTP contract and SQLite readback. JWT policy remains a separate design exercise.", "Comprueba el contrato HTTP implementado y la lectura en SQLite. La política JWT permanece como ejercicio de diseño.")</p></div></article>
+        <article><span>03</span><div><strong>@T("Keep AI optional", "Mantén IA opcional")</strong><p>@T("Exercise the configured AI boundary and verify its response requires review.", "Ejecuta el límite IA configurado y verifica que su respuesta requiere revisión.")</p></div></article>
+    </section>
+
+    <MiddleLabCodeReview />
+
+    <section class="playground middle-lab-workbench" aria-labelledby="middle-workbench-title">
+        <div class="playground-heading">
+            <div>
+                <span class="eyebrow">@T("Functional design exercise", "Ejercicio funcional de diseño")</span>
+                <h2 id="middle-workbench-title">@T("Build evidence in the correct order.", "Construye evidencia en el orden correcto.")</h2>
+            </div>
+            <div class="middle-lab-toolbar">
+                <div class="playground-endpoint"><code>POST /api/orders</code><span>@T("Same public contract", "Mismo contrato público")</span></div>
+                <button type="button" class="middle-lab-reset" disabled="@IsRunning" @onclick="ResetExercise">↻ @T("Restart exercise", "Reiniciar ejercicio")</button>
+            </div>
+        </div>
+        @if (SavedCompletion && !RunCompleted)
+        {
+            <p class="middle-lab-saved-note">@T("Your previous completion is saved. This practice run starts from the first decision.", "Tu finalización anterior está guardada. Esta práctica comienza desde la primera decisión.")</p>
+        }
+
+        <MiddleLabJourney IsRunning="@IsRunning" CurrentPhase="@DisplayPhase" EvidenceCount="@EvidenceCount" JourneyStep="@JourneyStep" />
+
+        <div class="middle-decision-grid">
+            <MiddleLabDecisionPanel SelectedDecision="@SelectedDecision" HasArchitectureEvidence="@HasArchitectureEvidence" IsRunning="@IsRunning" DecisionFeedback="@DecisionFeedback" OnSelect="SelectDecision" />
+            <MiddleLabHttpEvidencePanel HasArchitectureEvidence="@HasArchitectureEvidence" HasIntegrationEvidence="@HasIntegrationEvidence" IsRunning="@IsRunning" TestOutput="@DisplayTestOutput" OnCheck="RunIntegrationSuite" />
+            <MiddleLabAiEvidencePanel HasIntegrationEvidence="@HasIntegrationEvidence" HasAiEvidence="@HasAiEvidence" IsRunning="@IsRunning" AiOutput="@DisplayAiOutput" FailureOutput="@FailureOutput" OnCheck="CheckAiBoundary" OnSimulateTimeout="SimulateProviderTimeout" />
+        </div>
+        <MiddleLabChecklist HasArchitectureEvidence="@HasArchitectureEvidence" HasIntegrationEvidence="@HasIntegrationEvidence" HasAiEvidence="@HasAiEvidence" LabCompleted="@RunCompleted" CanComplete="@CanComplete" OnComplete="CompleteLab" />
+    </section>
+    <section class="lab-takeaway">
+        <div><span class="eyebrow">@T("What a Middle developer should defend", "Qué debe defender un desarrollador Middle")</span><h2>@T("A cleaner design needs evidence, not only more abstractions.", "Un diseño más limpio necesita evidencia, no solo más abstracciones.")</h2></div>
+        <p>@T("Explain the change pressure behind each boundary, why JWT authentication and policy authorization are different decisions, how HTTP integration tests preserve the contract, and why a configured AI adapter still obeys deterministic application policy.", "Explica la presión de cambio detrás de cada límite, por qué autenticación JWT y autorización por políticas son decisiones distintas, cómo las pruebas HTTP conservan el contrato y por qué un adaptador IA configurado todavía obedece políticas deterministas de aplicación.")</p>
+    </section>
+</div>
+
+@code {
+    private string? SelectedDecision { get; set; }
+    private string DecisionFeedback { get; set; } = string.Empty;
+    private bool HasArchitectureEvidence { get; set; }
+    private bool HasIntegrationEvidence { get; set; }
+    private bool HasAiEvidence { get; set; }
+    private bool SavedCompletion { get; set; }
+    private bool RunCompleted { get; set; }
+    private bool IsRunning { get; set; }
+    private int JourneyStep { get; set; }
+    private string CurrentPhase { get; set; } = string.Empty;
+    private string TestOutput { get; set; } = string.Empty;
+    private string AiOutput { get; set; } = string.Empty;
+    private string FailureOutput { get; set; } = string.Empty;
+    private int EvidenceCount => (HasArchitectureEvidence ? 1 : 0) + (HasIntegrationEvidence ? 1 : 0) + (HasAiEvidence ? 1 : 0);
+    private bool CanComplete => HasArchitectureEvidence && HasIntegrationEvidence && HasAiEvidence;
+    // Keep initial labels derived from the active language, so switching EN/ES before
+    // starting the exercise does not leave the previous language in child panels.
+    private string DisplayPhase => string.IsNullOrWhiteSpace(CurrentPhase)
+        ? T("Choose the first design decision", "Elige la primera decisión de diseño") : CurrentPhase;
+    private string DisplayTestOutput => string.IsNullOrWhiteSpace(TestOutput)
+        ? T("// Waiting for an architecture decision.", "// Esperando una decisión de arquitectura.") : TestOutput;
+    private string DisplayAiOutput => string.IsNullOrWhiteSpace(AiOutput)
+        ? T("// The AI boundary has not been exercised.", "// El límite de IA todavía no se ejecuta.") : AiOutput;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
+        var progress = LearningProgress.Migrate(stored);
+        var labSlug = LearningLevelCatalog.Get("middle").LabCompletionSlug;
+        SavedCompletion = progress.Completed?.Contains(
+            LearningProgress.Entry("middle", labSlug),
+            StringComparer.OrdinalIgnoreCase) == true;
+        StateHasChanged();
+    }
+
+    private void SelectDecision(string decision)
+    {
+        if (IsRunning) return;
+        if (SelectedDecision != decision)
+        {
+            // A changed architecture choice invalidates every check that depended on it.
+            // Saved course progress is a past achievement and is not erased by replaying.
+            ResetDownstreamEvidence();
+            RunCompleted = false;
+        }
+        SelectedDecision = decision;
+        HasArchitectureEvidence = decision == "ports";
+        JourneyStep = HasArchitectureEvidence ? 2 : 1;
+        CurrentPhase = HasArchitectureEvidence
+            ? T("Application ports selected", "Puertos de aplicación seleccionados")
+            : T("The service locator keeps dependencies hidden", "Service locator mantiene dependencias ocultas");
+        DecisionFeedback = HasArchitectureEvidence
+            ? T("Correct: the application owns focused ports and composition chooses the adapters.", "Correcto: la aplicación posee puertos enfocados y la composición elige los adaptadores.")
+            : T("Review: resolving dependencies inside the service hides its contract and lifetime needs.", "Revisa: resolver dependencias dentro del servicio oculta su contrato y sus ciclos de vida.");
+    }
+
+    private async Task RunIntegrationSuite()
+    {
+        if (!HasArchitectureEvidence || IsRunning) return;
+        // A repeated HTTP check must also require fresh AI evidence for this run.
+        HasIntegrationEvidence = false;
+        HasAiEvidence = false;
+        AiOutput = string.Empty;
+        FailureOutput = string.Empty;
+        RunCompleted = false;
+        IsRunning = true;
+        JourneyStep = 2;
+        CurrentPhase = T("Checking the order flow", "Comprobando el flujo de órdenes");
+        TestOutput = T("Checking…", "Comprobando…");
+        try
+        {
+            var evidence = await EvidenceService.VerifyAsync();
+            TestOutput = evidence.Detail;
+            HasIntegrationEvidence = evidence.Passed;
+            JourneyStep = evidence.Passed ? 4 : 2;
+            CurrentPhase = evidence.Passed
+                ? T("Order flow confirmed", "Flujo de órdenes confirmado")
+                : T("Check failed; inspect the result and retry", "La comprobación falló; revisa el resultado y reintenta");
+        }
+        catch (Exception)
+        {
+            HasIntegrationEvidence = false;
+            TestOutput = T("The local API check failed unexpectedly; retry after checking the server.", "La comprobación de la API local falló de forma inesperada; revisa el servidor y reintenta.");
+            CurrentPhase = T("Check failed", "Comprobación fallida");
+        }
+        finally { IsRunning = false; }
+    }
+
+    private async Task CheckAiBoundary()
+    {
+        if (!HasIntegrationEvidence || IsRunning) return;
+        HasAiEvidence = false;
+        RunCompleted = false;
+        IsRunning = true;
+        JourneyStep = 4;
+        CurrentPhase = T("Checking the configured AI boundary", "Comprobando el límite IA configurado");
+        AiOutput = T("Waiting for the provider…", "Esperando al proveedor…");
+        StateHasChanged();
+        try
+        {
+            // The same adapter used by the Junior AI playground is exercised here.
+            // A provider failure returns a reviewed fallback and never changes the order.
+            var suggestion = await AiSuggestionService.SuggestAsync(
+                T("Please deliver the monitor in the afternoon.", "Entrega el monitor por la tarde, por favor."), Language.Current);
+            HasAiEvidence = AiSuggestionContract.IsReviewable(suggestion);
+            var source = HostingProfile.HasRealAiProvider
+                ? T("LIVE PROVIDER", "PROVEEDOR REAL")
+                : T("DETERMINISTIC SIMULATION", "SIMULACIÓN DETERMINISTA");
+            AiOutput = $"{source}: {suggestion.Category}\n{suggestion.Summary}\nrequiresReview={suggestion.RequiresReview}; fallback={suggestion.IsFallback}\ndomain mutation: none";
+            JourneyStep = HasAiEvidence ? 6 : 4;
+            CurrentPhase = HasAiEvidence
+                ? T("AI review boundary confirmed", "Límite de revisión IA confirmado")
+                : T("AI output did not satisfy the review contract", "La salida IA no cumplió el contrato de revisión");
+        }
+        catch (Exception)
+        {
+            HasAiEvidence = false;
+            AiOutput = T("The provider check failed unexpectedly; no suggestion was applied.", "La comprobación del proveedor falló de forma inesperada; no se aplicó ninguna sugerencia.");
+            CurrentPhase = T("AI check failed", "Comprobación IA fallida");
+        }
+        finally { IsRunning = false; }
+    }
+
+    private void SimulateProviderTimeout()
+    {
+        if (!HasIntegrationEvidence || IsRunning) return;
+        // This fault injection is educational and separate from the configured
+        // provider check. It never sends a request or changes the stored order.
+        var fallback = AiProviderFailureScenario.TimeoutFallback(Language.Current);
+        FailureOutput = $"{T("SIMULATED PROVIDER TIMEOUT", "TIEMPO DE ESPERA SIMULADO")}: " +
+            $"{fallback.Summary} {fallback.Reason} " +
+            $"fallback={fallback.IsFallback}; requiresReview={fallback.RequiresReview}; " +
+            T("stored order unchanged", "orden guardada sin cambios");
+    }
+
+    private async Task CompleteLab()
+    {
+        // Capstone completion requires all three independent evidence gates and remains
+        // namespaced so it cannot overwrite Junior or module-level progress.
+        if (!CanComplete || RunCompleted) return;
+        if (!SavedCompletion)
+        {
+            var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
+            var progress = LearningProgress.Migrate(stored);
+            var viewed = LearningProgress.ForLevel(progress.Viewed, "middle");
+            var reviewed = LearningProgress.ForLevel(progress.Reviewed, "middle");
+            var completed = LearningProgress.ForLevel(progress.Completed, "middle");
+            var labSlug = LearningLevelCatalog.Get("middle").LabCompletionSlug;
+            viewed.Add(labSlug);
+            reviewed.Add(labSlug);
+            completed.Add(labSlug);
+            progress = LearningProgress.WithLevel(progress, "middle", viewed, reviewed, completed);
+            await JS.InvokeVoidAsync("labProgress.set", LearningProgress.StorageKey, progress);
+            SavedCompletion = true;
+        }
+        RunCompleted = true;
+        CurrentPhase = T("Middle capstone completed", "Integrador Middle completado");
+    }
+
+    private void ResetExercise()
+    {
+        if (IsRunning) return;
+        SelectedDecision = null;
+        DecisionFeedback = string.Empty;
+        HasArchitectureEvidence = false;
+        ResetDownstreamEvidence();
+        RunCompleted = false;
+        JourneyStep = 0;
+        CurrentPhase = string.Empty;
+    }
+
+    private void ResetDownstreamEvidence()
+    {
+        HasIntegrationEvidence = false;
+        HasAiEvidence = false;
+        TestOutput = string.Empty;
+        AiOutput = string.Empty;
+        FailureOutput = string.Empty;
+    }
+
+}

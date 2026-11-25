@@ -1,0 +1,21 @@
+@using DotnetCodeMaturityLab.Features.Orders
+@inject LabHostingProfile HostingProfile
+@inherits LocalizedComponentBase
+
+<article>
+    <span class="eyebrow">02 · @T("Integration evidence", "Evidencia de integración")</span>
+    <h3>@(HostingProfile.IsStaticDemo ? T("Explore the simulated HTTP journey.", "Explora el recorrido HTTP simulado.") : T("Verify the running API and SQLite.", "Comprueba la API y SQLite reales."))</h3>
+    <pre class="middle-evidence-console"><code>@TestOutput</code></pre>
+    <MiddleLabActionCue Visible="@(HasArchitectureEvidence && !HasIntegrationEvidence && !IsRunning)" Message="@(HostingProfile.IsStaticDemo ? T("Next: run the browser simulation.", "Siguiente: ejecuta la simulación en navegador.") : T("Next: check HTTP and SQLite.", "Siguiente: comprueba HTTP y SQLite."))" />
+    <button type="button" class="button button-secondary @(HasArchitectureEvidence && !HasIntegrationEvidence && !IsRunning ? "next-action" : null)" disabled="@(!HasArchitectureEvidence || IsRunning)" @onclick="OnCheck">
+        @(HasIntegrationEvidence ? T("Check HTTP again ↻", "Comprobar HTTP de nuevo ↻") : HostingProfile.IsStaticDemo ? T("Run browser simulation", "Ejecutar simulación en navegador") : T("Check HTTP and persistence", "Comprobar HTTP y persistencia"))
+    </button>
+</article>
+
+@code {
+    [Parameter] public bool HasArchitectureEvidence { get; set; }
+    [Parameter] public bool HasIntegrationEvidence { get; set; }
+    [Parameter] public bool IsRunning { get; set; }
+    [Parameter] public string TestOutput { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnCheck { get; set; }
+}

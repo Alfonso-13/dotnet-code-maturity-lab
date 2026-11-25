@@ -1,7 +1,7 @@
 @using System.Text.Json
 @using DotnetCodeMaturityLab.Features.Learning
 @using DotnetCodeMaturityLab.Features.Orders
-@inject CreateOrderService OrderService
+@inject IOrderLabTransport OrderTransport
 @inject IOrderStore OrderStore
 @inject LabHostingProfile HostingProfile
 @inject IJSRuntime JS
@@ -157,8 +157,8 @@
         if (IsSending) return;
 
         // The delays below are presentation-only. They expose the request journey one
-        // stage at a time; validation and persistence still run once through the real
-        // application service selected by the current hosting profile.
+        // stage at a time. The selected transport sends real local HTTP or runs a
+        // clearly labeled Pages simulation through the shared domain service.
         IsSending = true;
         ValidationStopped = false;
         RequestStep = 1;
@@ -182,17 +182,17 @@
             StateHasChanged();
             await Task.Delay(350);
 
-            var result = await OrderService.CreateAsync(request, Language.Current);
+            var result = await OrderTransport.SubmitAsync(request, Language.Current);
 
-            RequestStep = result.IsSuccess ? 3 : 5;
-            ValidationStopped = !result.IsSuccess;
-            RequestPhase = result.IsSuccess
+            RequestStep = result.StatusCode == 201 ? 3 : 5;
+            ValidationStopped = result.StatusCode == 400;
+            RequestPhase = result.StatusCode == 201
                 ? HostingProfile.PersistingMessage.Get(Language.Current)
                 : T("Validation stopped the write", "La validación detuvo la escritura");
             StateHasChanged();
             await Task.Delay(300);
 
-            if (result.IsSuccess)
+            if (result.StatusCode == 201 && result.Created is not null)
             {
                 RequestStep = 4;
                 RequestPhase = HostingProfile.StoredMessage.Get(Language.Current);
@@ -200,12 +200,11 @@
                 StateHasChanged();
                 await Task.Delay(300);
 
-                StatusCode = 201;
+                StatusCode = result.StatusCode;
                 StatusText = "Created";
-                ResponseJson = Serialize(CreateOrderResponse.FromOrder(result.Order!));
-                HasSuccessfulCase = result.Order is not null
-                    && result.Order.Subtotal == Input.Quantity * Input.UnitPrice
-                    && await OrderStore.FindAsync(result.Order.Id) is not null;
+                ResponseJson = FormatJson(result.ResponseJson);
+                HasSuccessfulCase = result.Created.Subtotal == Input.Quantity * Input.UnitPrice
+                    && await OrderStore.FindAsync(result.Created.Id) is not null;
                 // Six is the terminal sentinel after the five visible stages. StepClass
                 // uses it to mark every rendered stage as completed.
                 RequestStep = 6;
@@ -213,16 +212,11 @@
                 return;
             }
 
-            StatusCode = 400;
-            StatusText = "Bad Request";
-            ResponseJson = Serialize(new
-            {
-                title = T("One or more validation errors occurred.", "Uno o más errores de validación ocurrieron."),
-                status = 400,
-                errors = result.Errors
-            });
-            HasValidationCase = await OrderStore.CountAsync() == storedBefore;
-            PersistedOrderCount = storedBefore;
+            StatusCode = result.StatusCode;
+            StatusText = result.StatusCode == 400 ? "Bad Request" : "Unexpected Response";
+            ResponseJson = FormatJson(result.ResponseJson);
+            HasValidationCase = result.StatusCode == 400 && await OrderStore.CountAsync() == storedBefore;
+            PersistedOrderCount = await OrderStore.CountAsync();
             RequestStep = 6;
             RequestPhase = HostingProfile.InvalidMessage.Get(Language.Current);
         }
@@ -250,7 +244,8 @@
         if (!firstRender) return;
         var stored = await JS.InvokeAsync<LearningProgressState?>("labProgress.get", LearningProgress.StorageKey);
         var progress = LearningProgress.Migrate(stored);
-        LabCompleted = progress.Completed?.Contains(LearningProgress.Entry("junior", "crear-orden"), StringComparer.OrdinalIgnoreCase) == true;
+        var labSlug = LearningLevelCatalog.Get("junior").LabCompletionSlug;
+        LabCompleted = progress.Completed?.Contains(LearningProgress.Entry("junior", labSlug), StringComparer.OrdinalIgnoreCase) == true;
         if ((stored?.Version ?? 0) < LearningProgress.CurrentVersion)
         {
             await JS.InvokeVoidAsync("labProgress.set", LearningProgress.StorageKey, progress);
@@ -301,8 +296,9 @@
         var viewed = LearningProgress.ForLevel(progress.Viewed, "junior");
         var reviewed = LearningProgress.ForLevel(progress.Reviewed, "junior");
         var completed = LearningProgress.ForLevel(progress.Completed, "junior");
-        viewed.Add("crear-orden");
-        completed.Add("crear-orden");
+        var labSlug = LearningLevelCatalog.Get("junior").LabCompletionSlug;
+        viewed.Add(labSlug);
+        completed.Add(labSlug);
         progress = LearningProgress.WithLevel(progress, "junior", viewed, reviewed, completed);
         await JS.InvokeVoidAsync("labProgress.set", LearningProgress.StorageKey, progress);
         LabCompleted = true;
@@ -314,6 +310,12 @@
             WriteIndented = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
+
+    private static string FormatJson(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        return JsonSerializer.Serialize(document.RootElement, new JsonSerializerOptions { WriteIndented = true });
+    }
 
     private sealed class PlaygroundInput
     {
